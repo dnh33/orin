@@ -12,7 +12,7 @@ pub fn matches_name(name: &str, folded_name: &[u8], query: &crate::query::Query)
     }
 }
 
-fn matches_literal(name: &str, folded_name: &[u8], query: &crate::query::Query) -> bool {
+fn matches_literal(_name: &str, folded_name: &[u8], query: &crate::query::Query) -> bool {
     for term in &query.terms {
         match term {
             crate::query::Term::Lit(s) => {
@@ -35,7 +35,7 @@ fn matches_literal(name: &str, folded_name: &[u8], query: &crate::query::Query) 
             }
             crate::query::Term::Negate(inner) => {
                 if matches_literal(
-                    name,
+                    "",
                     folded_name,
                     &crate::query::Query {
                         raw: String::new(),

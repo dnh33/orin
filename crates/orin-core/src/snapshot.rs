@@ -165,15 +165,11 @@ pub fn load(path: &Path) -> Result<Index, Error> {
     entries.extend_from_slice(entries_slice);
 
     let sorted = unsafe {
-        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len_usize)
-            .iter()
-            .copied()
-            .collect::<Vec<u32>>()
+        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len_usize).to_vec()
     };
 
     // Reconstruct NamesArena
-    let mut names = crate::arena::NamesArena::default();
-    names.bytes = names_bytes;
+    let names = crate::arena::NamesArena { bytes: names_bytes };
 
     let index = crate::index::Index {
         entries,
@@ -308,15 +304,11 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
     entries.extend_from_slice(entries_slice);
 
     let sorted = unsafe {
-        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len_usize)
-            .iter()
-            .copied()
-            .collect::<Vec<u32>>()
+        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len_usize).to_vec()
     };
 
     // Reconstruct NamesArena
-    let mut names = crate::arena::NamesArena::default();
-    names.bytes = names_bytes;
+    let names = crate::arena::NamesArena { bytes: names_bytes };
 
     let index = crate::index::Index {
         entries,

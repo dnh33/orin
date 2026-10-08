@@ -117,8 +117,8 @@ fn parse_atom(s: &str) -> Term {
     if s.contains('*') || s.contains('?') {
         return Term::Globs(vec![s.to_string()]);
     }
-    if s.starts_with('!') {
-        return Term::Negate(Box::new(parse_atom(&s[1..])));
+    if let Some(stripped) = s.strip_prefix('!') {
+        return Term::Negate(Box::new(parse_atom(stripped)));
     }
     Term::Lit(s.to_string())
 }
@@ -144,8 +144,8 @@ fn parse_size(s: &str) -> Option<u64> {
 
 fn parse_time(s: &str) -> u64 {
     // Simplified: treat as days if ends with 'd', else as unix timestamp
-    if s.ends_with('d') {
-        let _days: u64 = s[..s.len() - 1].parse().unwrap_or(0);
+    if let Some(stripped) = s.strip_suffix('d') {
+        let _days: u64 = stripped.parse().unwrap_or(0);
         0 // placeholder
     } else {
         s.parse().unwrap_or(0)

@@ -21,7 +21,7 @@ fn evaluate_term(
     term: &crate::query::Term,
     entry: &crate::entry::Entry,
     name: &str,
-    folded_name: &[u8],
+    _folded_name: &[u8],
 ) -> bool {
     use crate::query::Term;
     match term {
@@ -68,8 +68,7 @@ mod tests {
             path_scope: None,
             escalate: true,
         };
-        let mut entry = crate::entry::Entry::default();
-        entry.flags = 0; // file
+        let entry = crate::entry::Entry { flags: 0, ..Default::default() };
         assert!(evaluate_filters(&query, &entry, "main.rs", b"main.rs"));
         assert!(!evaluate_filters(&query, &entry, "main.txt", b"main.txt"));
     }
@@ -87,8 +86,7 @@ mod tests {
             path_scope: None,
             escalate: true,
         };
-        let mut entry = crate::entry::Entry::default();
-        entry.flags = 0;
+        let entry = crate::entry::Entry { flags: 0, ..Default::default() };
         assert!(evaluate_filters(&query, &entry, "main.rs", b"main.rs"));
         assert!(!evaluate_filters(
             &query,
@@ -111,10 +109,8 @@ mod tests {
             path_scope: None,
             escalate: true,
         };
-        let mut file_entry = crate::entry::Entry::default();
-        file_entry.flags = 0;
-        let mut dir_entry = crate::entry::Entry::default();
-        dir_entry.flags = 1;
+        let file_entry = crate::entry::Entry { flags: 0, ..Default::default() };
+        let dir_entry = crate::entry::Entry { flags: 1, ..Default::default() };
         assert!(!evaluate_filters(&query, &file_entry, "file", b"file"));
         assert!(evaluate_filters(&query, &dir_entry, "dir", b"dir"));
     }

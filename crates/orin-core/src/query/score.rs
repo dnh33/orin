@@ -18,19 +18,18 @@ pub fn score_entry(
         return 900.0;
     }
     // Word-boundary substring (simplified)
+    if let Some(pos) = folded_name_bytes
+        .windows(folded_query.len())
+        .position(|w| w == folded_query)
+        && (pos == 0 || is_boundary_char(folded_name_bytes[pos - 1]))
+    {
+        return 700.0;
+    }
+    // Plain substring
     if folded_name_bytes
         .windows(folded_query.len())
         .any(|w| w == folded_query)
     {
-        // Check if preceded by boundary char
-        if let Some(pos) = folded_name_bytes
-            .windows(folded_query.len())
-            .position(|w| w == folded_query)
-        {
-            if pos == 0 || is_boundary_char(folded_name_bytes[pos - 1]) {
-                return 700.0;
-            }
-        }
         return 500.0;
     }
     0.0
