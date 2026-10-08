@@ -333,7 +333,6 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::index::Index;
 
     #[test]
     fn snapshot_roundtrip_preserves_search() {

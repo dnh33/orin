@@ -78,23 +78,12 @@ impl Default for UiConfig {
 }
 
 /// Full configuration.
-#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
 pub struct Config {
     pub daemon: DaemonConfig,
     pub index: IndexConfig,
     pub query: QueryConfig,
     pub ui: UiConfig,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            daemon: DaemonConfig::default(),
-            index: IndexConfig::default(),
-            query: QueryConfig::default(),
-            ui: UiConfig::default(),
-        }
-    }
 }
 
 /// Get default roots for the current platform.

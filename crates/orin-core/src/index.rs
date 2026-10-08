@@ -85,6 +85,11 @@ impl Index {
         self.entries.len() - self.tombstones as usize
     }
 
+    /// Returns true if the index has no live entries.
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// Total bytes in the names arena.
     pub fn names_bytes(&self) -> usize {
         self.names.bytes.len()
@@ -281,7 +286,7 @@ impl Index {
             cur = e.parent;
         }
         parts.reverse();
-        PathBuf::from(std::path::Path::new("").join(parts.join(std::path::MAIN_SEPARATOR_STR)))
+        std::path::Path::new("").join(parts.join(std::path::MAIN_SEPARATOR_STR))
     }
 
     fn find_root_for_entry(&self, idx: u32) -> usize {
