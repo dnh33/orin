@@ -1,6 +1,6 @@
 //! Platform paths: data dir, config dir, socket, log file, lock file — with env overrides.
 
-use interprocess::local_socket::Name;
+use interprocess::local_socket::{GenericFilePath, GenericNamespaced, Name, ToFsName, ToNsName};
 use std::path::PathBuf;
 
 #[cfg(not(windows))]
@@ -57,18 +57,27 @@ pub fn default_config_dir() -> PathBuf {
 }
 
 /// Get the socket/pipe name.
-pub fn socket_name() -> std::io::Result<interprocess::local_socket::Name<'static>> {
+pub fn socket_name() -> std::io::Result<Name<'static>> {
     if let Ok(name) = std::env::var("ORIN_SOCKET") {
-        return Ok(Name::new(name)?);
+        #[cfg(windows)]
+        {
+            return name.to_ns_name::<GenericNamespaced>().map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e));
+        }
+        #[cfg(not(windows))]
+        {
+            return name.to_fs_name::<GenericFilePath>().map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e));
+        }
     }
     if cfg!(windows) {
         let user = whoami::username();
         let hash = std::process::id() % 10000;
-        Ok(Name::new(format!(r"\\.\pipe\orin-{}-{:04}", user, hash))?)
+        let pipe_name = format!(r"\\.\pipe\orin-{}-{:04}", user, hash);
+        pipe_name.to_ns_name::<GenericNamespaced>().map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))
     } else {
         let uid = Uid::current().as_raw();
         let runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
-        Ok(Name::new(format!("{}/orin-{}.sock", runtime, uid))?)
+        let sock_path = format!("{}/orin-{}.sock", runtime, uid);
+        sock_path.to_fs_name::<GenericFilePath>().map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))
     }
 }
 

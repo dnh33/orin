@@ -82,7 +82,7 @@ pub struct Hit {
 }
 
 /// File metadata for stat operations.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StatInfo {
     pub path: String,
     pub exists: bool,
