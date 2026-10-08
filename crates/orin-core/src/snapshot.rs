@@ -412,9 +412,10 @@ mod tests {
         let path = tmp.path().join("test.snap");
         save(&idx, &path).unwrap();
 
-        // Corrupt the file
+        // Corrupt a byte in the payload (after the 64-byte header), which is
+        // covered by the CRC32 checksum.
         let mut bytes = std::fs::read(&path).unwrap();
-        let corrupt_idx = bytes.len() / 2;
+        let corrupt_idx = 64 + (bytes.len() - 64) / 2;
         bytes[corrupt_idx] ^= 0xFF;
         std::fs::write(&path, bytes).unwrap();
 
