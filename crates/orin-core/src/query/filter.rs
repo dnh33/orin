@@ -37,8 +37,8 @@ fn evaluate_term(
                 .any(|ext| name_lower.ends_with(&format!(".{}", ext.to_lowercase())));
             if *negate { !has_ext } else { has_ext }
         }
-        Term::SizeMin(min) => min.map_or(true, |min| entry.size as u64 >= min),
-        Term::SizeMax(max) => max.map_or(true, |max| entry.size as u64 <= max),
+        Term::SizeMin(min) => min.is_none_or(|min| entry.size as u64 >= min),
+        Term::SizeMax(max) => max.is_none_or(|max| entry.size as u64 <= max),
         Term::Kind(kind) => (entry.flags & 3) == *kind,
         Term::MaxDepth(d) => entry.depth <= *d,
         Term::MinDepth(d) => entry.depth >= *d,
