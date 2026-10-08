@@ -2,10 +2,7 @@
 
 use crate::arena::NamesArena;
 use crate::entry::{ENTRY_SIZE, Entry};
-use crate::fold::fold_vec;
-use crate::query::{MatchMode, Query, SortKey, Term};
 use rayon::prelude::*;
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 /// Root directory metadata.

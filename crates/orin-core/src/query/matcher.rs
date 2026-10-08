@@ -1,6 +1,6 @@
 //! Name matching modes: literal, glob, regex, fuzzy.
 
-use crate::query::{MatchMode, Term};
+use crate::query::MatchMode;
 
 /// Check if a name matches the query terms according to the match mode.
 pub fn matches_name(name: &str, folded_name: &[u8], query: &crate::query::Query) -> bool {

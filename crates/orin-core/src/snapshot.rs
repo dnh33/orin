@@ -5,7 +5,7 @@ use crate::errors::Error;
 use crate::index::{Index, Root};
 use crc32fast::Hasher;
 use std::fs::File;
-use std::io::{BufWriter, Read, Seek, SeekFrom, Write};
+use std::io::{BufWriter, Read, Write};
 use std::path::Path;
 
 /// Snapshot file magic bytes.

@@ -1,7 +1,6 @@
 //! Filter evaluation for search candidates.
 
-use crate::entry::{TYPE_DIR, TYPE_FILE, TYPE_SYMLINK};
-use crate::query::{Query, Term};
+use crate::query::Query;
 
 /// Evaluate all filters on a candidate entry.
 pub fn evaluate_filters(

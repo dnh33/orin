@@ -6,8 +6,6 @@ pub mod parse;
 pub mod score;
 
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
-
 /// A parsed search query.
 #[derive(Clone, Debug)]
 pub struct Query {

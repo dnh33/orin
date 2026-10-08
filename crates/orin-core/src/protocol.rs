@@ -1,7 +1,6 @@
 //! Daemon wire protocol: length-prefixed JSON frames over a local socket.
 
-use crate::index::Root;
-use crate::query::{Hit, SearchResult, StatInfo};
+use crate::query::StatInfo;
 use serde::{Deserialize, Serialize};
 
 /// Current protocol version.
