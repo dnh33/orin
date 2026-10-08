@@ -1,0 +1,21 @@
+[package]
+name = "orin-cli"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+
+[[bin]]
+name = "orin"
+path = "src/main.rs"
+
+[dependencies]
+orin-core = { path = "../orin-core" }
+clap = { workspace = true, features = ["derive"] }
+clap_complete = { workspace = true }
+anyhow = { workspace = true }
+ratatui = { workspace = true }
+crossterm = { workspace = true }
+rmcp = { workspace = true }
+open = { workspace = true }
+serde_json = { workspace = true }

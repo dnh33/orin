@@ -1,0 +1,11 @@
+target/
+docs/superpowers/
+.hermes/
+*.log
+orin-bench-*.json
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
