@@ -6,7 +6,7 @@ use crate::entry::{
     TYPE_OTHER, TYPE_SYMLINK,
 };
 use crate::fold::{cmp_folded, fold_into, fold_vec};
-use crate::query::{Hit, MatchMode, Query, SearchResult, SortKey, Term};
+use crate::query::{MatchMode, Query, SortKey, Term};
 use rayon::prelude::*;
 use std::collections::HashMap;
 use std::path::PathBuf;

@@ -35,9 +35,6 @@ pub enum Error {
     #[error("UTF-8 error: {0}")]
     Utf8(#[from] std::string::FromUtf8Error),
 
-    #[error("Interprocess error: {0}")]
-    Interprocess(#[from] interprocess::Error),
-
     #[error("Other: {0}")]
     Other(String),
 }

@@ -43,6 +43,16 @@ pub fn config_dir() -> PathBuf {
     }
 }
 
+/// Alias for config.rs compatibility.
+pub fn default_data_dir() -> PathBuf {
+    data_dir()
+}
+
+/// Alias for config.rs compatibility.
+pub fn default_config_dir() -> PathBuf {
+    config_dir()
+}
+
 /// Get the socket/pipe name.
 pub fn socket_name() -> std::io::Result<interprocess::local_socket::Name<'static>> {
     if let Ok(name) = std::env::var("ORIN_SOCKET") {
