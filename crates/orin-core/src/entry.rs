@@ -39,7 +39,7 @@ pub const FLAG_ROOT: u8 = 0b0001_0000;
 /// - `size`: file size in bytes (saturated at u32::MAX; >4 GiB noted in overflow table v0.2)
 /// - `mtime`: modification time as Unix seconds (0 if unavailable)
 #[repr(C)]
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Pod, Zeroable)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Pod, Zeroable)]
 pub struct Entry {
     pub name_off: u32,
     pub name_len: u16,
