@@ -53,6 +53,20 @@ pub struct Entry {
 // Compile-time assertion that Entry is exactly 20 bytes.
 const _: () = assert!(core::mem::size_of::<Entry>() == ENTRY_SIZE);
 
+impl Default for Entry {
+    fn default() -> Self {
+        Self {
+            name_off: 0,
+            name_len: 0,
+            flags: 0,
+            depth: 0,
+            parent: u32::MAX, // roots have no parent
+            size: 0,
+            mtime: 0,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
