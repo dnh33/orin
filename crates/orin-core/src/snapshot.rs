@@ -191,7 +191,7 @@ pub fn load(path: &Path) -> Result<Index, Error> {
 pub fn encode(index: &crate::index::Index) -> Result<Vec<u8>, Error> {
     let mut buf = Vec::new();
     let mut writer = std::io::Cursor::new(&mut buf);
-    
+
     // Serialize roots to JSON
     let roots_json = serde_json::to_vec(&index.roots)?;
     let roots_json_len = roots_json.len() as u32;
