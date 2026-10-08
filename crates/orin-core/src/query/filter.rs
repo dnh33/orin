@@ -45,7 +45,7 @@ fn evaluate_term(
         Term::MinDepth(d) => entry.depth >= *d,
         Term::MtimeAfter(_) => true,  // placeholder
         Term::MtimeBefore(_) => true, // placeholder
-        Term::PathSeg(seg) => {
+        Term::PathSeg(_seg) => {
             // Would need path reconstruction - placeholder
             true
         }

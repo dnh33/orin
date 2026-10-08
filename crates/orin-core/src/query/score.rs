@@ -41,21 +41,21 @@ mod tests {
 
     #[test]
     fn exact_match_scores_highest() {
-        let mut entry = crate::entry::Entry::default();
+        let entry = crate::entry::Entry::default();
         let score = score_entry(&entry, "apple", b"apple", 0);
         assert_eq!(score, 1000.0);
     }
 
     #[test]
     fn prefix_match_scores_high() {
-        let mut entry = crate::entry::Entry::default();
+        let entry = crate::entry::Entry::default();
         let score = score_entry(&entry, "apple", b"app", 0);
         assert_eq!(score, 900.0);
     }
 
     #[test]
     fn word_boundary_scores_higher() {
-        let mut entry = crate::entry::Entry::default();
+        let entry = crate::entry::Entry::default();
         let score = score_entry(&entry, "test_file", b"file", 0);
         // "file" is preceded by '_' which is a boundary
         assert_eq!(score, 700.0);

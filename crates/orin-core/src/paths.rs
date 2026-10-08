@@ -105,7 +105,7 @@ mod tests {
 
     #[test]
     fn data_dir_env_override() {
-        std::env::set_var("ORIN_DATA_DIR", "/custom/path");
+        unsafe { std::env::set_var("ORIN_DATA_DIR", "/custom/path") };
         assert_eq!(data_dir(), std::path::PathBuf::from("/custom/path"));
     }
 }
