@@ -414,7 +414,8 @@ mod tests {
 
         // Corrupt the file
         let mut bytes = std::fs::read(&path).unwrap();
-        bytes[100] ^= 0xFF;
+        let corrupt_idx = bytes.len() / 2;
+        bytes[corrupt_idx] ^= 0xFF;
         std::fs::write(&path, bytes).unwrap();
 
         let result = load(&path);

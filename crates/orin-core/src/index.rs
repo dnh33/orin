@@ -482,6 +482,12 @@ mod tests {
         );
         idx.finalize();
 
+        idx.roots.push(Root {
+            path: PathBuf::from("/tmp"),
+            first: 0,
+            count: 4,
+        });
+
         let q = crate::query::Query {
             raw: "app".into(),
             terms: vec![crate::query::Term::Lit("app".into())],
@@ -534,6 +540,12 @@ mod tests {
             0,
         );
         idx.finalize();
+
+        idx.roots.push(Root {
+            path: PathBuf::from("/tmp"),
+            first: 0,
+            count: 3,
+        });
 
         let q = crate::query::Query {
             raw: "test".into(),
