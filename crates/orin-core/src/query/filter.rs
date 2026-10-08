@@ -68,7 +68,10 @@ mod tests {
             path_scope: None,
             escalate: true,
         };
-        let entry = crate::entry::Entry { flags: 0, ..Default::default() };
+        let entry = crate::entry::Entry {
+            flags: 0,
+            ..Default::default()
+        };
         assert!(evaluate_filters(&query, &entry, "main.rs", b"main.rs"));
         assert!(!evaluate_filters(&query, &entry, "main.txt", b"main.txt"));
     }
@@ -86,7 +89,10 @@ mod tests {
             path_scope: None,
             escalate: true,
         };
-        let entry = crate::entry::Entry { flags: 0, ..Default::default() };
+        let entry = crate::entry::Entry {
+            flags: 0,
+            ..Default::default()
+        };
         assert!(evaluate_filters(&query, &entry, "main.rs", b"main.rs"));
         assert!(!evaluate_filters(
             &query,
@@ -109,8 +115,14 @@ mod tests {
             path_scope: None,
             escalate: true,
         };
-        let file_entry = crate::entry::Entry { flags: 0, ..Default::default() };
-        let dir_entry = crate::entry::Entry { flags: 1, ..Default::default() };
+        let file_entry = crate::entry::Entry {
+            flags: 0,
+            ..Default::default()
+        };
+        let dir_entry = crate::entry::Entry {
+            flags: 1,
+            ..Default::default()
+        };
         assert!(!evaluate_filters(&query, &file_entry, "file", b"file"));
         assert!(evaluate_filters(&query, &dir_entry, "dir", b"dir"));
     }
