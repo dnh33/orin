@@ -1,0 +1,34 @@
+name: fmt-fix
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to format"
+        required: true
+        type: string
+permissions:
+  contents: write
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --all
+      - name: Commit if changed
+        env:
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "style: cargo fmt"
+            git push origin "HEAD:refs/heads/${BRANCH}"
+          else
+            echo "Already formatted — nothing to commit."
+          fi

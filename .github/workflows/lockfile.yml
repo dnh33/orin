@@ -1,0 +1,32 @@
+name: lockfile
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to update"
+        required: true
+        type: string
+permissions:
+  contents: write
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo generate-lockfile
+      - name: Commit if changed
+        env:
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add Cargo.lock
+            git commit -m "chore: update Cargo.lock"
+            git push origin "HEAD:refs/heads/${BRANCH}"
+          else
+            echo "Lockfile already up to date."
+          fi
