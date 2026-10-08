@@ -343,7 +343,7 @@ impl Index {
             .iter()
             .map(|(idx, name, e)| crate::query::Hit {
                 idx: *idx,
-                score: self.score_entry(name),
+                score: crate::query::score::score_entry(e, name, &folded_query, e.flags & 3),
                 path: self.path_of(*idx),
                 name: name.clone(),
                 kind: e.flags & 3,
