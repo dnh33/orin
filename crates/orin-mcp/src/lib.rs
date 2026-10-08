@@ -3,5 +3,5 @@
 //! This library provides the `find`, `stat`, and `status` tools over
 //! the MCP stdio transport, backed by the orin daemon.
 
-/// Placeholder to make the crate compile before real implementation.
+/// Placeholder that keeps the crate compiling until the real implementation lands.
 pub fn placeholder() {}
