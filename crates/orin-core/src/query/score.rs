@@ -1,7 +1,12 @@
 //! Deterministic scoring schedule for result ranking.
 
 /// Score an entry against a folded query.
-pub fn score_entry(_entry: &crate::entry::Entry, name: &str, folded_query: &[u8], _kind: u8) -> f32 {
+pub fn score_entry(
+    _entry: &crate::entry::Entry,
+    name: &str,
+    folded_query: &[u8],
+    _kind: u8,
+) -> f32 {
     let folded_name = crate::fold::fold_vec(name);
     let folded_name_bytes = folded_name.as_slice();
 
