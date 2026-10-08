@@ -1,7 +1,7 @@
 //! Configuration model (TOML) and platform defaults.
 
 use crate::errors::Error;
-use crate::paths::{default_data_dir, default_config_dir};
+use crate::paths::{default_config_dir, default_data_dir};
 use std::path::PathBuf;
 
 /// Daemon configuration.
@@ -113,7 +113,12 @@ pub fn default_roots() -> Vec<String> {
         }
         roots
     } else {
-        vec![dirs::home_dir().unwrap_or_else(|| PathBuf::from("/")).to_string_lossy().into_owned()]
+        vec![
+            dirs::home_dir()
+                .unwrap_or_else(|| PathBuf::from("/"))
+                .to_string_lossy()
+                .into_owned(),
+        ]
     }
 }
 

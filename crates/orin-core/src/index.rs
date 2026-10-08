@@ -1,9 +1,12 @@
 //! The in-memory search index: entries, names, sorted keys, and roots.
 
 use crate::arena::NamesArena;
-use crate::entry::{Entry, ENTRY_SIZE, TYPE_FILE, TYPE_DIR, TYPE_SYMLINK, TYPE_OTHER, FLAG_HIDDEN, FLAG_NAME_TRUNCATED, FLAG_ROOT};
-use crate::fold::{fold_into, fold_vec, cmp_folded};
-use crate::query::{Query, MatchMode, SortKey, SearchResult, Hit, Term};
+use crate::entry::{
+    ENTRY_SIZE, Entry, FLAG_HIDDEN, FLAG_NAME_TRUNCATED, FLAG_ROOT, TYPE_DIR, TYPE_FILE,
+    TYPE_OTHER, TYPE_SYMLINK,
+};
+use crate::fold::{cmp_folded, fold_into, fold_vec};
+use crate::query::{Hit, MatchMode, Query, SearchResult, SortKey, Term};
 use rayon::prelude::*;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -64,10 +67,10 @@ pub struct StatInfo {
 pub struct Index {
     entries: Vec<Entry>,
     names: NamesArena,
-    sorted: Vec<u32>,    // indices into entries, sorted by folded name
+    sorted: Vec<u32>, // indices into entries, sorted by folded name
     roots: Vec<Root>,
-    tombstones: u32,     // count of removed entries
-    unreadable: u64,     // count of unreadable dirs during scan
+    tombstones: u32, // count of removed entries
+    unreadable: u64, // count of unreadable dirs during scan
 }
 
 impl Index {
@@ -116,16 +119,18 @@ impl Index {
     /// the depth to assign to entries whose parent is `None` (roots).
     pub fn insert_batch(&mut self, items: &[NewEntry<'_>], base_depth: u8) -> Vec<u32> {
         let mut indices = Vec::with_capacity(items.len());
-        let mut parent_map: std::collections::HashMap<(usize, u32), u32> = std::collections::HashMap::new(); // (root, local_parent_idx) -> global_idx
+        let mut parent_map: std::collections::HashMap<(usize, u32), u32> =
+            std::collections::HashMap::new(); // (root, local_parent_idx) -> global_idx
 
         for item in items {
             let global_idx = self.entries.len() as u32;
 
             // Determine parent index
             let parent_idx = match item.parent {
-                Some(local_parent) => {
-                    parent_map.get(&(item.root, local_parent)).copied().unwrap_or(u32::MAX)
-                }
+                Some(local_parent) => parent_map
+                    .get(&(item.root, local_parent))
+                    .copied()
+                    .unwrap_or(u32::MAX),
                 None => u32::MAX,
             };
 
@@ -180,7 +185,8 @@ impl Index {
             indices.push(global_idx);
 
             // Track for children
-            if item.kind == 1 { // directory
+            if item.kind == 1 {
+                // directory
                 parent_map.insert((item.root, global_idx), global_idx);
             }
         }
@@ -198,8 +204,14 @@ impl Index {
 
         self.sorted = live;
         self.sorted.par_sort_unstable_by(|&a, &b| {
-            let name_a = self.names.get(self.entries[a as usize].name_off, self.entries[a as usize].name_len);
-            let name_b = self.names.get(self.entries[b as usize].name_off, self.entries[b as usize].name_len);
+            let name_a = self.names.get(
+                self.entries[a as usize].name_off,
+                self.entries[a as usize].name_len,
+            );
+            let name_b = self.names.get(
+                self.entries[b as usize].name_off,
+                self.entries[b as usize].name_len,
+            );
             crate::fold::cmp_folded(name_a, name_b).then_with(|| a.cmp(&b))
         });
     }
@@ -207,8 +219,14 @@ impl Index {
     /// Insert a single entry into the sorted array (maintains order).
     pub fn sorted_insert(&mut self, idx: u32) {
         let pos = self.sorted.partition_point(|&i| {
-            let name_i = self.names.get(self.entries[i as usize].name_off, self.entries[i as usize].name_len);
-            let name_new = self.names.get(self.entries[idx as usize].name_off, self.entries[idx as usize].name_len);
+            let name_i = self.names.get(
+                self.entries[i as usize].name_off,
+                self.entries[i as usize].name_len,
+            );
+            let name_new = self.names.get(
+                self.entries[idx as usize].name_off,
+                self.entries[idx as usize].name_len,
+            );
             crate::fold::cmp_folded(name_i, name_new).is_lt()
         });
         self.sorted.insert(pos, idx);
@@ -287,13 +305,16 @@ impl Index {
         let start = Instant::now();
 
         // Extract first literal term for simple search
-        let folded_query = crate::fold::fold_vec(&q.terms.iter()
-            .filter_map(|t| match t {
-                crate::query::Term::Lit(s) => Some(s.clone()),
-                _ => None,
-            })
-            .collect::<Vec<_>>()
-            .join(" "));
+        let folded_query = crate::fold::fold_vec(
+            &q.terms
+                .iter()
+                .filter_map(|t| match t {
+                    crate::query::Term::Lit(s) => Some(s.clone()),
+                    _ => None,
+                })
+                .collect::<Vec<_>>()
+                .join(" "),
+        );
 
         // Collect matching candidates
         let mut candidates = Vec::new();
@@ -306,7 +327,11 @@ impl Index {
             let folded_name = crate::fold::fold_vec(name);
 
             // Simple literal substring match on folded bytes
-            if folded_name.as_bytes().windows(folded_query.len()).any(|w| w == folded_query.as_bytes()) {
+            if folded_name
+                .as_bytes()
+                .windows(folded_query.len())
+                .any(|w| w == folded_query.as_bytes())
+            {
                 let e = &self.entries[idx as usize];
                 candidates.push((idx, name.to_string(), e));
             }
@@ -318,7 +343,9 @@ impl Index {
         candidates.sort_by(|a, b| {
             let score_a = self.score_entry(&a.1);
             let score_b = self.score_entry(&b.1);
-            score_b.partial_cmp(&score_a).unwrap_or(std::cmp::Ordering::Equal)
+            score_b
+                .partial_cmp(&score_a)
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
 
         // Pagination
@@ -389,28 +416,88 @@ mod tests {
     #[test]
     fn finalize_sorts_folded() {
         let mut idx = Index::new();
-        idx.insert_batch(&[
-            NewEntry { name: "Zebra", parent: None, kind: 1, hidden: false, size: 0, mtime: 0, root: 0 },
-            NewEntry { name: "apple", parent: None, kind: 1, hidden: false, size: 0, mtime: 0, root: 0 },
-            NewEntry { name: "Banana", parent: None, kind: 1, hidden: false, size: 0, mtime: 0, root: 0 },
-        ], 0);
+        idx.insert_batch(
+            &[
+                NewEntry {
+                    name: "Zebra",
+                    parent: None,
+                    kind: 1,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+                NewEntry {
+                    name: "apple",
+                    parent: None,
+                    kind: 1,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+                NewEntry {
+                    name: "Banana",
+                    parent: None,
+                    kind: 1,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+            ],
+            0,
+        );
         idx.finalize();
 
-        let names: Vec<_> = idx.sorted.iter()
-            .map(|&i| idx.name_of(i))
-            .collect();
+        let names: Vec<_> = idx.sorted.iter().map(|&i| idx.name_of(i)).collect();
         assert_eq!(names, vec!["apple", "Banana", "Zebra"]);
     }
 
     #[test]
     fn prefix_search_window() {
         let mut idx = Index::new();
-        idx.insert_batch(&[
-            NewEntry { name: "App.tsx", parent: None, kind: 0, hidden: false, size: 0, mtime: 0, root: 0 },
-            NewEntry { name: "apple", parent: None, kind: 0, hidden: false, size: 0, mtime: 0, root: 0 },
-            NewEntry { name: "application", parent: None, kind: 0, hidden: false, size: 0, mtime: 0, root: 0 },
-            NewEntry { name: "Banana", parent: None, kind: 0, hidden: false, size: 0, mtime: 0, root: 0 },
-        ], 0);
+        idx.insert_batch(
+            &[
+                NewEntry {
+                    name: "App.tsx",
+                    parent: None,
+                    kind: 0,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+                NewEntry {
+                    name: "apple",
+                    parent: None,
+                    kind: 0,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+                NewEntry {
+                    name: "application",
+                    parent: None,
+                    kind: 0,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+                NewEntry {
+                    name: "Banana",
+                    parent: None,
+                    kind: 0,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+            ],
+            0,
+        );
         idx.finalize();
 
         let q = crate::query::Query {
@@ -432,11 +519,38 @@ mod tests {
     #[test]
     fn substring_scan_finds_case_insensitive() {
         let mut idx = Index::new();
-        idx.insert_batch(&[
-            NewEntry { name: "test_file.rs", parent: None, kind: 0, hidden: false, size: 0, mtime: 0, root: 0 },
-            NewEntry { name: "TEST_OTHER.txt", parent: None, kind: 0, hidden: false, size: 0, mtime: 0, root: 0 },
-            NewEntry { name: "other", parent: None, kind: 0, hidden: false, size: 0, mtime: 0, root: 0 },
-        ], 0);
+        idx.insert_batch(
+            &[
+                NewEntry {
+                    name: "test_file.rs",
+                    parent: None,
+                    kind: 0,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+                NewEntry {
+                    name: "TEST_OTHER.txt",
+                    parent: None,
+                    kind: 0,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+                NewEntry {
+                    name: "other",
+                    parent: None,
+                    kind: 0,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+            ],
+            0,
+        );
         idx.finalize();
 
         let q = crate::query::Query {
@@ -457,11 +571,34 @@ mod tests {
     #[test]
     fn path_of_assembles() {
         let mut idx = Index::new();
-        let indices = idx.insert_batch(&[
-            NewEntry { name: "src", parent: None, kind: 1, hidden: false, size: 0, mtime: 0, root: 0 },
-            NewEntry { name: "main.rs", parent: Some(0), kind: 0, hidden: false, size: 0, mtime: 0, root: 0 },
-        ], 0);
-        idx.roots.push(crate::Root { path: PathBuf::from("/home/user/project"), first: 0, count: 2 });
+        let indices = idx.insert_batch(
+            &[
+                NewEntry {
+                    name: "src",
+                    parent: None,
+                    kind: 1,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+                NewEntry {
+                    name: "main.rs",
+                    parent: Some(0),
+                    kind: 0,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+            ],
+            0,
+        );
+        idx.roots.push(crate::Root {
+            path: PathBuf::from("/home/user/project"),
+            first: 0,
+            count: 2,
+        });
         idx.finalize();
 
         let path = idx.path_of(indices[1]);

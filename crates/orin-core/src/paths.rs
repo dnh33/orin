@@ -1,7 +1,7 @@
 //! Platform paths: data dir, config dir, socket, log file, lock file — with env overrides.
 
-use std::path::PathBuf;
 use interprocess::local_socket::Name;
+use std::path::PathBuf;
 
 /// Get the data directory (snapshots, logs, lock).
 pub fn data_dir() -> PathBuf {

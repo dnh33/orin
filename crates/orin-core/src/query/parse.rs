@@ -164,7 +164,11 @@ fn parse_atom(s: &str) -> Term {
     // Check for known prefixes
     if let Some(rest) = s.strip_prefix("ext:") {
         let neg = rest.starts_with('!');
-        let exts = rest.trim_start_matches('!').split(',').map(|s| s.to_string()).collect();
+        let exts = rest
+            .trim_start_matches('!')
+            .split(',')
+            .map(|s| s.to_string())
+            .collect();
         return Term::Ext(exts, neg);
     }
     if let Some(rest) = s.strip_prefix("size:") {
@@ -220,15 +224,17 @@ fn parse_atom(s: &str) -> Term {
 
 fn parse_size(s: &str) -> Option<u64> {
     let s = s.trim();
-    if s.is_empty() { return None; }
+    if s.is_empty() {
+        return None;
+    }
     let (num, unit) = if s.ends_with('K') || s.ends_with('k') {
-        (&s[..s.len()-1], 1024)
+        (&s[..s.len() - 1], 1024)
     } else if s.ends_with('M') || s.ends_with('m') {
-        (&s[..s.len()-1], 1024*1024)
+        (&s[..s.len() - 1], 1024 * 1024)
     } else if s.ends_with('G') || s.ends_with('g') {
-        (&s[..s.len()-1], 1024*1024*1024)
+        (&s[..s.len() - 1], 1024 * 1024 * 1024)
     } else if s.ends_with('T') || s.ends_with('t') {
-        (&s[..s.len()-1], 1024*1024*1024*1024)
+        (&s[..s.len() - 1], 1024 * 1024 * 1024 * 1024)
     } else {
         (s, 1)
     };
@@ -238,7 +244,7 @@ fn parse_size(s: &str) -> Option<u64> {
 fn parse_time(s: &str) -> u64 {
     // Simplified: treat as days if ends with 'd', else as unix timestamp
     if s.ends_with('d') {
-        let days: u64 = s[..s.len()-1].parse().unwrap_or(0);
+        let days: u64 = s[..s.len() - 1].parse().unwrap_or(0);
         0 // placeholder
     } else {
         s.parse().unwrap_or(0)

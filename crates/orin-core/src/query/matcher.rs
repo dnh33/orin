@@ -17,28 +17,38 @@ fn matches_literal(name: &str, folded_name: &[u8], query: &crate::query::Query) 
         match term {
             crate::query::Term::Lit(s) => {
                 let folded = crate::fold::fold_vec(s);
-                if !folded_name.windows(folded.len()).any(|w| w == folded.as_bytes()) {
+                if !folded_name
+                    .windows(folded.len())
+                    .any(|w| w == folded.as_bytes())
+                {
                     return false;
                 }
             }
             crate::query::Term::Phrase(s) => {
                 let folded = crate::fold::fold_vec(s);
-                if !folded_name.windows(folded.len()).any(|w| w == folded.as_bytes()) {
+                if !folded_name
+                    .windows(folded.len())
+                    .any(|w| w == folded.as_bytes())
+                {
                     return false;
                 }
             }
             crate::query::Term::Negate(inner) => {
-                if matches_literal(name, folded_name, &crate::query::Query {
-                    raw: String::new(),
-                    terms: vec![*inner.clone()],
-                    mode: crate::query::MatchMode::Literal,
-                    sort: crate::query::SortKey::Score,
-                    limit: 10,
-                    offset: 0,
-                    root: None,
-                    path_scope: None,
-                    escalate: false,
-                }) {
+                if matches_literal(
+                    name,
+                    folded_name,
+                    &crate::query::Query {
+                        raw: String::new(),
+                        terms: vec![*inner.clone()],
+                        mode: crate::query::MatchMode::Literal,
+                        sort: crate::query::SortKey::Score,
+                        limit: 10,
+                        offset: 0,
+                        root: None,
+                        path_scope: None,
+                        escalate: false,
+                    },
+                ) {
                     return false;
                 }
             }

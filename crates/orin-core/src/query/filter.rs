@@ -1,10 +1,15 @@
 //! Filter evaluation for search candidates.
 
-use crate::entry::{TYPE_FILE, TYPE_DIR, TYPE_SYMLINK};
+use crate::entry::{TYPE_DIR, TYPE_FILE, TYPE_SYMLINK};
 use crate::query::{Query, Term};
 
 /// Evaluate all filters on a candidate entry.
-pub fn evaluate_filters(query: &Query, entry: &crate::entry::Entry, name: &str, folded_name: &[u8]) -> bool {
+pub fn evaluate_filters(
+    query: &Query,
+    entry: &crate::entry::Entry,
+    name: &str,
+    folded_name: &[u8],
+) -> bool {
     for term in &query.terms {
         if !evaluate_term(term, entry, name, folded_name) {
             return false;
@@ -13,7 +18,12 @@ pub fn evaluate_filters(query: &Query, entry: &crate::entry::Entry, name: &str, 
     true
 }
 
-fn evaluate_term(term: &crate::query::Term, entry: &crate::entry::Entry, name: &str, folded_name: &[u8]) -> bool {
+fn evaluate_term(
+    term: &crate::query::Term,
+    entry: &crate::entry::Entry,
+    name: &str,
+    folded_name: &[u8],
+) -> bool {
     use crate::query::Term;
     match term {
         Term::Lit(_) | Term::Phrase(_) | Term::Globs(_) | Term::Regex(_) => {
@@ -23,19 +33,17 @@ fn evaluate_term(term: &crate::query::Term, entry: &crate::entry::Entry, name: &
         Term::Negate(inner) => !evaluate_term(inner, entry, name, folded_name),
         Term::Ext(exts, negate) => {
             let name_lower = name.to_lowercase();
-            let has_ext = exts.iter().any(|ext| name_lower.ends_with(&format!(".{}", ext.to_lowercase())));
+            let has_ext = exts
+                .iter()
+                .any(|ext| name_lower.ends_with(&format!(".{}", ext.to_lowercase())));
             if *negate { !has_ext } else { has_ext }
         }
-        Term::SizeMin(min) => {
-            min.map_or(true, |min| entry.size as u64 >= min)
-        }
-        Term::SizeMax(max) => {
-            max.map_or(true, |max| entry.size as u64 <= max)
-        }
+        Term::SizeMin(min) => min.map_or(true, |min| entry.size as u64 >= min),
+        Term::SizeMax(max) => max.map_or(true, |max| entry.size as u64 <= max),
         Term::Kind(kind) => (entry.flags & 3) == *kind,
         Term::MaxDepth(d) => entry.depth <= *d,
         Term::MinDepth(d) => entry.depth >= *d,
-        Term::MtimeAfter(_) => true, // placeholder
+        Term::MtimeAfter(_) => true,  // placeholder
         Term::MtimeBefore(_) => true, // placeholder
         Term::PathSeg(seg) => {
             // Would need path reconstruction - placeholder
@@ -83,7 +91,12 @@ mod tests {
         let mut entry = crate::entry::Entry::default();
         entry.flags = 0;
         assert!(evaluate_filters(&query, &entry, "main.rs", b"main.rs"));
-        assert!(!evaluate_filters(&query, &entry, "config.json", b"config.json"));
+        assert!(!evaluate_filters(
+            &query,
+            &entry,
+            "config.json",
+            b"config.json"
+        ));
     }
 
     #[test]

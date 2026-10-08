@@ -1,8 +1,11 @@
 //! Atomic snapshot persistence with CRC32 integrity and format versioning.
 
-use crate::entry::{Entry, ENTRY_SIZE, TYPE_FILE, TYPE_DIR, TYPE_SYMLINK, TYPE_OTHER, FLAG_HIDDEN, FLAG_NAME_TRUNCATED, FLAG_ROOT};
-use crate::index::{Index, Root};
+use crate::entry::{
+    ENTRY_SIZE, Entry, FLAG_HIDDEN, FLAG_NAME_TRUNCATED, FLAG_ROOT, TYPE_DIR, TYPE_FILE,
+    TYPE_OTHER, TYPE_SYMLINK,
+};
 use crate::errors::Error;
+use crate::index::{Index, Root};
 use bytemuck::{cast_slice, cast_slice_mut};
 use crc32fast::Hasher;
 use std::fs::File;
@@ -66,10 +69,7 @@ pub fn save(index: &crate::index::Index, path: &Path) -> std::io::Result<()> {
     hasher.update(entries_bytes);
     hasher.update(&index.names.bytes);
     let sorted_bytes = unsafe {
-        std::slice::from_raw_parts(
-            index.sorted.as_ptr() as *const u8,
-            index.sorted.len() * 4,
-        )
+        std::slice::from_raw_parts(index.sorted.as_ptr() as *const u8, index.sorted.len() * 4)
     };
     hasher.update(sorted_bytes);
     let crc = hasher.finalize();
@@ -81,10 +81,7 @@ pub fn save(index: &crate::index::Index, path: &Path) -> std::io::Result<()> {
     let mut header_with_crc = header;
     header_with_crc.crc32 = crc;
     file.write_all(unsafe {
-        std::slice::from_raw_parts(
-            &header_with_crc as *const SnapshotHeader as *const u8,
-            64,
-        )
+        std::slice::from_raw_parts(&header_with_crc as *const SnapshotHeader as *const u8, 64)
     })?;
 
     // Write payload
@@ -111,16 +108,18 @@ pub fn load(path: &Path) -> Result<Index, Error> {
     // Read header
     let mut header_bytes = [0u8; 64];
     file.read_exact(&mut header_bytes)?;
-    let header: SnapshotHeader = unsafe {
-        std::ptr::read(header_bytes.as_ptr() as *const SnapshotHeader)
-    };
+    let header: SnapshotHeader =
+        unsafe { std::ptr::read(header_bytes.as_ptr() as *const SnapshotHeader) };
 
     // Verify magic
     if header.magic != SNAPSHOT_MAGIC {
         return Err(Error::Snapshot("invalid magic".into()));
     }
     if header.format != SNAPSHOT_FORMAT {
-        return Err(Error::Snapshot(format!("unsupported format version {}", header.format)));
+        return Err(Error::Snapshot(format!(
+            "unsupported format version {}",
+            header.format
+        )));
     }
 
     // Read payload
@@ -152,10 +151,7 @@ pub fn load(path: &Path) -> Result<Index, Error> {
     let roots: Vec<Root> = serde_json::from_slice(&roots_json)?;
     let mut entries = Vec::with_capacity(entries_len);
     let entries_slice = unsafe {
-        std::slice::from_raw_parts_mut(
-            entries_bytes.as_mut_ptr() as *mut Entry,
-            entries_len,
-        )
+        std::slice::from_raw_parts_mut(entries_bytes.as_mut_ptr() as *mut Entry, entries_len)
     };
     entries.extend_from_slice(entries_slice);
 
@@ -199,17 +195,40 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::index::Index;
     use crate::arena::NamesArena;
+    use crate::index::Index;
 
     #[test]
     fn snapshot_roundtrip_preserves_search() {
         let mut idx = crate::index::Index::new();
-        idx.insert_batch(&[
-            crate::index::NewEntry { name: "apple", parent: None, kind: 1, hidden: false, size: 0, mtime: 0, root: 0 },
-            crate::index::NewEntry { name: "banana", parent: None, kind: 1, hidden: false, size: 0, mtime: 0, root: 0 },
-        ], 0);
-        idx.roots.push(crate::index::Root { path: std::path::PathBuf::from("/test"), first: 0, count: 2 });
+        idx.insert_batch(
+            &[
+                crate::index::NewEntry {
+                    name: "apple",
+                    parent: None,
+                    kind: 1,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+                crate::index::NewEntry {
+                    name: "banana",
+                    parent: None,
+                    kind: 1,
+                    hidden: false,
+                    size: 0,
+                    mtime: 0,
+                    root: 0,
+                },
+            ],
+            0,
+        );
+        idx.roots.push(crate::index::Root {
+            path: std::path::PathBuf::from("/test"),
+            first: 0,
+            count: 2,
+        });
         idx.finalize();
 
         let tmp = tempfile::tempdir().unwrap();
@@ -238,9 +257,18 @@ mod tests {
     #[test]
     fn snapshot_rejects_corruption() {
         let mut idx = crate::index::Index::new();
-        idx.insert_batch(&[
-            crate::index::NewEntry { name: "test", parent: None, kind: 1, hidden: false, size: 0, mtime: 0, root: 0 },
-        ], 0);
+        idx.insert_batch(
+            &[crate::index::NewEntry {
+                name: "test",
+                parent: None,
+                kind: 1,
+                hidden: false,
+                size: 0,
+                mtime: 0,
+                root: 0,
+            }],
+            0,
+        );
         idx.finalize();
 
         let tmp = tempfile::tempdir().unwrap();
@@ -259,9 +287,18 @@ mod tests {
     #[test]
     fn snapshot_rejects_wrong_magic() {
         let mut idx = crate::index::Index::new();
-        idx.insert_batch(&[
-            crate::index::NewEntry { name: "test", parent: None, kind: 1, hidden: false, size: 0, mtime: 0, root: 0 },
-        ], 0);
+        idx.insert_batch(
+            &[crate::index::NewEntry {
+                name: "test",
+                parent: None,
+                kind: 1,
+                hidden: false,
+                size: 0,
+                mtime: 0,
+                root: 0,
+            }],
+            0,
+        );
         idx.finalize();
 
         let tmp = tempfile::tempdir().unwrap();

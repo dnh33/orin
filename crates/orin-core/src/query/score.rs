@@ -13,9 +13,15 @@ pub fn score_entry(entry: &crate::entry::Entry, name: &str, folded_query: &[u8],
         return 900.0;
     }
     // Word-boundary substring (simplified)
-    if folded_name_bytes.windows(folded_query.len()).any(|w| w == folded_query) {
+    if folded_name_bytes
+        .windows(folded_query.len())
+        .any(|w| w == folded_query)
+    {
         // Check if preceded by boundary char
-        if let Some(pos) = folded_name_bytes.windows(folded_query.len()).position(|w| w == folded_query) {
+        if let Some(pos) = folded_name_bytes
+            .windows(folded_query.len())
+            .position(|w| w == folded_query)
+        {
             if pos == 0 || is_boundary_char(folded_name_bytes[pos - 1]) {
                 return 700.0;
             }
