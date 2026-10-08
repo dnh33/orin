@@ -3,7 +3,6 @@
 use crate::entry::{ENTRY_SIZE, Entry};
 use crate::errors::Error;
 use crate::index::{Index, Root};
-use bytemuck;
 use crc32fast::Hasher;
 use std::fs::File;
 use std::io::{BufWriter, Read, Seek, SeekFrom, Write};
@@ -41,17 +40,17 @@ pub fn save(index: &crate::index::Index, path: &Path) -> std::io::Result<()> {
     let roots_json_len = roots_json.len() as u32;
 
     // Prepare header
-    let header = SnapshotHeader {
+    let mut header = SnapshotHeader {
         magic: SNAPSHOT_MAGIC,
         format: SNAPSHOT_FORMAT,
         entry_count: index.entries.len() as u64,
         names_len: index.names.bytes.len() as u64,
         sorted_len: index.sorted.len() as u64,
         roots_json_len,
-        crc32: 0, // filled later
+        crc32: 0,
         tombstones: index.tombstones as u64,
         unreadable: index.unreadable,
-        _reserved: [0; 12],
+        _reserved: [0; 4],
     };
 
     // Calculate CRC32 of payload
@@ -69,16 +68,14 @@ pub fn save(index: &crate::index::Index, path: &Path) -> std::io::Result<()> {
         std::slice::from_raw_parts(index.sorted.as_ptr() as *const u8, index.sorted.len() * 4)
     };
     hasher.update(sorted_bytes);
-    let crc = hasher.finalize();
+    header.crc32 = hasher.finalize();
 
     // Write to temp file
     let mut file = BufWriter::new(File::create(&tmp_path)?);
 
-    // Write header (with CRC)
-    let mut header_with_crc = header;
-    header_with_crc.crc32 = crc;
+    // Write header
     file.write_all(unsafe {
-        std::slice::from_raw_parts(&header_with_crc as *const SnapshotHeader as *const u8, 64)
+        std::slice::from_raw_parts(&header as *const SnapshotHeader as *const u8, 64)
     })?;
 
     // Write payload
@@ -105,8 +102,7 @@ pub fn load(path: &Path) -> Result<Index, Error> {
     // Read header
     let mut header_bytes = [0u8; 64];
     file.read_exact(&mut header_bytes)?;
-    let header: SnapshotHeader =
-        unsafe { std::ptr::read(header_bytes.as_ptr() as *const SnapshotHeader) };
+    let header = unsafe { std::ptr::read_unaligned(header_bytes.as_ptr() as *const SnapshotHeader) };
 
     // Verify magic
     if header.magic != SNAPSHOT_MAGIC {
@@ -179,14 +175,132 @@ pub fn load(path: &Path) -> Result<Index, Error> {
 pub fn encode(index: &crate::index::Index) -> Result<Vec<u8>, Error> {
     let mut buf = Vec::new();
     let mut writer = std::io::Cursor::new(&mut buf);
-    save(index, &mut writer)?;
-    Ok(buf.into_inner())
+    
+    // Serialize roots to JSON
+    let roots_json = serde_json::to_vec(&index.roots)?;
+    let roots_json_len = roots_json.len() as u32;
+
+    // Prepare header
+    let mut header = SnapshotHeader {
+        magic: SNAPSHOT_MAGIC,
+        format: SNAPSHOT_FORMAT,
+        entry_count: index.entries.len() as u64,
+        names_len: index.names.bytes.len() as u64,
+        sorted_len: index.sorted.len() as u64,
+        roots_json_len,
+        crc32: 0,
+        tombstones: index.tombstones as u64,
+        unreadable: index.unreadable,
+        _reserved: [0; 4],
+    };
+
+    // Calculate CRC32 of payload
+    let mut hasher = Hasher::new();
+    hasher.update(&roots_json);
+    let entries_bytes = unsafe {
+        std::slice::from_raw_parts(
+            index.entries.as_ptr() as *const u8,
+            index.entries.len() * ENTRY_SIZE,
+        )
+    };
+    hasher.update(entries_bytes);
+    hasher.update(&index.names.bytes);
+    let sorted_bytes = unsafe {
+        std::slice::from_raw_parts(index.sorted.as_ptr() as *const u8, index.sorted.len() * 4)
+    };
+    hasher.update(sorted_bytes);
+    header.crc32 = hasher.finalize();
+
+    // Write header
+    writer.write_all(unsafe {
+        std::slice::from_raw_parts(&header as *const SnapshotHeader as *const u8, 64)
+    })?;
+
+    // Write payload
+    writer.write_all(&roots_json)?;
+    writer.write_all(entries_bytes)?;
+    writer.write_all(&index.names.bytes)?;
+    writer.write_all(unsafe {
+        std::slice::from_raw_parts(index.sorted.as_ptr() as *const u8, index.sorted.len() * 4)
+    })?;
+
+    Ok(buf)
 }
 
 /// Decode index from bytes.
 pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
     let mut cursor = std::io::Cursor::new(bytes);
-    load(&mut cursor)
+
+    // Read header
+    let mut header_bytes = [0u8; 64];
+    cursor.read_exact(&mut header_bytes)?;
+    let header = unsafe { std::ptr::read_unaligned(header_bytes.as_ptr() as *const SnapshotHeader) };
+
+    // Verify magic
+    if header.magic != SNAPSHOT_MAGIC {
+        return Err(Error::Snapshot("invalid magic".into()));
+    }
+    if header.format != SNAPSHOT_FORMAT {
+        return Err(Error::Snapshot(format!(
+            "unsupported format version {}",
+            header.format
+        )));
+    }
+
+    // Read payload
+    let mut roots_json = vec![0u8; header.roots_json_len as usize];
+    cursor.read_exact(&mut roots_json)?;
+
+    let entries_len = header.entry_count as usize;
+    let mut entries_bytes = vec![0u8; entries_len * ENTRY_SIZE];
+    cursor.read_exact(&mut entries_bytes)?;
+
+    let mut names_bytes = vec![0u8; header.names_len as usize];
+    cursor.read_exact(&mut names_bytes)?;
+
+    let sorted_len = header.sorted_len as usize;
+    let mut sorted_bytes = vec![0u8; sorted_len * 4];
+    cursor.read_exact(&mut sorted_bytes)?;
+
+    // Verify CRC32
+    let mut hasher = Hasher::new();
+    hasher.update(&roots_json);
+    hasher.update(&entries_bytes);
+    hasher.update(&names_bytes);
+    hasher.update(&sorted_bytes);
+    if hasher.finalize() != header.crc32 {
+        return Err(Error::Snapshot("CRC32 mismatch".into()));
+    }
+
+    // Deserialize
+    let roots: Vec<Root> = serde_json::from_slice(&roots_json)?;
+    let mut entries = Vec::with_capacity(entries_len);
+    let entries_slice = unsafe {
+        std::slice::from_raw_parts_mut(entries_bytes.as_mut_ptr() as *mut Entry, entries_len)
+    };
+    entries.extend_from_slice(entries_slice);
+
+    let sorted = unsafe {
+        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len)
+            .iter()
+            .copied()
+            .collect::<Vec<u32>>()
+    };
+
+    // Reconstruct NamesArena
+    let mut names = crate::arena::NamesArena::default();
+    names.bytes = names_bytes;
+
+    let mut index = crate::index::Index {
+        entries,
+        names,
+        sorted,
+        roots,
+        tombstones: header.tombstones as u32,
+        unreadable: header.unreadable,
+    };
+
+    Ok(index)
 }
 
 #[cfg(test)]
@@ -308,5 +422,27 @@ mod tests {
 
         let result = load(&path);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn encode_decode_roundtrip() {
+        let mut idx = crate::index::Index::new();
+        idx.insert_batch(
+            &[crate::index::NewEntry {
+                name: "test",
+                parent: None,
+                kind: 1,
+                hidden: false,
+                size: 0,
+                mtime: 0,
+                root: 0,
+            }],
+            0,
+        );
+        idx.finalize();
+
+        let encoded = encode(&idx).unwrap();
+        let decoded = decode(&encoded).unwrap();
+        assert_eq!(decoded.len(), idx.len());
     }
 }
