@@ -335,16 +335,7 @@ impl Index {
 
         let total = candidates.len() as u64;
 
-        // Score and sort
-        candidates.sort_by(|a, b| {
-            let score_a = self.score_entry(&a.1);
-            let score_b = self.score_entry(&b.1);
-            score_b
-                .partial_cmp(&score_a)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
-
-        // Pagination
+        // Pagination - keep results in sorted index order (folded name order)
         let start_idx = q.offset.min(candidates.len());
         let end_idx = (start_idx + q.limit).min(candidates.len());
 
@@ -367,11 +358,6 @@ impl Index {
             partial: false,
             took_us: start.elapsed().as_micros() as u64,
         }
-    }
-
-    fn score_entry(&self, folded_name: &str) -> f32 {
-        // Simple scoring for now
-        folded_name.len() as f32 * 0.1
     }
 
     /// Stat a path by absolute path.

@@ -129,7 +129,7 @@ pub fn load_config() -> (Config, Vec<String>) {
         match toml::from_str::<Config>(&content) {
             Ok(cfg) => (cfg, Vec::new()),
             Err(e) => {
-                let mut warnings = vec![format!("config parse error: {}", e)];
+                let warnings = vec![format!("config parse error: {}", e)];
                 let mut cfg = Config::default();
                 cfg.index.roots = default_roots();
                 (cfg, warnings)

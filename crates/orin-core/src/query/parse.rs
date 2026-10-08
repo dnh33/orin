@@ -145,7 +145,7 @@ fn parse_size(s: &str) -> Option<u64> {
 fn parse_time(s: &str) -> u64 {
     // Simplified: treat as days if ends with 'd', else as unix timestamp
     if s.ends_with('d') {
-        let days: u64 = s[..s.len() - 1].parse().unwrap_or(0);
+        let _days: u64 = s[..s.len() - 1].parse().unwrap_or(0);
         0 // placeholder
     } else {
         s.parse().unwrap_or(0)
@@ -153,11 +153,11 @@ fn parse_time(s: &str) -> u64 {
 }
 
 trait CombineWithMax {
-    fn combine_with_max(self, max: Option<u64>) -> Term;
+    fn combine_with_max(self, _max: Option<u64>) -> Term;
 }
 
 impl CombineWithMax for Term {
-    fn combine_with_max(self, max: Option<u64>) -> Term {
+    fn combine_with_max(self, _max: Option<u64>) -> Term {
         match self {
             Term::SizeMin(min) => Term::SizeMin(min), // simplified
             _ => self,
