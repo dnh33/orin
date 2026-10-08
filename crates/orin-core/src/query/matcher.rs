@@ -34,22 +34,22 @@ fn matches_literal(_name: &str, folded_name: &[u8], query: &crate::query::Query)
                 }
             }
             crate::query::Term::Negate(inner) => {
-                    return !matches_literal(
-                        "",
-                        folded_name,
-                        &crate::query::Query {
-                            raw: String::new(),
-                            terms: vec![*inner.clone()],
-                            mode: crate::query::MatchMode::Literal,
-                            sort: crate::query::SortKey::Score,
-                            limit: 10,
-                            offset: 0,
-                            root: None,
-                            path_scope: None,
-                            escalate: false,
-                        },
-                    );
-                }
+        return !matches_literal(
+            "",
+            folded_name,
+            &crate::query::Query {
+                raw: String::new(),
+                terms: vec![*inner.clone()],
+                mode: crate::query::MatchMode::Literal,
+                sort: crate::query::SortKey::Score,
+                limit: 10,
+                offset: 0,
+                root: None,
+                path_scope: None,
+                escalate: false,
+            },
+        );
+    }
             _ => {} // other terms handled by filter
         }
     }
