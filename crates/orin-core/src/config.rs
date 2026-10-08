@@ -1,7 +1,6 @@
 //! Configuration model (TOML) and platform defaults.
 
-use crate::errors::Error;
-use crate::paths::{default_config_dir, default_data_dir};
+use crate::paths::{default_config_dir};
 use std::path::PathBuf;
 
 /// Daemon configuration.

@@ -1,11 +1,8 @@
 //! The in-memory search index: entries, names, sorted keys, and roots.
 
 use crate::arena::NamesArena;
-use crate::entry::{
-    ENTRY_SIZE, Entry, FLAG_HIDDEN, FLAG_NAME_TRUNCATED, FLAG_ROOT, TYPE_DIR, TYPE_FILE,
-    TYPE_OTHER, TYPE_SYMLINK,
-};
-use crate::fold::{cmp_folded, fold_into, fold_vec};
+use crate::entry::{ENTRY_SIZE, Entry};
+use crate::fold::fold_vec;
 use crate::query::{MatchMode, Query, SortKey, Term};
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -328,9 +325,8 @@ impl Index {
 
             // Simple literal substring match on folded bytes
             if folded_name
-                .as_bytes()
                 .windows(folded_query.len())
-                .any(|w| w == folded_query.as_bytes())
+                .any(|w| w == folded_query)
             {
                 let e = &self.entries[idx as usize];
                 candidates.push((idx, name.to_string(), e));
@@ -594,7 +590,7 @@ mod tests {
             ],
             0,
         );
-        idx.roots.push(crate::Root {
+        idx.roots.push(Root {
             path: PathBuf::from("/home/user/project"),
             first: 0,
             count: 2,

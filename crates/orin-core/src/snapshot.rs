@@ -1,12 +1,9 @@
 //! Atomic snapshot persistence with CRC32 integrity and format versioning.
 
-use crate::entry::{
-    ENTRY_SIZE, Entry, FLAG_HIDDEN, FLAG_NAME_TRUNCATED, FLAG_ROOT, TYPE_DIR, TYPE_FILE,
-    TYPE_OTHER, TYPE_SYMLINK,
-};
+use crate::entry::{ENTRY_SIZE, Entry};
 use crate::errors::Error;
 use crate::index::{Index, Root};
-use bytemuck::{cast_slice, cast_slice_mut};
+use bytemuck;
 use crc32fast::Hasher;
 use std::fs::File;
 use std::io::{BufWriter, Read, Seek, SeekFrom, Write};
@@ -195,7 +192,6 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::arena::NamesArena;
     use crate::index::Index;
 
     #[test]

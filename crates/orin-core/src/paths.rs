@@ -3,6 +3,9 @@
 use interprocess::local_socket::Name;
 use std::path::PathBuf;
 
+#[cfg(not(windows))]
+use nix::unistd::Uid;
+
 /// Get the data directory (snapshots, logs, lock).
 pub fn data_dir() -> PathBuf {
     if let Ok(dir) = std::env::var("ORIN_DATA_DIR") {
@@ -63,7 +66,7 @@ pub fn socket_name() -> std::io::Result<interprocess::local_socket::Name<'static
         let hash = std::process::id() % 10000;
         Ok(Name::new(format!(r"\\.\pipe\orin-{}-{:04}", user, hash))?)
     } else {
-        let uid = nix::unistd::Uid::current().as_raw();
+        let uid = Uid::current().as_raw();
         let runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
         Ok(Name::new(format!("{}/orin-{}.sock", runtime, uid))?)
     }
