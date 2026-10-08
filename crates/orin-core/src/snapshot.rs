@@ -31,6 +31,11 @@ struct SnapshotHeader {
 
 const _: () = assert!(std::mem::size_of::<SnapshotHeader>() == 64);
 
+/// Read packed header from bytes, copying all fields to avoid unaligned references.
+fn read_header(bytes: &[u8; 64]) -> SnapshotHeader {
+    unsafe { std::ptr::read_unaligned(bytes.as_ptr() as *const SnapshotHeader) }
+}
+
 /// Save index to an atomic snapshot file.
 pub fn save(index: &crate::index::Index, path: &Path) -> std::io::Result<()> {
     let tmp_path = path.with_extension("snap.tmp");
@@ -102,32 +107,43 @@ pub fn load(path: &Path) -> Result<Index, Error> {
     // Read header
     let mut header_bytes = [0u8; 64];
     file.read_exact(&mut header_bytes)?;
-    let header = unsafe { std::ptr::read_unaligned(header_bytes.as_ptr() as *const SnapshotHeader) };
+    let header = read_header(&header_bytes);
+
+    // Copy fields to avoid unaligned references
+    let magic = header.magic;
+    let format = header.format;
+    let entry_count = header.entry_count;
+    let names_len = header.names_len;
+    let sorted_len = header.sorted_len;
+    let roots_json_len = header.roots_json_len;
+    let crc32 = header.crc32;
+    let tombstones = header.tombstones;
+    let unreadable = header.unreadable;
 
     // Verify magic
-    if header.magic != SNAPSHOT_MAGIC {
+    if magic != SNAPSHOT_MAGIC {
         return Err(Error::Snapshot("invalid magic".into()));
     }
-    if header.format != SNAPSHOT_FORMAT {
+    if format != SNAPSHOT_FORMAT {
         return Err(Error::Snapshot(format!(
             "unsupported format version {}",
-            header.format
+            format
         )));
     }
 
     // Read payload
-    let mut roots_json = vec![0u8; header.roots_json_len as usize];
+    let mut roots_json = vec![0u8; roots_json_len as usize];
     file.read_exact(&mut roots_json)?;
 
-    let entries_len = header.entry_count as usize;
+    let entries_len = entry_count as usize;
     let mut entries_bytes = vec![0u8; entries_len * ENTRY_SIZE];
     file.read_exact(&mut entries_bytes)?;
 
-    let mut names_bytes = vec![0u8; header.names_len as usize];
+    let mut names_bytes = vec![0u8; names_len as usize];
     file.read_exact(&mut names_bytes)?;
 
-    let sorted_len = header.sorted_len as usize;
-    let mut sorted_bytes = vec![0u8; sorted_len * 4];
+    let sorted_len_usize = sorted_len as usize;
+    let mut sorted_bytes = vec![0u8; sorted_len_usize * 4];
     file.read_exact(&mut sorted_bytes)?;
 
     // Verify CRC32
@@ -136,7 +152,7 @@ pub fn load(path: &Path) -> Result<Index, Error> {
     hasher.update(&entries_bytes);
     hasher.update(&names_bytes);
     hasher.update(&sorted_bytes);
-    if hasher.finalize() != header.crc32 {
+    if hasher.finalize() != crc32 {
         return Err(Error::Snapshot("CRC32 mismatch".into()));
     }
 
@@ -149,7 +165,7 @@ pub fn load(path: &Path) -> Result<Index, Error> {
     entries.extend_from_slice(entries_slice);
 
     let sorted = unsafe {
-        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len)
+        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len_usize)
             .iter()
             .copied()
             .collect::<Vec<u32>>()
@@ -159,13 +175,13 @@ pub fn load(path: &Path) -> Result<Index, Error> {
     let mut names = crate::arena::NamesArena::default();
     names.bytes = names_bytes;
 
-    let mut index = crate::index::Index {
+    let index = crate::index::Index {
         entries,
         names,
         sorted,
         roots,
-        tombstones: header.tombstones as u32,
-        unreadable: header.unreadable,
+        tombstones: tombstones as u32,
+        unreadable,
     };
 
     Ok(index)
@@ -234,32 +250,43 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
     // Read header
     let mut header_bytes = [0u8; 64];
     cursor.read_exact(&mut header_bytes)?;
-    let header = unsafe { std::ptr::read_unaligned(header_bytes.as_ptr() as *const SnapshotHeader) };
+    let header = read_header(&header_bytes);
+
+    // Copy fields to avoid unaligned references
+    let magic = header.magic;
+    let format = header.format;
+    let entry_count = header.entry_count;
+    let names_len = header.names_len;
+    let sorted_len = header.sorted_len;
+    let roots_json_len = header.roots_json_len;
+    let crc32 = header.crc32;
+    let tombstones = header.tombstones;
+    let unreadable = header.unreadable;
 
     // Verify magic
-    if header.magic != SNAPSHOT_MAGIC {
+    if magic != SNAPSHOT_MAGIC {
         return Err(Error::Snapshot("invalid magic".into()));
     }
-    if header.format != SNAPSHOT_FORMAT {
+    if format != SNAPSHOT_FORMAT {
         return Err(Error::Snapshot(format!(
             "unsupported format version {}",
-            header.format
+            format
         )));
     }
 
     // Read payload
-    let mut roots_json = vec![0u8; header.roots_json_len as usize];
+    let mut roots_json = vec![0u8; roots_json_len as usize];
     cursor.read_exact(&mut roots_json)?;
 
-    let entries_len = header.entry_count as usize;
+    let entries_len = entry_count as usize;
     let mut entries_bytes = vec![0u8; entries_len * ENTRY_SIZE];
     cursor.read_exact(&mut entries_bytes)?;
 
-    let mut names_bytes = vec![0u8; header.names_len as usize];
+    let mut names_bytes = vec![0u8; names_len as usize];
     cursor.read_exact(&mut names_bytes)?;
 
-    let sorted_len = header.sorted_len as usize;
-    let mut sorted_bytes = vec![0u8; sorted_len * 4];
+    let sorted_len_usize = sorted_len as usize;
+    let mut sorted_bytes = vec![0u8; sorted_len_usize * 4];
     cursor.read_exact(&mut sorted_bytes)?;
 
     // Verify CRC32
@@ -268,7 +295,7 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
     hasher.update(&entries_bytes);
     hasher.update(&names_bytes);
     hasher.update(&sorted_bytes);
-    if hasher.finalize() != header.crc32 {
+    if hasher.finalize() != crc32 {
         return Err(Error::Snapshot("CRC32 mismatch".into()));
     }
 
@@ -281,7 +308,7 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
     entries.extend_from_slice(entries_slice);
 
     let sorted = unsafe {
-        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len)
+        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len_usize)
             .iter()
             .copied()
             .collect::<Vec<u32>>()
@@ -291,13 +318,13 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
     let mut names = crate::arena::NamesArena::default();
     names.bytes = names_bytes;
 
-    let mut index = crate::index::Index {
+    let index = crate::index::Index {
         entries,
         names,
         sorted,
         roots,
-        tombstones: header.tombstones as u32,
-        unreadable: header.unreadable,
+        tombstones: tombstones as u32,
+        unreadable,
     };
 
     Ok(index)
