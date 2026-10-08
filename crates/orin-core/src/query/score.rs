@@ -3,7 +3,7 @@
 /// Score an entry against a folded query.
 pub fn score_entry(entry: &crate::entry::Entry, name: &str, folded_query: &[u8], _kind: u8) -> f32 {
     let folded_name = crate::fold::fold_vec(name);
-    let folded_name_bytes = folded_name.as_bytes();
+    let folded_name_bytes = folded_name.as_slice();
 
     // Tier scoring per frozen schedule
     if folded_name_bytes == folded_query {

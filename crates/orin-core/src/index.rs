@@ -62,12 +62,12 @@ pub struct StatInfo {
 
 /// The in-memory search index.
 pub struct Index {
-    entries: Vec<Entry>,
-    names: NamesArena,
-    sorted: Vec<u32>, // indices into entries, sorted by folded name
-    roots: Vec<Root>,
-    tombstones: u32, // count of removed entries
-    unreadable: u64, // count of unreadable dirs during scan
+    pub entries: Vec<Entry>,
+    pub names: NamesArena,
+    pub sorted: Vec<u32>, // indices into entries, sorted by folded name
+    pub roots: Vec<Root>,
+    pub tombstones: u32, // count of removed entries
+    pub unreadable: u64, // count of unreadable dirs during scan
 }
 
 impl Index {

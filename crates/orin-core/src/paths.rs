@@ -74,10 +74,18 @@ pub fn socket_name() -> std::io::Result<Name<'static>> {
         let pipe_name = format!(r"\\.\pipe\orin-{}-{:04}", user, hash);
         pipe_name.to_ns_name::<GenericNamespaced>().map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))
     } else {
-        let uid = Uid::current().as_raw();
-        let runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
-        let sock_path = format!("{}/orin-{}.sock", runtime, uid);
-        sock_path.to_fs_name::<GenericFilePath>().map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))
+        #[cfg(not(windows))]
+        {
+            let uid = Uid::current().as_raw();
+            let runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".into());
+            let sock_path = format!("{}/orin-{}.sock", runtime, uid);
+            sock_path.to_fs_name::<GenericFilePath>().map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))
+        }
+        #[cfg(windows)]
+        {
+            // Windows branch already handled above, unreachable
+            Err(std::io::Error::new(std::io::ErrorKind::Other, "unreachable"))
+        }
     }
 }
 

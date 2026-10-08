@@ -27,7 +27,7 @@ struct SnapshotHeader {
     crc32: u32,
     tombstones: u64,
     unreadable: u64,
-    _reserved: [u8; 12], // pad to 64 bytes
+    _reserved: [u8; 4], // pad to 64 bytes (8+4+8+8+8+4+4+8+8+4 = 64)
 }
 
 const _: () = assert!(std::mem::size_of::<SnapshotHeader>() == 64);

@@ -19,7 +19,7 @@ fn matches_literal(name: &str, folded_name: &[u8], query: &crate::query::Query) 
                 let folded = crate::fold::fold_vec(s);
                 if !folded_name
                     .windows(folded.len())
-                    .any(|w| w == folded.as_bytes())
+                    .any(|w| w == folded.as_slice())
                 {
                     return false;
                 }
@@ -28,7 +28,7 @@ fn matches_literal(name: &str, folded_name: &[u8], query: &crate::query::Query) 
                 let folded = crate::fold::fold_vec(s);
                 if !folded_name
                     .windows(folded.len())
-                    .any(|w| w == folded.as_bytes())
+                    .any(|w| w == folded.as_slice())
                 {
                     return false;
                 }
