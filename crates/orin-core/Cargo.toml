@@ -19,3 +19,10 @@ dirs = { workspace = true }
 thiserror = { workspace = true }
 globset = { workspace = true }
 regex = { workspace = true }
+whoami = { workspace = true }
+nix = { workspace = true, features = ["unistd"] }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+whoami = { workspace = true }
+nix = { workspace = true, features = ["unistd"] }
