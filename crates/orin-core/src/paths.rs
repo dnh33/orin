@@ -1,8 +1,10 @@
 //! Platform paths: data dir, config dir, socket, log file, lock file — with env overrides.
 
-use interprocess::local_socket::{GenericFilePath, GenericNamespaced, Name, ToFsName, ToNsName};
+use interprocess::local_socket::{GenericNamespaced, Name, ToNsName};
 use std::path::PathBuf;
 
+#[cfg(not(windows))]
+use interprocess::local_socket::{GenericFilePath, ToFsName};
 #[cfg(not(windows))]
 use nix::unistd::Uid;
 

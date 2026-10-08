@@ -29,7 +29,7 @@ fn evaluate_term(
             // These are handled by the matcher, not the filter
             true
         }
-        Term::Negate(inner) => !evaluate_term(inner, entry, name, folded_name),
+        Term::Negate(inner) => !evaluate_term(inner, entry, name, _folded_name),
         Term::Ext(exts, negate) => {
             let name_lower = name.to_lowercase();
             let has_ext = exts
