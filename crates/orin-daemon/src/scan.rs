@@ -150,3 +150,4 @@ mod tests {
         let count = scan_root(dir.path(), 0, &mut idx).unwrap();
         assert_eq!(count, 2); // file.txt + subdir
     }
+}
