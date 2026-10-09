@@ -232,7 +232,7 @@ impl Server {
 
             Stat { id, path } => {
                 let state = self.state.lock().unwrap();
-                let info = state.index.stat_path(&std::path::Path::new(&path));
+                let info = state.index.stat_path(std::path::Path::new(&path));
                 Response::StatData { id, data: info }
             }
 

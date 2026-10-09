@@ -119,7 +119,7 @@ mod tests {
     #[test]
     fn state_creation() {
         let dir = tempdir().unwrap();
-        let state = State::new(&dir.path().to_path_buf()).unwrap();
+        let state = State::new(dir.path()).unwrap();
         assert_eq!(state.index.len(), 0);
         assert!(!state.roots.is_empty());
         assert!(state.listener.is_some());

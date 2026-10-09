@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn apply_create() {
         let dir = tempdir().unwrap();
-        let state = crate::state::new_shared(&dir.path().to_path_buf()).unwrap();
+        let state = crate::state::new_shared(dir.path()).unwrap();
         let file = dir.path().join("test.txt");
         std::fs::write(&file, b"hello").unwrap();
 

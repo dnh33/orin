@@ -105,7 +105,7 @@ pub fn start_polling_watcher(
 fn poll_root(
     root: &Path,
     last_modified: &mut std::collections::HashMap<PathBuf, std::time::SystemTime>,
-    state: &SharedState,
+    _state: &SharedState,
 ) -> Result<()> {
     use ignore::WalkBuilder;
     let walker = WalkBuilder::new(root)

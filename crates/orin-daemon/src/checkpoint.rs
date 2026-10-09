@@ -133,14 +133,14 @@ mod tests {
     #[test]
     fn checkpoint_save_load() {
         let dir = tempdir().unwrap();
-        let state = crate::state::new_shared(&dir.path().to_path_buf()).unwrap();
+        let state = crate::state::new_shared(dir.path()).unwrap();
         let cp = Checkpoint::new(dir.path().to_path_buf(), 60);
 
         // Save
         cp.save(&state).unwrap();
 
         // Load into new state
-        let state2 = crate::state::new_shared(&dir.path().to_path_buf()).unwrap();
+        let state2 = crate::state::new_shared(dir.path()).unwrap();
         let loaded = cp.try_load(&state2).unwrap();
         assert!(loaded);
     }
