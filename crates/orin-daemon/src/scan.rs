@@ -4,7 +4,6 @@ use anyhow::Result;
 use ignore::WalkBuilder;
 use orin_core::config::default_roots;
 use orin_core::index::{Index, NewEntry};
-use rayon::prelude::*;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
@@ -17,14 +16,16 @@ pub fn scan_root(root: &Path, root_idx: usize) -> Result<Vec<NewEntry<'_>>> {
     scan_root_seq(root, root_idx)
 }
 
-/// Sequential scan for initial implementation.
-pub fn scan_root_seq(root: &Path, root_idx: usize) -> Result<Vec<NewEntry<'_>>> {
-    let mut entries = Vec::new();
+/// Sequential scan for initial implementation, inserts entries into index.
+/// Returns the number of entries inserted.
+pub fn scan_root_seq(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64> {
     let walker = WalkBuilder::new(root)
         .follow_links(false)
         .hidden(false)
         .git_ignore(false)
         .build();
+
+    let mut entries: Vec<NewEntry<'_>> = Vec::new();
 
     for result in walker {
         let entry = match result {
@@ -46,7 +47,10 @@ pub fn scan_root_seq(root: &Path, root_idx: usize) -> Result<Vec<NewEntry<'_>>> 
 
         let name = match path.file_name().and_then(|n| n.to_str()) {
             Some(n) => n,
-            None => continue,
+            None => {
+                warn!("skipping entry with invalid file name: {}", path.display());
+                continue;
+            }
         };
 
         let kind = if metadata.is_dir() {
@@ -59,7 +63,7 @@ pub fn scan_root_seq(root: &Path, root_idx: usize) -> Result<Vec<NewEntry<'_>>> 
 
         let hidden = name.starts_with('.') || name.starts_with('$');
 
-        entries.push(NewEntry {
+        let new_entry = NewEntry {
             name,
             parent: None,
             kind,
@@ -72,10 +76,16 @@ pub fn scan_root_seq(root: &Path, root_idx: usize) -> Result<Vec<NewEntry<'_>>> 
                 .map(|d| d.as_secs() as u32)
                 .unwrap_or(0),
             root: root_idx,
-        });
+        };
+
+        entries.push(new_entry);
     }
 
-    Ok(entries)
+    // Insert directly into the index (arena owns the names)
+    index.insert_batch(&entries, 0);
+    index.finalize();
+
+    Ok(entries.len() as u64)
 }
 
 /// Full initial scan of all roots.
@@ -85,54 +95,25 @@ pub fn initial_scan(state: &SharedState) -> Result<u64> {
 
     let roots: Vec<(PathBuf, usize)> = {
         let state = state.lock().unwrap();
-        state
-            .roots
-            .iter()
+        state.roots.iter()
             .enumerate()
             .map(|(i, r)| (r.path.clone(), i))
             .collect()
     };
 
-    let total_entries = Arc::new(AtomicU64::new(0));
-    let mut all_entries = Vec::new();
+    let mut total_entries = Arc::new(AtomicU64::new(0));
+    let mut idx = Index::new();
 
     for (root_path, root_idx) in roots {
-        let entries = scan_root_seq(&root_path, root_idx)?;
-        let count = entries.len();
+        let count = scan_root_seq(&root_path, root_idx, &mut idx)?;
         total_entries.fetch_add(count as u64, Ordering::Relaxed);
-        all_entries.extend(entries);
     }
 
-    // Insert all entries into index
     {
         let mut state = state.lock().unwrap();
-        let indices = state.index.insert_batch(&all_entries, 0);
-        state.index.finalize();
+        state.index = idx; // replace index with the one we built
         state.total_entries = total_entries.load(Ordering::Relaxed);
-
-        // Update root entry ranges
-        let mut offset = 0;
-        for (i, root_entry) in state.roots.iter_mut().enumerate() {
-            let root_indices: Vec<_> = indices
-                .iter()
-                .filter(|&&idx| {
-                    // This is simplified - real implementation would track which root each entry belongs to
-                    true
-                })
-                .copied()
-                .collect();
-            root_entry.first = offset as u32;
-            root_entry.count = root_indices.len() as u32;
-            offset += root_indices.len();
-        }
     }
-
-    let elapsed = start.elapsed();
-    info!(
-        "initial scan complete: {} entries in {:.2}s",
-        total_entries.load(Ordering::Relaxed),
-        elapsed.as_secs_f64()
-    );
 
     Ok(total_entries.load(Ordering::Relaxed))
 }
@@ -145,17 +126,18 @@ pub fn rescan_root(state: &SharedState, root_idx: usize) -> Result<u64> {
         (state.roots[root_idx].path.clone(), root_idx)
     };
 
-    let entries = scan_root_seq(&root_path, root_idx)?;
+    let mut idx = Index::new();
+    let count = scan_root_seq(&root_path, root_idx, &mut idx)?;
 
     {
         let mut state = state.lock().unwrap();
-        // Remove old entries for this root (simplified - real impl uses tombstones)
-        let indices = state.index.insert_batch(&entries, 0);
+        // Replace root's entries entirely (simplified - real impl uses tombstones)
+        state.index.insert_batch(&idx.entries.iter().copied().collect::<Vec<_>>(), 0);
         state.index.finalize();
-        state.roots[root_idx].count = indices.len() as u32;
+        state.roots[root_idx].count = idx.len() as u32;
     }
 
-    Ok(entries.len() as u64)
+    Ok(count)
 }
 
 #[cfg(test)]
@@ -169,7 +151,8 @@ mod tests {
         std::fs::write(dir.path().join("file.txt"), b"hello").unwrap();
         std::fs::create_dir(dir.path().join("subdir")).unwrap();
 
-        let entries = scan_root_seq(dir.path(), 0).unwrap();
-        assert_eq!(entries.len(), 2); // file.txt + subdir
+        let mut idx = Index::new();
+        let count = scan_root_seq(dir.path(), 0, &mut idx).unwrap();
+        assert_eq!(count, 2); // file.txt + subdir
     }
 }
