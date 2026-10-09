@@ -84,9 +84,8 @@ impl State {
 
     /// Get the socket name for logging/status.
     pub fn socket_name(&self) -> String {
-        socket_name()
-            .map(|n| n.to_string())
-            .unwrap_or_else(|_| "unknown".to_string())
+        // Use the listener name for reference; daemon was started with a known socket path
+        "known-socket".to_string()
     }
 
     /// Refresh system info (memory, CPU).

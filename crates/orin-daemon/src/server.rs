@@ -1,9 +1,7 @@
 //! IPC server: accepts connections, reads frames, dispatches to handlers, writes responses.
 
 use anyhow::Result;
-use interprocess::local_socket::{Listener, Stream};
-use interprocess::local_socket::traits::{Listener as _, Stream as _};
-use interprocess::try_clone::TryClone as _;
+use interprocess::local_socket::{ListenerOptions, ListenerNonblockingMode, prelude::*};
 use orin_core::protocol::{
     read_frame, write_frame, Request, Response, StatusData, RootWire, Progress, PROTOCOL_VERSION,
 };
@@ -42,10 +40,10 @@ impl Server {
             state.listener.take().expect("listener not initialized")
         };
 
-        info!("server listening on {:?}", listener.name());
+        info!("server listening on {:?}", listener);
 
         // Set non-blocking accept with a timeout so we can check shutdown
-        listener.set_nonblocking(true)?;
+        listener.set_nonblocking(ListenerNonblockingMode::Both)?;
 
         loop {
             if shutdown.load(Ordering::SeqCst) {
@@ -87,13 +85,14 @@ impl Server {
 
     /// Handle a single client connection.
     fn handle_connection(&mut self, stream: Stream) -> Result<()> {
-        let mut reader = BufReader::new(stream.try_clone()?);
-        let mut writer = BufWriter::new(stream);
+        let (rx, tx) = stream.split();
+        let mut reader = BufReader::new(rx);
+        let mut writer = BufWriter::new(tx);
 
         loop {
             // Read request frame
             let request: Option<Request> = match read_frame(&mut reader) {
-                Ok(Some(req)) => req,
+                Ok(Some(req)) => Some(req),
                 Ok(None) => {
                     // Clean EOF
                     debug!("client disconnected");
@@ -104,6 +103,7 @@ impl Server {
                     return Err(e.into());
                 }
             };
+            let Some(request) = request else { continue };
 
             self.last_activity = Instant::now();
 
@@ -162,7 +162,7 @@ impl Server {
                 Response::Status { id, data }
             }
 
-            Query { id, q, limit, offset, sort, root, path_scope } => {
+            Query { id, q, limit, offset, sort, root } => {
                 use orin_core::query::{parse_query, SearchResult, SortKey};
                 let mut state = self.state.lock().unwrap();
 

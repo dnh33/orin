@@ -22,20 +22,19 @@ impl WatcherHandle {
     pub fn start(roots: Vec<PathBuf>, state: SharedState) -> Result<Self> {
         let (tx, rx) = mpsc::channel();
 
-        // Try notify watcher first
-        let watcher = match RecommendedWatcher::new(
+        let watcher: Result<RecommendedWatcher, _> = RecommendedWatcher::new(
             tx.clone(),
             Config::default().with_poll_interval(Duration::from_secs(30)),
-        ) {
+        );
+        let watcher = match watcher {
             Ok(w) => w,
             Err(e) => {
                 warn!("notify watcher failed, falling back to poll: {}", e);
-                // Fallback to polling watcher
                 let poll_watcher = notify::PollWatcher::new(
                     tx,
                     Config::default().with_poll_interval(Duration::from_secs(30)),
                 )?;
-                poll_watcher
+                RecommendedWatcher::Poll(poll_watcher)
             }
         };
 

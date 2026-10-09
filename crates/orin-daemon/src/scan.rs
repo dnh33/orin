@@ -14,68 +14,7 @@ use crate::state::{RootEntry, ScanProgress, SharedState};
 
 /// Scan a single root directory and return NewEntry items.
 pub fn scan_root(root: &Path, root_idx: usize) -> Result<Vec<NewEntry<'_>>> {
-    let mut entries: Vec<NewEntry<'_>> = Vec::new();
-    let walker = WalkBuilder::new(root)
-        .follow_links(false)
-        .hidden(false) // we track hidden as a flag
-        .git_ignore(false) // configurable later
-        .build_parallel();
-
-    walker.run(|| {
-        let mut local_entries: Vec<NewEntry<'_>> = Vec::new();
-        Box::new(move |result| {
-            match result {
-                Ok(entry) => {
-                    let path = entry.path();
-                    let metadata = match entry.metadata() {
-                        Ok(m) => m,
-                        Err(e) => {
-                            warn!("metadata error for {}: {}", path.display(), e);
-                            return ignore::WalkState::Continue;
-                        }
-                    };
-
-                    let name = match path.file_name().and_then(|n| n.to_str()) {
-                        Some(n) => n,
-                        None => return ignore::WalkState::Continue,
-                    };
-
-                    let kind = if metadata.is_dir() {
-                        orin_core::entry::TYPE_DIR
-                    } else if metadata.file_type().is_symlink() {
-                        orin_core::entry::TYPE_SYMLINK
-                    } else {
-                        orin_core::entry::TYPE_FILE
-                    };
-
-                    let hidden = name.starts_with('.') || name.starts_with('$');
-
-                    local_entries.push(NewEntry {
-                        name,
-                        parent: None, // will be resolved in apply
-                        kind,
-                        hidden,
-                        size: metadata.len(),
-                        mtime: metadata
-                            .modified()
-                            .ok()
-                            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
-                            .map(|d| d.as_secs() as u32)
-                            .unwrap_or(0),
-                        root: root_idx,
-                    });
-                }
-                Err(e) => {
-                    warn!("walk error: {}", e);
-                }
-            }
-            ignore::WalkState::Continue
-        })
-    });
-
-    // The parallel walker doesn't easily return collected entries.
-    // For now, use a simpler sequential walk for the skeleton.
-    Ok(Vec::new())
+    scan_root_seq(root, root_idx)
 }
 
 /// Sequential scan for initial implementation.
