@@ -13,6 +13,7 @@ use crate::state::SharedState;
 /// Watcher handle for managing the background watcher thread.
 pub struct WatcherHandle {
     watcher: Option<RecommendedWatcher>,
+    #[allow(dead_code)]
     rx: Option<mpsc::Receiver<notify::Result<Event>>>,
     thread: Option<thread::JoinHandle<()>>,
 }

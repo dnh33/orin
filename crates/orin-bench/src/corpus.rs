@@ -90,7 +90,7 @@ pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
     while written < cfg.files {
         let dir = &dirs[i % dirs.len()];
         let ext = cfg.extensions[rng.random_range(0..cfg.extensions.len())];
-        let fname = format!("{}_{}_{}.{}", cfg.prefix, i, ext);
+        let fname = format!("{}_{}.{}", cfg.prefix, i, ext);
         let path = dir.join(&fname);
 
         let size = match rng.random_range(0..10) {
