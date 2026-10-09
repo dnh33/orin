@@ -5,8 +5,8 @@ use ignore::WalkBuilder;
 use orin_core::config::default_roots;
 use orin_core::index::{Index, NewEntry};
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use tracing::{debug, info, warn};
 
 use crate::state::{RootEntry, ScanProgress, SharedState};
@@ -101,7 +101,9 @@ pub fn initial_scan(state: &SharedState) -> Result<u64> {
 
     let roots: Vec<(PathBuf, usize)> = {
         let state = state.lock().unwrap();
-        state.roots.iter()
+        state
+            .roots
+            .iter()
             .enumerate()
             .map(|(i, r)| (r.path.clone(), i))
             .collect()

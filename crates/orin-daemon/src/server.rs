@@ -3,7 +3,7 @@
 use anyhow::Result;
 use interprocess::local_socket::{ListenerNonblockingMode, ListenerOptions, Stream, prelude::*};
 use orin_core::protocol::{
-    read_frame, write_frame, Request, Response, StatusData, RootWire, Progress, PROTOCOL_VERSION,
+    PROTOCOL_VERSION, Progress, Request, Response, RootWire, StatusData, read_frame, write_frame,
 };
 use std::io::{BufReader, BufWriter, Write};
 use std::sync::atomic::Ordering;
@@ -159,8 +159,15 @@ impl Server {
                 Response::Status { id, data }
             }
 
-            Query { id, q, limit, offset, sort, root } => {
-                use orin_core::query::{parse_query, SearchResult, SortKey};
+            Query {
+                id,
+                q,
+                limit,
+                offset,
+                sort,
+                root,
+            } => {
+                use orin_core::query::{SearchResult, SortKey, parse_query};
                 let mut state = self.state.lock().unwrap();
 
                 let mut query = match parse_query(&q) {
