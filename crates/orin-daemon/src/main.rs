@@ -4,19 +4,20 @@
 //! watches the filesystem for changes, and serves queries over a
 //! Unix socket (or Windows named pipe).
 
-mod state;
-mod server;
-mod scan;
-mod watch;
 mod apply;
 mod checkpoint;
+mod lib;
 mod revalidate;
+mod scan;
+mod server;
+mod state;
+mod watch;
 
 use anyhow::Result;
 use clap::Parser;
 use orin_core::paths::{data_dir, socket_name};
 use std::path::PathBuf;
-use tracing::{info};
+use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt};
 
 #[derive(Parser, Debug)]
