@@ -1,0 +1,71 @@
+name: bench
+
+on:
+  workflow_dispatch:
+    inputs:
+      corpus:
+        type: choice
+        options: [tiny, medium, large]
+        default: tiny
+      tool:
+        type: choice
+        options: [orin, fd, find, rg]
+        default: orin
+
+jobs:
+  gen:
+    runs-on: ubuntu-latest
+    outputs:
+      corpus_path: ${{ steps.setpath.outputs.corpus }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Generate corpus
+        run: |
+          mkdir -p /tmp/orin-bench
+          cargo run --release -p orin-bench gen \
+            --corpus ${{ inputs.corpus }} \
+            --out /tmp/orin-bench/corpus \
+            --seed 0xC0FFEE
+      - name: Set path output
+        id: setpath
+        run: echo "corpus=/tmp/orin-bench/corpus" >> "$GITHUB_OUTPUT"
+
+  bench:
+    needs: gen
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        tool: [orin, fd, find, rg]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install fd (ubuntu)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y fd-find ripgrep
+      - name: Install fd/rg (macos)
+        if: runner.os == 'macOS'
+        run: brew install fd ripgrep
+      - name: Install fd/rg (windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install fd ripgrep -y
+          refreshenv
+      - run: cargo build --release -p orin-bench
+      - name: Run benchmark
+        run: |
+          cargo run --release -p orin-bench run \
+            --tool ${{ matrix.tool }} \
+            --corpus /tmp/orin-bench/corpus \
+            --queries crates/orin-bench/queries.json \
+            --iterations 1000 \
+            --out /tmp/orin-bench/results_${{ matrix.tool }}_${{ matrix.os }}.json
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-results
+          path: /tmp/orin-bench/results_*.json

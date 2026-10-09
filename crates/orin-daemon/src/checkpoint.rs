@@ -1,7 +1,7 @@
 //! Periodic atomic snapshots (checkpoint) of the index to disk.
 
 use anyhow::Result;
-use orin_core::snapshot::{save_snapshot, load_snapshot, SnapshotHeader};
+use orin_core::snapshot::{SnapshotHeader, load_snapshot, save_snapshot};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
@@ -44,7 +44,8 @@ impl Checkpoint {
                 .duration_since(UNIX_EPOCH)
                 .unwrap_or_default()
                 .as_secs();
-            self.last_checkpoint.store(state.last_checkpoint, Ordering::Relaxed);
+            self.last_checkpoint
+                .store(state.last_checkpoint, Ordering::Relaxed);
             info!("snapshot loaded: {} entries", state.index.len());
         }
         Ok(loaded)

@@ -1,0 +1,24 @@
+{
+  "exact": ["Cargo.toml", "README.md", "main.rs", "LICENSE", ".gitignore"],
+  "prefix": ["test_", "app_", "config_", "src_", "pkg_"],
+  "substring": ["test", "util", "mod", "fn", "struct"],
+  "ext": ["ext:rs", "ext:toml", "ext:json", "ext:md", "ext:!lock", "ext:!toml"],
+  "type": ["type:f", "type:d"],
+  "size": ["size:>1M", "size:100K..1M", "size:<10K"],
+  "depth": ["depth:<3", "depth:>5", "depth:==2"],
+  "combined": [
+    "ext:rs type:f test",
+    "app size:>100K",
+    "src depth:<5",
+    "config ext:toml type:f",
+    "!ext:lock size:>0"
+  ],
+  "case": ["App", "APP", "app"],
+  "glob": ["*.test.rs", "src/**/*.rs", "**/*.md"],
+  "re": [
+    "re:test_.*\\.rs$",
+    "re:^app_.*",
+    "re:config.*\\.(toml|json)$",
+    "re:.*[^a-zA-Z0-9]test[^a-zA-Z0-9].*"
+  ]
+}

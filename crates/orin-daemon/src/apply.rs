@@ -21,10 +21,20 @@ pub fn apply_events(state: &SharedState, events: Vec<FsEvent>) -> Result<usize> 
 /// A single filesystem event to apply.
 #[derive(Debug, Clone)]
 pub enum FsEvent {
-    Create { path: std::path::PathBuf, is_dir: bool },
-    Modify { path: std::path::PathBuf },
-    Remove { path: std::path::PathBuf },
-    Rename { from: std::path::PathBuf, to: std::path::PathBuf },
+    Create {
+        path: std::path::PathBuf,
+        is_dir: bool,
+    },
+    Modify {
+        path: std::path::PathBuf,
+    },
+    Remove {
+        path: std::path::PathBuf,
+    },
+    Rename {
+        from: std::path::PathBuf,
+        to: std::path::PathBuf,
+    },
 }
 
 /// Apply a single event.
