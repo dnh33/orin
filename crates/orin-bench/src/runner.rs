@@ -7,11 +7,17 @@ use std::process::Command;
 use std::time::{Duration, Instant};
 
 pub struct RunResult {
+    #[allow(dead_code)]
     pub tool: String,
+    #[allow(dead_code)]
     pub corpus_dir: String,
+    #[allow(dead_code)]
     pub query: String,
+    #[allow(dead_code)]
     pub latency_us: u64,
+    #[allow(dead_code)]
     pub exit_code: i32,
+    #[allow(dead_code)]
     pub output_bytes: usize,
 }
 

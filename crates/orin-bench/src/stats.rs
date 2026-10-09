@@ -3,11 +3,17 @@
 use std::time::Duration;
 
 pub struct Stats {
+    #[allow(dead_code)]
     pub latency_p50_us: f64,
+    #[allow(dead_code)]
     pub latency_p95_us: f64,
+    #[allow(dead_code)]
     pub latency_p99_us: f64,
+    #[allow(dead_code)]
     pub qps: f64,
+    #[allow(dead_code)]
     pub rss_peak_mb: f64,
+    #[allow(dead_code)]
     pub rss_steady_mb: f64,
 }
 
@@ -45,6 +51,7 @@ pub fn from_durations(latencies: &[Duration]) -> Stats {
     }
 }
 
+#[allow(dead_code)]
 pub fn from_us(p50: f64, p95: f64, p99: f64, qps: f64) -> Stats {
     Stats {
         latency_p50_us: p50,
