@@ -122,7 +122,7 @@ pub fn rescan_root(state: &SharedState, root_idx: usize) -> Result<u64> {
     };
 
     let mut idx = Index::new();
-    let count = scan_root_seq(&root_path, root_idx, &mut idx)?;
+    let count = scan_root(&root_path, root_idx, &mut idx)?;
 
     {
         let mut state = state.lock().unwrap();
@@ -141,7 +141,7 @@ mod tests {
     use tempfile::tempdir;
 
     #[test]
-    fn scan_root_seq_basic() {
+    fn scan_root_basic() {
         let dir = tempdir().unwrap();
         std::fs::write(dir.path().join("file.txt"), b"hello").unwrap();
         std::fs::create_dir(dir.path().join("subdir")).unwrap();
@@ -150,4 +150,3 @@ mod tests {
         let count = scan_root(dir.path(), 0, &mut idx).unwrap();
         assert_eq!(count, 2); // file.txt + subdir
     }
-}
