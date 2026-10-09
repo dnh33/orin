@@ -206,11 +206,11 @@ mod tests {
     fn revalidate_basic() {
         let dir = tempdir().unwrap();
         let state = crate::state::new_shared(&dir.path().to_path_buf()).unwrap();
-        let rv = Revalidate::new(60);
+        let _rv = Revalidate::new(60);
 
         std::fs::write(dir.path().join("newfile.txt"), b"test").unwrap();
 
-        let (checked, fixed) = revalidate_root(&state, &dir.path().to_path_buf()).unwrap();
+        let (checked, _fixed) = revalidate_root(&state, &dir.path().to_path_buf()).unwrap();
         assert!(checked > 0);
         // Note: fixed may be 0 if initial scan already ran
     }

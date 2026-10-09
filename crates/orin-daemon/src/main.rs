@@ -6,7 +6,6 @@
 
 mod apply;
 mod checkpoint;
-mod lib;
 mod revalidate;
 mod scan;
 mod server;
