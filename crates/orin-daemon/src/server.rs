@@ -1,11 +1,11 @@
 //! IPC server: accepts connections, reads frames, dispatches to handlers, writes responses.
 
 use anyhow::Result;
-use interprocess::local_socket::{ListenerOptions, ListenerNonblockingMode, prelude::*};
+use interprocess::local_socket::{ListenerOptions, ListenerNonblockingMode, prelude::*, Stream};
 use orin_core::protocol::{
     read_frame, write_frame, Request, Response, StatusData, RootWire, Progress, PROTOCOL_VERSION,
 };
-use std::io::{BufReader, BufWriter};
+use std::io::{BufReader, BufWriter, Write};
 use std::sync::atomic::Ordering;
 use std::time::{Duration, Instant};
 use tracing::{debug, error, info, warn};
@@ -190,7 +190,6 @@ impl Server {
                     };
                 }
                 query.root = root;
-                query.path_scope = path_scope;
 
                 let now = std::time::SystemTime::now()
                     .duration_since(std::time::UNIX_EPOCH)
