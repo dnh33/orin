@@ -1,7 +1,7 @@
 //! IPC server: accepts connections, reads frames, dispatches to handlers, writes responses.
 
 use anyhow::Result;
-use interprocess::local_socket::{Listener, Stream};
+use interprocess::local_socket::{Listener, LocalSocketListener, Stream};
 use orin_core::protocol::{
     read_frame, write_frame, Request, Response, StatusData, RootWire, Progress, PROTOCOL_VERSION,
 };

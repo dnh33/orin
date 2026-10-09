@@ -2,6 +2,8 @@
 
 use anyhow::Result;
 use orin_core::snapshot::{save_snapshot, load_snapshot, SnapshotHeader};
+use std::fs::File;
+use std::io::Read;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -94,7 +96,10 @@ impl Checkpoint {
     pub fn snapshot_info(&self) -> Option<SnapshotHeader> {
         let snapshot_path = self.data_dir.join("orin.snap");
         if snapshot_path.exists() {
-            orin_core::snapshot::read_header(&snapshot_path).ok()
+            let mut file = File::open(&snapshot_path).ok()?;
+            let mut header_bytes = [0u8; 64];
+            file.read_exact(&mut header_bytes).ok()?;
+            Some(orin_core::snapshot::read_header(&header_bytes))
         } else {
             None
         }

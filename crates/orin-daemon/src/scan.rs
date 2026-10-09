@@ -14,7 +14,7 @@ use crate::state::{RootEntry, ScanProgress, SharedState};
 
 /// Scan a single root directory and return NewEntry items.
 pub fn scan_root(root: &Path, root_idx: usize) -> Result<Vec<NewEntry<'_>>> {
-    let mut entries = Vec::new();
+    let mut entries: Vec<NewEntry<'_>> = Vec::new();
     let walker = WalkBuilder::new(root)
         .follow_links(false)
         .hidden(false) // we track hidden as a flag
@@ -22,7 +22,7 @@ pub fn scan_root(root: &Path, root_idx: usize) -> Result<Vec<NewEntry<'_>>> {
         .build_parallel();
 
     walker.run(|| {
-        let mut local_entries = Vec::new();
+        let mut local_entries: Vec<NewEntry<'_>> = Vec::new();
         Box::new(move |result| {
             match result {
                 Ok(entry) => {

@@ -116,7 +116,7 @@ fn revalidate_root(state: &SharedState, root: &PathBuf) -> Result<(u64, u64)> {
     Ok((checked, fixed))
 }
 
-fn add_missing(state: &SharedState, path: &PathBuf) -> Result<()> {
+fn add_missing(state: &SharedState, path: &Path) -> Result<()> {
     let metadata = match std::fs::metadata(path) {
         Ok(m) => m,
         Err(_) => return Ok(()),
