@@ -26,6 +26,6 @@ mod tests {
         };
         let _ = checkpoint::Checkpoint::new(std::path::PathBuf::new(), 60);
         let _ = revalidate::Revalidate::new(60);
-        let _ = scan::scan_root(std::path::Path::new("."), 0, &mut Index::new());
+        let _ = scan::scan_root(std::path::Path::new("."), 0, &mut orin_core::index::Index::new());
     }
 }

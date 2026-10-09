@@ -143,7 +143,6 @@ pub fn rescan_root(state: &SharedState, root_idx: usize) -> Result<u64> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use orin_core::index::Index;
     use tempfile::tempdir;
 
     #[test]
@@ -152,7 +151,7 @@ mod tests {
         std::fs::write(dir.path().join("file.txt"), b"hello").unwrap();
         std::fs::create_dir(dir.path().join("subdir")).unwrap();
 
-        let mut idx = Index::new();
+        let mut idx = orin_core::index::Index::new();
         let count = scan_root(dir.path(), 0, &mut idx).unwrap();
         assert_eq!(count, 2); // file.txt + subdir
     }
