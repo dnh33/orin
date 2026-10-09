@@ -32,7 +32,8 @@ pub struct QueryMatrix {
 
 impl QueryMatrix {
     pub fn load(path: &PathBuf) -> anyhow::Result<Self> {
-        let data = std::fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
+        let data =
+            std::fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
         serde_json::from_str(&data).context("parse queries.json")
     }
 
@@ -61,3 +62,4 @@ pub struct Queries {
     pub corpus_size: usize,
     pub queries: Vec<String>,
 }
+

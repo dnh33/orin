@@ -20,7 +20,11 @@ use tracing::{info};
 use tracing_subscriber::{EnvFilter, fmt};
 
 #[derive(Parser, Debug)]
-#[command(name = "orind", version, about = "orin daemon — whole-disk instant file search")]
+#[command(
+    name = "orind",
+    version,
+    about = "orin daemon — whole-disk instant file search"
+)]
 struct Args {
     /// Data directory (overrides ORIN_DATA_DIR)
     #[arg(long, value_name = "DIR")]
@@ -82,3 +86,5 @@ fn main() -> Result<()> {
     info!("orin daemon stopped");
     Ok(())
 }
+
+

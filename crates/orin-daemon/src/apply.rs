@@ -174,3 +174,5 @@ mod tests {
         assert!(state.index.lookup_path(&file).is_some());
     }
 }
+
+

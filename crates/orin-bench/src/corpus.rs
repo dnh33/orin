@@ -1,8 +1,8 @@
 //! Deterministic synthetic corpus generation.
 
 use anyhow::Context;
-use rand::SeedableRng;
 use rand::Rng;
+use rand::SeedableRng;
 use rand::rngs::StdRng;
 use std::fs;
 use std::path::PathBuf;
@@ -31,13 +31,17 @@ fn config_for(name: &str) -> CorpusConfig {
         "large" => CorpusConfig {
             files: 2_000_000,
             depth: 15,
-            extensions: &["txt", "rs", "md", "toml", "json", "lock", "py", "js", "ts", "c", "h"],
+            extensions: &[
+                "txt", "rs", "md", "toml", "json", "lock", "py", "js", "ts", "c", "h",
+            ],
             prefix: "large",
         },
         "real-home" => CorpusConfig {
             files: 1_000_000,
             depth: 6,
-            extensions: &["txt", "rs", "md", "toml", "json", "lock", "py", "js", "ts", "c", "h", "cfg"],
+            extensions: &[
+                "txt", "rs", "md", "toml", "json", "lock", "py", "js", "ts", "c", "h", "cfg",
+            ],
             prefix: "home",
         },
         _ => CorpusConfig {
@@ -90,11 +94,11 @@ pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
         let path = dir.join(&fname);
 
         let size = match rng.gen_range(0..10) {
-            0 => rng.gen_range(1..100),            // tiny
-            1 => rng.gen_range(100..10_000),        // small
-            2 => rng.gen_range(10_000..1_000_000), // medium
+            0 => rng.gen_range(1..100),                // tiny
+            1 => rng.gen_range(100..10_000),           // small
+            2 => rng.gen_range(10_000..1_000_000),     // medium
             3 => rng.gen_range(1_000_000..50_000_000), // large
-            _ => rng.gen_range(1..1_000),           // default
+            _ => rng.gen_range(1..1_000),              // default
         };
 
         let content: Vec<u8> = (0..size).map(|_| rng.gen_range(0..256u8)).collect();
@@ -117,3 +121,4 @@ pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
 
     Ok(())
 }
+

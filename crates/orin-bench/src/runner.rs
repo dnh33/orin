@@ -39,7 +39,11 @@ pub fn run_tool(
     Ok(latencies)
 }
 
-fn run_single(tool: &str, corpus_dir: &PathBuf, query: &str) -> anyhow::Result<std::process::Output> {
+fn run_single(
+    tool: &str,
+    corpus_dir: &PathBuf,
+    query: &str,
+) -> anyhow::Result<std::process::Output> {
     let mut tool_cmd = match tool {
         "orin" => {
             // orin query mode
@@ -82,9 +86,13 @@ pub fn run(
     let mut results = Vec::with_capacity(total_queries);
 
     // Just first 10 queries for quick benchmark run
-    let queries_to_run: Vec<String> = qmatrix.exact.iter()
-        .cloned().chain(qmatrix.prefix.iter().cloned())
-        .chain(qmatrix.substring.iter().cloned()).collect();
+    let queries_to_run: Vec<String> = qmatrix
+        .exact
+        .iter()
+        .cloned()
+        .chain(qmatrix.prefix.iter().cloned())
+        .chain(qmatrix.substring.iter().cloned())
+        .collect();
 
     for q in queries_to_run.iter().take(10) {
         let latencies = run_tool(tool, corpus_dir, q, iterations)?;
@@ -100,11 +108,14 @@ pub fn run(
         ));
     }
 
-    std::fs::write(
-        out_path,
-        format!("[{}]", results.join(",")),
-    )?;
-    println!("bench: {} queries x {} iterations = {} results -> {}", results.len(), iterations, results.len(), out_path.display());
+    std::fs::write(out_path, format!("[{}]", results.join(",")))?;
+    println!(
+        "bench: {} queries x {} iterations = {} results -> {}",
+        results.len(),
+        iterations,
+        results.len(),
+        out_path.display()
+    );
     Ok(())
 }
 
@@ -124,3 +135,4 @@ pub fn summarize(latencies: &[Duration]) -> (f64, f64, f64) {
 
     (p50, p95, p99)
 }
+

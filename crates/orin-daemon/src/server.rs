@@ -1,7 +1,7 @@
 //! IPC server: accepts connections, reads frames, dispatches to handlers, writes responses.
 
 use anyhow::Result;
-use interprocess::local_socket::{ListenerOptions, ListenerNonblockingMode, prelude::*, Stream};
+use interprocess::local_socket::{ListenerNonblockingMode, ListenerOptions, Stream, prelude::*};
 use orin_core::protocol::{
     read_frame, write_frame, Request, Response, StatusData, RootWire, Progress, PROTOCOL_VERSION,
 };
@@ -10,7 +10,7 @@ use std::sync::atomic::Ordering;
 use std::time::{Duration, Instant};
 use tracing::{debug, error, info, warn};
 
-use crate::state::{SharedState, ScanProgress};
+use crate::state::{ScanProgress, SharedState};
 
 /// Main server loop.
 pub struct Server {
@@ -31,10 +31,7 @@ impl Server {
     }
 
     /// Run the server until shutdown is signaled.
-    pub fn run(
-        &mut self,
-        shutdown: std::sync::Arc<std::sync::atomic::AtomicBool>,
-    ) -> Result<()> {
+    pub fn run(&mut self, shutdown: std::sync::Arc<std::sync::atomic::AtomicBool>) -> Result<()> {
         let listener = {
             let mut state = self.state.lock().unwrap();
             state.listener.take().expect("listener not initialized")
@@ -330,3 +327,4 @@ mod tests {
         assert_eq!(server.idle_exit_secs, 0);
     }
 }
+

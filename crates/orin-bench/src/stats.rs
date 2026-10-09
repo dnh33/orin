@@ -55,3 +55,4 @@ pub fn from_us(p50: f64, p95: f64, p99: f64, qps: f64) -> Stats {
         rss_steady_mb: 0.0,
     }
 }
+
