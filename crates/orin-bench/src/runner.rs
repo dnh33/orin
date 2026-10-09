@@ -31,8 +31,8 @@ pub fn run_tool(
         let result = run_single(tool, corpus_dir, query)?;
         let dur = start.elapsed();
         latencies.push(dur);
-        if result.exit_code != 0 {
-            eprintln!("Warning: {} exited {} for query '{}'", tool, result.exit_code, query);
+        if result.status.code() != Some(0) {
+            eprintln!("Warning: {} exited non-zero for query '{}'", tool, query);
         }
     }
 
@@ -40,7 +40,7 @@ pub fn run_tool(
 }
 
 fn run_single(tool: &str, corpus_dir: &PathBuf, query: &str) -> anyhow::Result<std::process::Output> {
-    let tool_cmd = match tool {
+    let mut tool_cmd = match tool {
         "orin" => {
             // orin query mode
             let mut cmd = Command::new("cargo");
