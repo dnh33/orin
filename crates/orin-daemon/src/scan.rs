@@ -130,16 +130,12 @@ pub fn rescan_root(state: &SharedState, root_idx: usize) -> Result<u64> {
         (state.roots[root_idx].path.clone(), root_idx)
     };
 
-    let mut index = Index::new();
-    let count = scan_root(&root_path, root_idx, &mut index)?;
-
-    {
+    let count: u64 = {
         let mut state = state.lock().unwrap();
-        // Note: full re-scan insertion simplified; real impl uses tombstones
-        state.index.insert_batch(&index.entries.iter().copied().collect::<Vec<_>>(), 0);
-        state.index.finalize();
-        state.roots[root_idx].count = index.len() as u32;
-    }
+        scan_root(&root_path, root_idx, &mut state.index)?;
+        state.roots[root_idx].count = state.index.len() as u32;
+        state.index.len() as u64
+    };
 
     Ok(count)
 }
