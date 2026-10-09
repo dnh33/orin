@@ -51,6 +51,9 @@ pub fn load_snapshot(path: &Path, index: &mut crate::index::Index) -> std::io::R
         Err(e) => Err(std::io::Error::new(std::io::ErrorKind::Other, e)),
     }
 }
+
+/// Save index to an atomic snapshot file (internal).
+fn save(index: &crate::index::Index, path: &Path) -> std::io::Result<()> {
     let tmp_path = path.with_extension("snap.tmp");
 
     // Serialize roots to JSON
@@ -338,6 +341,7 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tempfile::tempdir;
 
     #[test]
     fn snapshot_roundtrip_preserves_search() {
