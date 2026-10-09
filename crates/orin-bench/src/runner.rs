@@ -112,7 +112,7 @@ pub fn summarize(latencies: &[Duration]) -> (f64, f64, f64) {
     if latencies.is_empty() {
         return (0.0, 0.0, 0.0);
     }
-    let sorted: Vec<f64> = latencies.iter().map(|d| d.as_micros() as f64).collect();
+    let mut sorted: Vec<f64> = latencies.iter().map(|d| d.as_micros() as f64).collect();
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
     let p50 = sorted[sorted.len() * 50 / 100];
