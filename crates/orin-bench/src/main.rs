@@ -8,9 +8,9 @@ use std::path::PathBuf;
 
 mod corpus;
 mod queries;
+mod report;
 mod runner;
 mod stats;
-mod report;
 
 #[derive(Parser, Debug)]
 #[command(name = "orin-bench", version, about = "orin benchmark suite")]
