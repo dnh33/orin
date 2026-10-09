@@ -20,6 +20,7 @@ pub struct WatcherHandle {
 }
 
 impl WatcherHandle {
+    #[allow(dead_code)]
     /// Start watching the given roots.
     pub fn start(roots: Vec<PathBuf>, state: SharedState) -> Result<Self> {
         let (tx, rx) = mpsc::channel();
@@ -54,6 +55,7 @@ impl WatcherHandle {
         })
     }
 
+    #[allow(dead_code)]
     /// Stop the watcher.
     pub fn stop(mut self) {
         if let Some(w) = self.watcher.take() {
@@ -65,6 +67,7 @@ impl WatcherHandle {
     }
 }
 
+#[allow(dead_code)]
 /// Handle a filesystem event.
 fn handle_event(event: Event, _state: &SharedState) {
     use EventKind::*;

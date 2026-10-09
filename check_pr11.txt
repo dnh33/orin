@@ -1,0 +1,609 @@
+check	Run cargo clippy --workspace --all-targets -- -D warnings	﻿2026-10-09T19:27:14.0779165Z ##[group]Run cargo clippy --workspace --all-targets -- -D warnings
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.0779747Z [36;1mcargo clippy --workspace --all-targets -- -D warnings[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.0835466Z shell: /usr/bin/bash -e {0}
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.0835793Z env:
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.0836100Z   CARGO_HOME: /home/runner/.cargo
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.0836444Z   CARGO_INCREMENTAL: 0
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.0836768Z   CARGO_TERM_COLOR: always
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.0837137Z   CACHE_ON_FAILURE: false
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.0837428Z ##[endgroup]
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.2537912Z [1m[92m    Checking[0m orin-core v0.1.0 (/home/runner/work/orin/orin/crates/orin-core)
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.6510114Z [1m[92m    Checking[0m orin-daemon v0.1.0 (/home/runner/work/orin/orin/crates/orin-daemon)
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.6511350Z [1m[92m    Checking[0m orin-bench v0.1.0 (/home/runner/work/orin/orin/crates/orin-bench)
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.6625189Z [1m[92m    Checking[0m orin-mcp v0.1.0 (/home/runner/work/orin/orin/crates/orin-mcp)
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:14.6845098Z [1m[92m    Checking[0m orin-cli v0.1.0 (/home/runner/work/orin/orin/crates/orin-cli)
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0681508Z [1m[91merror[0m[1m: associated items `start` and `stop` are never used[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0682604Z   [1m[94m--> [0mcrates/orin-daemon/src/watch.rs:24:12
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0683149Z    [1m[94m|[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0684081Z [1m[94m22[0m [1m[94m|[0m impl WatcherHandle {
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0684861Z    [1m[94m|[0m [1m[94m------------------[0m [1m[94massociated items in this implementation[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0685681Z [1m[94m23[0m [1m[94m|[0m     /// Start watching the given roots.
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0686754Z [1m[94m24[0m [1m[94m|[0m     pub fn start(roots: Vec<PathBuf>, state: SharedState) -> Result<Self> {
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0687550Z    [1m[94m|[0m            [1m[91m^^^^^[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0688134Z [1m[94m...[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0688658Z [1m[94m58[0m [1m[94m|[0m     pub fn stop(mut self) {
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0689368Z    [1m[94m|[0m            [1m[91m^^^^[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0689991Z    [1m[94m|[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0690570Z    [1m[94m= [0m[1mnote[0m: `-D dead-code` implied by `-D warnings`
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0691559Z    [1m[94m= [0m[1mhelp[0m: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0692147Z 
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0692513Z [1m[91merror[0m[1m: function `handle_event` is never used[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0693244Z   [1m[94m--> [0mcrates/orin-daemon/src/watch.rs:69:4
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0693987Z    [1m[94m|[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0694605Z [1m[94m69[0m [1m[94m|[0m fn handle_event(event: Event, _state: &SharedState) {
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0695424Z    [1m[94m|[0m    [1m[91m^^^^^^^^^^^^[0m
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.0695709Z 
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.1052021Z [1m[91merror[0m: could not compile `orin-daemon` (bin "orind") due to 2 previous errors
+check	Run cargo clippy --workspace --all-targets -- -D warnings	2026-10-09T19:27:15.1268532Z ##[error]Process completed with exit code 101.
+test (ubuntu-latest)	Run cargo test --workspace	﻿2026-10-09T19:27:07.2397118Z ##[group]Run cargo test --workspace
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:07.2397668Z [36;1mcargo test --workspace[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:07.2445035Z shell: /usr/bin/bash -e {0}
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:07.2445388Z env:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:07.2445633Z   CARGO_HOME: /home/runner/.cargo
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:07.2445915Z   CARGO_INCREMENTAL: 0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:07.2446480Z   CARGO_TERM_COLOR: always
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:07.2446801Z   CACHE_ON_FAILURE: false
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:07.2447383Z ##[endgroup]
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:07.8620517Z [1m[92m    Updating[0m crates.io index
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.6918619Z [1m[92m     Locking[0m 331 packages to highest Rust 1.99.0 compatible versions
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.7234929Z [1m[92m      Adding[0m dirs v6.0.0 [1m[33m(available: v7.0.0)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.7291012Z [1m[92m      Adding[0m generic-array v0.14.7 [1m[33m(available: v0.14.9)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.7389609Z [1m[92m      Adding[0m nix v0.28.0 [1m[33m(available: v0.31.3)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.7493438Z [1m[92m      Adding[0m psm v0.1.24 [1m[33m(available: v0.1.32)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.7512949Z [1m[92m      Adding[0m rand v0.9.5 [1m[33m(available: v0.10.3)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.7513923Z [1m[92m      Adding[0m rand_chacha v0.9.0 [1m[33m(available: v0.10.0)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.7938258Z [1m[92m      Adding[0m sysinfo v0.31.4 [1m[33m(available: v0.39.6)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.8043947Z [1m[92m      Adding[0m toml v0.9.12+spec-1.1.0 [1m[33m(available: v1.1.8+spec-1.1.0)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:09.8113772Z [1m[92m      Adding[0m whoami v1.6.1 [1m[33m(available: v2.1.3)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.0034328Z [1m[92m Downloading[0m crates ...
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4725534Z [1m[92m  Downloaded[0m matchers v0.2.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4731061Z [1m[92m  Downloaded[0m indoc v2.0.8
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4748226Z [1m[92m  Downloaded[0m ignore v0.4.33
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4765711Z [1m[92m  Downloaded[0m pest_generator v2.9.3
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4774234Z [1m[92m  Downloaded[0m pest_meta v2.9.3
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4788401Z [1m[92m  Downloaded[0m pest_derive v2.9.3
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4800349Z [1m[92m  Downloaded[0m pest v2.9.3
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4835578Z [1m[92m  Downloaded[0m psm v0.1.24
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4852380Z [1m[92m  Downloaded[0m ppv-lite86 v0.2.21
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4860621Z [1m[92m  Downloaded[0m rand_chacha v0.9.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4868088Z [1m[92m  Downloaded[0m rand_core v0.9.5
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4876142Z [1m[92m  Downloaded[0m rand v0.9.5
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4901304Z [1m[92m  Downloaded[0m stacker v0.1.25
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4912789Z [1m[92m  Downloaded[0m tokio-util v0.7.20
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4967078Z [1m[92m  Downloaded[0m toml_parser v1.1.5+spec-1.1.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.4989643Z [1m[92m  Downloaded[0m zerocopy v0.8.62
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.8421088Z [1m[92m   Compiling[0m regex-automata v0.4.18
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.8461115Z [1m[92m   Compiling[0m toml_parser v1.1.5+spec-1.1.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.8527846Z [1m[92m   Compiling[0m iana-time-zone v0.1.65
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:10.8567340Z [1m[92m   Compiling[0m zerocopy v0.8.62
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:13.3093124Z [1m[92m   Compiling[0m toml v0.9.12+spec-1.1.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:13.4435994Z [1m[92m   Compiling[0m chrono v0.4.45
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:13.4827654Z [1m[92m   Compiling[0m indoc v2.0.8
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:13.7507718Z [1m[92m   Compiling[0m getrandom v0.3.4
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:13.9167982Z [1m[92m   Compiling[0m instability v0.3.14
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:14.3272882Z [1m[92m   Compiling[0m tokio-util v0.7.20
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:14.9627680Z [1m[92m   Compiling[0m globset v0.4.20
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:14.9797864Z [1m[92m   Compiling[0m regex v1.13.1
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:15.0117726Z [1m[92m   Compiling[0m matchers v0.2.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:15.0788021Z [1m[92m   Compiling[0m schemars v1.2.2
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:15.3968580Z [1m[92m   Compiling[0m orin-core v0.1.0 (/home/runner/work/orin/orin/crates/orin-core)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:15.8064986Z [1m[92m   Compiling[0m tracing-subscriber v0.3.23
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:16.9038131Z [1m[92m   Compiling[0m rmcp v3.5.1
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:17.0887893Z [1m[92m   Compiling[0m ignore v0.4.33
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:18.2773862Z [1m[92m   Compiling[0m ratatui-widgets v0.3.2
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:18.9578069Z [1m[92m   Compiling[0m rand_core v0.9.5
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:19.1008259Z [1m[92m   Compiling[0m ratatui-crossterm v0.1.2
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:19.2378582Z [1m[92m   Compiling[0m orin-daemon v0.1.0 (/home/runner/work/orin/orin/crates/orin-daemon)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:20.6408066Z [1m[92m   Compiling[0m ratatui-macros v0.7.2
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:20.6797756Z [1m[92m   Compiling[0m ratatui v0.30.2
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:21.2637728Z [1m[92m   Compiling[0m ppv-lite86 v0.2.21
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:21.6944347Z [1m[92m   Compiling[0m rand_chacha v0.9.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:22.0748640Z [1m[92m   Compiling[0m rand v0.9.5
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:22.4719009Z [1m[92m   Compiling[0m orin-bench v0.1.0 (/home/runner/work/orin/orin/crates/orin-bench)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:24.6384106Z [1m[92m   Compiling[0m orin-mcp v0.1.0 (/home/runner/work/orin/orin/crates/orin-mcp)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.7863676Z [1m[92m   Compiling[0m orin-cli v0.1.0 (/home/runner/work/orin/orin/crates/orin-cli)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.8567889Z [1m[92m    Finished[0m `test` profile [unoptimized + debuginfo] target(s) in 18.38s
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9234892Z [1m[92m     Running[0m unittests src/main.rs (target/debug/deps/orin_bench-343bcec9d97feb50)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9254973Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9255838Z running 0 tests
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9256675Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9257134Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9257810Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9261047Z [1m[92m     Running[0m unittests src/main.rs (target/debug/deps/orin-5cadb734252bb878)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9288807Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9289443Z running 0 tests
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9289659Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9289960Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9290287Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9291023Z [1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/orin_core-1c167388b6cd50b1)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9300950Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9301612Z running 39 tests
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9311418Z test arena::tests::arena_multiple_names ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9312109Z test arena::tests::arena_push_get_roundtrip ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9312615Z test config::tests::default_roots_nonempty ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9313060Z test entry::tests::entry_is_pod_and_zeroable ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9313618Z test arena::tests::arena_truncates_long_names ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9314102Z test entry::tests::entry_size_is_20 ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9314619Z test entry::tests::flag_constants_match_spec ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9315135Z test errors::tests::error_display ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9315547Z test fold::tests::cmp_folded_range ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9315973Z test fold::tests::fold_ascii ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9316551Z test fold::tests::fold_unicode_lowercase ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9317027Z test fold::tests::nfc_roundtrip ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9317490Z test fold::tests::prefix_cmp_equal_when_prefix ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9317988Z test index::tests::path_of_assembles ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9318453Z test paths::tests::data_dir_env_override ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9318961Z test index::tests::prefix_search_window ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9319573Z test index::tests::substring_scan_finds_case_insensitive ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9320112Z test protocol::tests::frame_roundtrip ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9320499Z test protocol::tests::response_roundtrip ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9320814Z test query::filter::tests::ext_filter_negation ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9321134Z test query::filter::tests::ext_filter_positive ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9321449Z test query::filter::tests::kind_filter ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9321843Z test query::matcher::tests::literal_match_case_insensitive ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9322415Z test query::matcher::tests::literal_match_ascii ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9323098Z test index::tests::finalize_sorts_folded ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9323412Z test query::parse::tests::parse_ext_filter ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9323733Z test query::parse::tests::parse_ext_negation ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9324038Z test query::parse::tests::parse_literal ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9324329Z test query::parse::tests::parse_size ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9324631Z test query::parse::tests::parse_smart_case ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9324924Z test query::parse::tests::parse_type ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9325918Z test query::score::tests::prefix_match_scores_high ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9327834Z test query::score::tests::exact_match_scores_highest ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9328406Z test query::score::tests::word_boundary_scores_higher ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9328978Z test query::tests::parse_query_reexports ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9329382Z test snapshot::tests::encode_decode_roundtrip ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9429744Z test snapshot::tests::snapshot_roundtrip_preserves_search ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9430703Z test snapshot::tests::snapshot_rejects_corruption ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9431617Z test snapshot::tests::snapshot_rejects_wrong_magic ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9431960Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9432310Z test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9432823Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9435127Z [1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/orin_daemon-4bac95dd2f5e2f98)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9448320Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9449390Z running 8 tests
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9467531Z test apply::tests::apply_create ... FAILED
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9468240Z test revalidate::tests::revalidate_basic ... FAILED
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9477627Z test scan::tests::scan_root_basic ... FAILED
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9479817Z test server::tests::server_creation ... FAILED
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9481619Z test state::tests::state_creation ... FAILED
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9485570Z test tests::daemon_modules_compile ... ok
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9487112Z test watch::tests::watcher_handle_creation ... FAILED
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9724480Z test checkpoint::tests::checkpoint_save_load ... FAILED
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9724906Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9725034Z failures:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9725207Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9725422Z ---- apply::tests::apply_create stdout ----
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9725792Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9726381Z thread 'apply::tests::apply_create' (2954) panicked at crates/orin-daemon/src/apply.rs:171:58:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9727016Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 98)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9727494Z note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9727778Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9727933Z ---- revalidate::tests::revalidate_basic stdout ----
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9728145Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9728439Z thread 'revalidate::tests::revalidate_basic' (2956) panicked at crates/orin-daemon/src/revalidate.rs:214:58:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9729013Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 98)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9729349Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9729476Z ---- scan::tests::scan_root_basic stdout ----
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9729664Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9729903Z thread 'scan::tests::scan_root_basic' (2957) panicked at crates/orin-daemon/src/scan.rs:162:9:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9730319Z assertion `left == right` failed
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9730566Z   left: 3
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9730762Z  right: 2
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9730868Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9730997Z ---- server::tests::server_creation stdout ----
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9731295Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9731646Z thread 'server::tests::server_creation' (2958) panicked at crates/orin-daemon/src/server.rs:333:63:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9732168Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 98)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9732445Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9732568Z ---- state::tests::state_creation stdout ----
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9732753Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9733232Z thread 'state::tests::state_creation' (2959) panicked at crates/orin-daemon/src/state.rs:126:44:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9733738Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 98)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9734012Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9734155Z ---- watch::tests::watcher_handle_creation stdout ----
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9734367Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9734641Z thread 'watch::tests::watcher_handle_creation' (2961) panicked at crates/orin-daemon/src/watch.rs:158:58:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9735478Z [1m[91merror[0m: test failed, to rerun pass `-p orin-daemon --lib`
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9735933Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 98)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9736487Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9736655Z ---- checkpoint::tests::checkpoint_save_load stdout ----
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9736884Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9737173Z thread 'checkpoint::tests::checkpoint_save_load' (2955) panicked at crates/orin-daemon/src/checkpoint.rs:150:59:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9737742Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 98)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9738006Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9738010Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9738098Z failures:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9738315Z     apply::tests::apply_create
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9738582Z     checkpoint::tests::checkpoint_save_load
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9738882Z     revalidate::tests::revalidate_basic
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9739157Z     scan::tests::scan_root_basic
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9739414Z     server::tests::server_creation
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9739675Z     state::tests::state_creation
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9739941Z     watch::tests::watcher_handle_creation
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9740112Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9740360Z test result: FAILED. 1 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9740677Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9819227Z ##[error]Process completed with exit code 101.
+test (macos-latest)	Run cargo test --workspace	﻿2026-10-09T19:27:25.4168300Z ##[group]Run cargo test --workspace
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:25.4169340Z [36;1mcargo test --workspace[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:25.4224130Z shell: /bin/bash -e {0}
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:25.4224470Z env:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:25.4224810Z   CARGO_HOME: /Users/runner/.cargo
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:25.4225090Z   CARGO_INCREMENTAL: 0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:25.4225380Z   CARGO_TERM_COLOR: always
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:25.4225600Z   CACHE_ON_FAILURE: false
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:25.4225900Z ##[endgroup]
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:25.9172720Z [1m[92m    Updating[0m crates.io index
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.7856430Z [1m[92m     Locking[0m 331 packages to highest Rust 1.99.0 compatible versions
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.8165730Z [1m[92m      Adding[0m dirs v6.0.0 [1m[33m(available: v7.0.0)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.8219420Z [1m[92m      Adding[0m generic-array v0.14.7 [1m[33m(available: v0.14.9)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.8295180Z [1m[92m      Adding[0m nix v0.28.0 [1m[33m(available: v0.31.3)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.8371550Z [1m[92m      Adding[0m psm v0.1.24 [1m[33m(available: v0.1.32)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.8382390Z [1m[92m      Adding[0m rand v0.9.5 [1m[33m(available: v0.10.3)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.8384010Z [1m[92m      Adding[0m rand_chacha v0.9.0 [1m[33m(available: v0.10.0)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.8752700Z [1m[92m      Adding[0m sysinfo v0.31.4 [1m[33m(available: v0.39.6)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.8820400Z [1m[92m      Adding[0m toml v0.9.12+spec-1.1.0 [1m[33m(available: v1.1.8+spec-1.1.0)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:26.8875810Z [1m[92m      Adding[0m whoami v1.6.1 [1m[33m(available: v2.1.3)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:27.8553140Z [1m[92m Downloading[0m crates ...
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.8617940Z [1m[92m  Downloaded[0m ignore v0.4.33
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.8702000Z [1m[92m  Downloaded[0m indoc v2.0.8
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.8800660Z [1m[92m  Downloaded[0m matchers v0.2.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.8849580Z [1m[92m  Downloaded[0m pest_derive v2.9.3
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.8876700Z [1m[92m  Downloaded[0m pest v2.9.3
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.8994540Z [1m[92m  Downloaded[0m pest_generator v2.9.3
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9045590Z [1m[92m  Downloaded[0m pest_meta v2.9.3
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9109080Z [1m[92m  Downloaded[0m ppv-lite86 v0.2.21
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9134080Z [1m[92m  Downloaded[0m psm v0.1.24
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9200530Z [1m[92m  Downloaded[0m rand v0.9.5
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9291780Z [1m[92m  Downloaded[0m rand_chacha v0.9.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9320770Z [1m[92m  Downloaded[0m rand_core v0.9.5
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9352080Z [1m[92m  Downloaded[0m stacker v0.1.25
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9447720Z [1m[92m  Downloaded[0m tokio-util v0.7.20
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9706600Z [1m[92m  Downloaded[0m toml_parser v1.1.5+spec-1.1.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:29.9776060Z [1m[92m  Downloaded[0m zerocopy v0.8.62
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:30.2469190Z [1m[92m   Compiling[0m regex-automata v0.4.18
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:30.2578530Z [1m[92m   Compiling[0m toml_parser v1.1.5+spec-1.1.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:30.2727860Z [1m[92m   Compiling[0m iana-time-zone v0.1.65
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:30.9892420Z [1m[92m   Compiling[0m chrono v0.4.45
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:31.4377180Z [1m[92m   Compiling[0m toml v0.9.12+spec-1.1.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:32.7338310Z [1m[92m   Compiling[0m indoc v2.0.8
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:33.0517640Z [1m[92m   Compiling[0m zerocopy v0.8.62
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:35.9841690Z [1m[92m   Compiling[0m globset v0.4.20
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:36.8387110Z [1m[92m   Compiling[0m regex v1.13.1
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:37.1310930Z [1m[92m   Compiling[0m orin-core v0.1.0 (/Users/runner/work/orin/orin/crates/orin-core)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:37.1398550Z [1m[92m   Compiling[0m getrandom v0.3.4
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:37.2184730Z [1m[92m   Compiling[0m schemars v1.2.2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:37.3695660Z [1m[92m   Compiling[0m instability v0.3.14
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:37.9833800Z [1m[92m   Compiling[0m matchers v0.2.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:38.0914000Z [1m[92m   Compiling[0m tokio-util v0.7.20
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:38.8178760Z [1m[92m   Compiling[0m tracing-subscriber v0.3.23
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:38.9093580Z [1m[92m   Compiling[0m rmcp v3.5.1
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:41.5918960Z [1m[92m   Compiling[0m ignore v0.4.33
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:42.4129240Z [1m[92m   Compiling[0m ratatui-widgets v0.3.2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:43.2888500Z [1m[92m   Compiling[0m ppv-lite86 v0.2.21
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:43.4415970Z [1m[92m   Compiling[0m rand_core v0.9.5
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:43.5666660Z [1m[92m   Compiling[0m ratatui-crossterm v0.1.2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:43.7582430Z [1m[92m   Compiling[0m ratatui-macros v0.7.2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:43.8225880Z [1m[92m   Compiling[0m rand_chacha v0.9.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:44.1995880Z [1m[92m   Compiling[0m orin-daemon v0.1.0 (/Users/runner/work/orin/orin/crates/orin-daemon)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:44.3121040Z [1m[92m   Compiling[0m rand v0.9.5
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:44.8293760Z [1m[92m   Compiling[0m ratatui v0.30.2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:44.9768450Z [1m[92m   Compiling[0m orin-bench v0.1.0 (/Users/runner/work/orin/orin/crates/orin-bench)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:47.8211950Z [1m[92m   Compiling[0m orin-mcp v0.1.0 (/Users/runner/work/orin/orin/crates/orin-mcp)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.2887500Z [1m[92m   Compiling[0m orin-cli v0.1.0 (/Users/runner/work/orin/orin/crates/orin-cli)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.4377140Z [1m[92m    Finished[0m `test` profile [unoptimized + debuginfo] target(s) in 23.85s
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5531820Z [1m[92m     Running[0m unittests src/main.rs (target/debug/deps/orin_bench-1ee33e4fc477a33c)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5571910Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5572370Z running 0 tests
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5573210Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5573870Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5574950Z [1m[92m     Running[0m unittests src/main.rs (target/debug/deps/orin-00efd700d61864ec)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5575350Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5607440Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5608440Z running 0 tests
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5608670Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5610170Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5611180Z [1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/orin_core-49c73541d2dd6211)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5611730Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5662280Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5666050Z running 39 tests
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5672230Z test arena::tests::arena_multiple_names ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5672760Z test arena::tests::arena_push_get_roundtrip ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5674340Z test arena::tests::arena_truncates_long_names ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5675410Z test entry::tests::entry_is_pod_and_zeroable ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5676090Z test config::tests::default_roots_nonempty ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5676980Z test entry::tests::entry_size_is_20 ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5680410Z test entry::tests::flag_constants_match_spec ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5680960Z test fold::tests::cmp_folded_range ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5681400Z test fold::tests::fold_ascii ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5681760Z test errors::tests::error_display ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5682390Z test fold::tests::fold_unicode_lowercase ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5682820Z test fold::tests::prefix_cmp_equal_when_prefix ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5683170Z test fold::tests::nfc_roundtrip ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5683560Z test index::tests::finalize_sorts_folded ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5683950Z test index::tests::path_of_assembles ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5684340Z test index::tests::prefix_search_window ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5684780Z test index::tests::substring_scan_finds_case_insensitive ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5685270Z test paths::tests::data_dir_env_override ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5685620Z test query::filter::tests::ext_filter_negation ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5686050Z test protocol::tests::frame_roundtrip ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5686770Z test protocol::tests::response_roundtrip ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5687320Z test query::filter::tests::ext_filter_positive ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5687850Z test query::filter::tests::kind_filter ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5688380Z test query::matcher::tests::literal_match_ascii ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5817010Z test query::matcher::tests::literal_match_case_insensitive ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5817740Z test query::parse::tests::parse_ext_filter ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5818760Z test query::parse::tests::parse_ext_negation ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5819320Z test query::parse::tests::parse_literal ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5820050Z test query::parse::tests::parse_size ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5820480Z test query::parse::tests::parse_smart_case ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5820990Z test query::parse::tests::parse_type ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5821510Z test query::score::tests::exact_match_scores_highest ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5822150Z test query::score::tests::prefix_match_scores_high ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5867900Z test query::score::tests::word_boundary_scores_higher ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5869190Z test query::tests::parse_query_reexports ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5870360Z test snapshot::tests::encode_decode_roundtrip ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5875260Z test snapshot::tests::snapshot_rejects_wrong_magic ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5881250Z test snapshot::tests::snapshot_rejects_corruption ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5883200Z test snapshot::tests::snapshot_roundtrip_preserves_search ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5883570Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5883790Z test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5885240Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5886950Z [1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/orin_daemon-a63465f8ea0f49a4)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5949850Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5957870Z running 8 tests
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5972260Z test revalidate::tests::revalidate_basic ... FAILED
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5973610Z test apply::tests::apply_create ... FAILED
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5995600Z test server::tests::server_creation ... FAILED
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.5996150Z test state::tests::state_creation ... FAILED
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6016110Z test tests::daemon_modules_compile ... ok
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6019570Z test watch::tests::watcher_handle_creation ... FAILED
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6030490Z test scan::tests::scan_root_basic ... FAILED
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6158370Z test checkpoint::tests::checkpoint_save_load ... FAILED
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6158670Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6158800Z failures:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6158940Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6159140Z ---- revalidate::tests::revalidate_basic stdout ----
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6159380Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6159660Z thread 'revalidate::tests::revalidate_basic' (10171) panicked at crates/orin-daemon/src/revalidate.rs:214:58:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6160800Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 48)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6161530Z note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6162000Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6162170Z ---- apply::tests::apply_create stdout ----
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6162450Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6162840Z thread 'apply::tests::apply_create' (10169) panicked at crates/orin-daemon/src/apply.rs:171:58:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6163440Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 48)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6163830Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6163950Z ---- server::tests::server_creation stdout ----
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6164580Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6164970Z thread 'server::tests::server_creation' (10173) panicked at crates/orin-daemon/src/server.rs:333:63:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6165650Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 48)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6165920Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6166110Z ---- state::tests::state_creation stdout ----
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6166330Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6166630Z thread 'state::tests::state_creation' (10174) panicked at crates/orin-daemon/src/state.rs:126:44:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6167310Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 48)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6167660Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6167870Z ---- watch::tests::watcher_handle_creation stdout ----
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6168160Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6168810Z thread 'watch::tests::watcher_handle_creation' (10176) panicked at crates/orin-daemon/src/watch.rs:158:58:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6174780Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 48)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6175120Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6175740Z [1m[91merror[0m: test failed, to rerun pass `-p orin-daemon --lib`
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6176160Z ---- scan::tests::scan_root_basic stdout ----
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6176420Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6176720Z thread 'scan::tests::scan_root_basic' (10172) panicked at crates/orin-daemon/src/scan.rs:162:9:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6177310Z assertion `left == right` failed
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6177640Z   left: 3
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6178410Z  right: 2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6178600Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6178830Z ---- checkpoint::tests::checkpoint_save_load stdout ----
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6179060Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6179960Z thread 'checkpoint::tests::checkpoint_save_load' (10170) panicked at crates/orin-daemon/src/checkpoint.rs:150:59:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6180750Z called `Result::unwrap()` on an `Err` value: Address already in use (os error 48)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6181060Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6181070Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6181130Z failures:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6181520Z     apply::tests::apply_create
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6181910Z     checkpoint::tests::checkpoint_save_load
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6182190Z     revalidate::tests::revalidate_basic
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6182560Z     scan::tests::scan_root_basic
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6182900Z     server::tests::server_creation
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6183150Z     state::tests::state_creation
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6183550Z     watch::tests::watcher_handle_creation
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6183800Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6184080Z test result: FAILED. 1 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6184450Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T19:27:49.6233720Z ##[error]Process completed with exit code 101.
+test (windows-latest)	Run cargo test --workspace	﻿2026-10-09T19:28:19.7091231Z ##[group]Run cargo test --workspace
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:19.7092023Z [36;1mcargo test --workspace[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:19.7650508Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:19.7651100Z env:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:19.7651444Z   CARGO_HOME: C:\Users\runneradmin\.cargo
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:19.7651808Z   CARGO_INCREMENTAL: 0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:19.7652337Z   CARGO_TERM_COLOR: always
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:19.7652995Z   CACHE_ON_FAILURE: false
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:19.7653317Z ##[endgroup]
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.2249198Z [1m[92m    Updating[0m crates.io index
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.7964582Z [1m[92m     Locking[0m 331 packages to highest Rust 1.99.0 compatible versions
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.8324423Z [1m[92m      Adding[0m dirs v6.0.0 [1m[93m(available: v7.0.0)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.8404097Z [1m[92m      Adding[0m generic-array v0.14.7 [1m[93m(available: v0.14.9)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.8537770Z [1m[92m      Adding[0m nix v0.28.0 [1m[93m(available: v0.31.3)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.8660600Z [1m[92m      Adding[0m psm v0.1.24 [1m[93m(available: v0.1.32)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.8681776Z [1m[92m      Adding[0m rand v0.9.5 [1m[93m(available: v0.10.3)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.8683181Z [1m[92m      Adding[0m rand_chacha v0.9.0 [1m[93m(available: v0.10.0)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.9292797Z [1m[92m      Adding[0m sysinfo v0.31.4 [1m[93m(available: v0.39.6)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.9428797Z [1m[92m      Adding[0m toml v0.9.12+spec-1.1.0 [1m[93m(available: v1.1.8+spec-1.1.0)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:20.9523897Z [1m[92m      Adding[0m whoami v1.6.1 [1m[93m(available: v2.1.3)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:28:28.8097693Z [1m[92m Downloading[0m crates ...
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:04.9909882Z [1m[92m  Downloaded[0m indoc v2.0.8
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:05.7705468Z [1m[92m  Downloaded[0m ignore v0.4.33
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:06.3065108Z [1m[92m  Downloaded[0m matchers v0.2.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:06.4775244Z [1m[92m  Downloaded[0m pest_generator v2.9.3
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:06.6013609Z [1m[92m  Downloaded[0m pest_derive v2.9.3
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:06.9804299Z [1m[92m  Downloaded[0m pest_meta v2.9.3
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:07.3928765Z [1m[92m  Downloaded[0m pest v2.9.3
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:07.5739588Z [1m[92m  Downloaded[0m ppv-lite86 v0.2.21
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:07.7904184Z [1m[92m  Downloaded[0m psm v0.1.24
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:08.5478286Z [1m[92m  Downloaded[0m rand v0.9.5
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:08.7805310Z [1m[92m  Downloaded[0m rand_chacha v0.9.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:08.7901581Z [1m[92m  Downloaded[0m rand_core v0.9.5
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:08.8181267Z [1m[92m  Downloaded[0m stacker v0.1.25
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:08.9075521Z [1m[92m  Downloaded[0m tokio-util v0.7.20
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:09.9629376Z [1m[92m  Downloaded[0m toml_parser v1.1.5+spec-1.1.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:10.0466250Z [1m[92m  Downloaded[0m zerocopy v0.8.62
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:11.7697143Z [1m[92m   Compiling[0m regex-automata v0.4.18
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:11.7727973Z [1m[92m   Compiling[0m toml_parser v1.1.5+spec-1.1.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:11.7811935Z [1m[92m   Compiling[0m chrono v0.4.45
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:11.7816391Z [1m[92m   Compiling[0m getrandom v0.3.4
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:13.0655551Z [1m[92m   Compiling[0m toml v0.9.12+spec-1.1.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:13.9861629Z [1m[92m   Compiling[0m indoc v2.0.8
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:14.8623383Z [1m[92m   Compiling[0m zerocopy v0.8.62
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:14.9402801Z [1m[92m   Compiling[0m schemars v1.2.2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:15.7869988Z [1m[92m   Compiling[0m globset v0.4.20
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:16.3858809Z [1m[92m   Compiling[0m regex v1.13.1
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:17.3615259Z [1m[92m   Compiling[0m orin-core v0.1.0 (D:\a\orin\orin\crates\orin-core)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:18.0843566Z [1m[92m   Compiling[0m matchers v0.2.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:18.4466925Z [1m[92m   Compiling[0m instability v0.3.14
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:18.9155225Z [1m[92m   Compiling[0m tokio-util v0.7.20
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:19.6375324Z [1m[92m   Compiling[0m rmcp v3.5.1
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:20.1315530Z [1m[92m   Compiling[0m tracing-subscriber v0.3.23
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:23.3457347Z [1m[92m   Compiling[0m ignore v0.4.33
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:26.2484651Z [1m[92m   Compiling[0m ratatui-widgets v0.3.2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:27.5986739Z [1m[92m   Compiling[0m ppv-lite86 v0.2.21
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:28.3619846Z [1m[92m   Compiling[0m rand_core v0.9.5
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:28.3738415Z [1m[92m   Compiling[0m ratatui-crossterm v0.1.2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:28.6920529Z [1m[92m   Compiling[0m rand_chacha v0.9.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:28.7017521Z [1m[92m   Compiling[0m ratatui-macros v0.7.2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:28.9573452Z [1m[92m   Compiling[0m orin-daemon v0.1.0 (D:\a\orin\orin\crates\orin-daemon)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:29.4456151Z [1m[92m   Compiling[0m rand v0.9.5
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:30.3250486Z [1m[92m   Compiling[0m ratatui v0.30.2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:30.6743110Z [1m[92m   Compiling[0m orin-bench v0.1.0 (D:\a\orin\orin\crates\orin-bench)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:35.3038605Z [1m[92m   Compiling[0m orin-mcp v0.1.0 (D:\a\orin\orin\crates\orin-mcp)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:38.6663231Z [1m[92m   Compiling[0m orin-cli v0.1.0 (D:\a\orin\orin\crates\orin-cli)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.1933821Z [1m[92m    Finished[0m `test` profile [unoptimized + debuginfo] target(s) in 1m 19s
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.2811136Z [1m[92m     Running[0m unittests src\main.rs (target\debug\deps\orin_bench-51696ac4f92a598f.exe)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.2923938Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.2924888Z running 0 tests
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.2925303Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.2925777Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.2926417Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.2945015Z [1m[92m     Running[0m unittests src\main.rs (target\debug\deps\orin-8944af57d7f8ba35.exe)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3053085Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3053807Z running 0 tests
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3054313Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3055097Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3055746Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3072246Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\orin_core-3c65ed9a6f27b2f8.exe)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3222852Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3224515Z running 39 tests
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3251069Z test arena::tests::arena_push_get_roundtrip ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3251879Z test config::tests::default_roots_nonempty ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3253034Z test arena::tests::arena_truncates_long_names ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3253742Z test arena::tests::arena_multiple_names ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3257933Z test entry::tests::entry_is_pod_and_zeroable ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3260133Z test entry::tests::entry_size_is_20 ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3261106Z test entry::tests::flag_constants_match_spec ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3261971Z test errors::tests::error_display ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3262604Z test fold::tests::cmp_folded_range ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3264132Z test fold::tests::fold_ascii ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3266796Z test fold::tests::fold_unicode_lowercase ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3269767Z test fold::tests::nfc_roundtrip ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3270851Z test fold::tests::prefix_cmp_equal_when_prefix ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3271614Z test index::tests::finalize_sorts_folded ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3272784Z test index::tests::prefix_search_window ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3274078Z test index::tests::path_of_assembles ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3278676Z test index::tests::substring_scan_finds_case_insensitive ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3279503Z test paths::tests::data_dir_env_override ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3280191Z test query::filter::tests::ext_filter_negation ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3281015Z test query::filter::tests::ext_filter_positive ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3292679Z test protocol::tests::response_roundtrip ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3293515Z test protocol::tests::frame_roundtrip ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3294236Z test query::filter::tests::kind_filter ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3294922Z test query::matcher::tests::literal_match_ascii ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3296731Z test query::matcher::tests::literal_match_case_insensitive ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3297449Z test query::parse::tests::parse_ext_filter ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3298174Z test query::parse::tests::parse_ext_negation ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3298930Z test query::parse::tests::parse_literal ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3299502Z test query::parse::tests::parse_size ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3300203Z test query::parse::tests::parse_smart_case ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3306631Z test query::parse::tests::parse_type ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3307436Z test query::score::tests::exact_match_scores_highest ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3308258Z test query::score::tests::prefix_match_scores_high ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3309397Z test query::score::tests::word_boundary_scores_higher ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3316205Z test query::tests::parse_query_reexports ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.3319275Z test snapshot::tests::encode_decode_roundtrip ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.6360038Z test snapshot::tests::snapshot_roundtrip_preserves_search ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.6424873Z test snapshot::tests::snapshot_rejects_corruption ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.6429140Z test snapshot::tests::snapshot_rejects_wrong_magic ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.6429928Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.6430563Z test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.6431356Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.6468994Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\orin_daemon-aebed40bbdd757d1.exe)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.6639527Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.6640197Z running 8 tests
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.8549879Z test checkpoint::tests::checkpoint_save_load ... FAILED
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.8570620Z test apply::tests::apply_create ... FAILED
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.8572609Z test scan::tests::scan_root_basic ... FAILED
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.8579947Z test server::tests::server_creation ... FAILED
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.8595595Z test watch::tests::watcher_handle_creation ... FAILED
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.8596652Z test tests::daemon_modules_compile ... ok
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.8604567Z test state::tests::state_creation ... FAILED
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9949328Z test revalidate::tests::revalidate_basic ... FAILED
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9950189Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9951659Z failures:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9952030Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9952395Z ---- checkpoint::tests::checkpoint_save_load stdout ----
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9952849Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9953409Z thread 'checkpoint::tests::checkpoint_save_load' (7232) panicked at crates\orin-daemon\src\checkpoint.rs:143:58:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9954314Z called `Result::unwrap()` on an `Err` value: Access is denied. (os error 5)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9955048Z note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9955985Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9956233Z ---- apply::tests::apply_create stdout ----
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9956543Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9956936Z thread 'apply::tests::apply_create' (7244) panicked at crates\orin-daemon\src\apply.rs:171:58:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9957657Z called `Result::unwrap()` on an `Err` value: Access is denied. (os error 5)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9958040Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9958268Z ---- scan::tests::scan_root_basic stdout ----
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9958542Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9958855Z thread 'scan::tests::scan_root_basic' (7216) panicked at crates\orin-daemon\src\scan.rs:162:9:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9959455Z assertion `left == right` failed
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9959854Z   left: 3
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9960194Z  right: 2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9960346Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9960588Z ---- server::tests::server_creation stdout ----
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9960887Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9961223Z thread 'server::tests::server_creation' (7212) panicked at crates\orin-daemon\src\server.rs:333:63:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9962310Z called `Result::unwrap()` on an `Err` value: Access is denied. (os error 5)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9962759Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9963001Z ---- watch::tests::watcher_handle_creation stdout ----
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9964700Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9965123Z thread 'watch::tests::watcher_handle_creation' (7200) panicked at crates\orin-daemon\src\watch.rs:158:58:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9965923Z called `Result::unwrap()` on an `Err` value: Access is denied. (os error 5)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9966374Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9966598Z ---- state::tests::state_creation stdout ----
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9966859Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9967309Z thread 'state::tests::state_creation' (7208) panicked at crates\orin-daemon\src\state.rs:126:44:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9968054Z called `Result::unwrap()` on an `Err` value: Access is denied. (os error 5)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9968488Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9968742Z ---- revalidate::tests::revalidate_basic stdout ----
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9969073Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9969679Z thread 'revalidate::tests::revalidate_basic' (7220) panicked at crates\orin-core\src\index.rs:282:44:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9970488Z index out of bounds: the len is 0 but the index is 0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9970849Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9970854Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9971044Z failures:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9971401Z     apply::tests::apply_create
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9971835Z     checkpoint::tests::checkpoint_save_load
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9972305Z     revalidate::tests::revalidate_basic
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9972801Z     scan::tests::scan_root_basic
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9973251Z     server::tests::server_creation
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9973674Z     state::tests::state_creation
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9974071Z     watch::tests::watcher_handle_creation
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9974401Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9974823Z test result: FAILED. 1 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9975309Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:39.9989905Z [1m[91merror[0m: test failed, to rerun pass `-p orin-daemon --lib`
+test (windows-latest)	Run cargo test --workspace	2026-10-09T19:29:40.1148852Z ##[error]Process completed with exit code 1.
