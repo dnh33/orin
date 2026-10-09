@@ -73,7 +73,7 @@ impl Revalidate {
 }
 
 /// Revalidate a single root: walk filesystem and compare with index.
-fn revalidate_root(state: &SharedState, root: &PathBuf) -> Result<(u64, u64)> {
+fn revalidate_root(state: &SharedState, root: &Path) -> Result<(u64, u64)> {
     use ignore::WalkBuilder;
 
     let mut checked = 0u64;

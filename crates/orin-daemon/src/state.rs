@@ -47,7 +47,7 @@ pub struct ScanProgress {
 
 impl State {
     /// Create a new state with an empty index and default roots.
-    pub fn new(data_dir: &PathBuf) -> Result<Self> {
+    pub fn new(data_dir: &Path) -> Result<Self> {
         let index = Index::new();
         let roots = orin_core::config::default_roots()
             .into_iter()
@@ -109,7 +109,7 @@ impl State {
 pub type SharedState = Arc<Mutex<State>>;
 
 /// Create a new shared state.
-pub fn new_shared(data_dir: &PathBuf) -> Result<SharedState> {
+pub fn new_shared(data_dir: &Path) -> Result<SharedState> {
     Ok(Arc::new(Mutex::new(State::new(data_dir)?)))
 }
 

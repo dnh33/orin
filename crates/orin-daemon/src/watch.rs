@@ -103,7 +103,7 @@ pub fn start_polling_watcher(
 }
 
 fn poll_root(
-    root: &PathBuf,
+    root: &Path,
     last_modified: &mut std::collections::HashMap<PathBuf, std::time::SystemTime>,
     state: &SharedState,
 ) -> Result<()> {

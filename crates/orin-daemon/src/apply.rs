@@ -1,7 +1,7 @@
 //! Apply queued filesystem changes to the index.
 
 use anyhow::Result;
-use orin_core::index::{Index, NewEntry};
+use orin_core::index::NewEntry;
 use std::path::Path;
 use tracing::{debug, info};
 
