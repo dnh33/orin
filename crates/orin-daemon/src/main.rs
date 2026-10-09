@@ -24,23 +24,23 @@ use tracing_subscriber::{EnvFilter, fmt};
 struct Args {
     /// Data directory (overrides ORIN_DATA_DIR)
     #[arg(long, value_name = "DIR")]
-    data_dir: Option<PathBuf>
+    data_dir: Option<PathBuf>,
 
     /// Socket path (overrides ORIN_SOCKET)
     #[arg(long, value_name = "PATH")]
-    socket: Option<String>
+    socket: Option<String>,
 
     /// Log level (trace, debug, info, warn, error)
     #[arg(long, default_value = "info")]
-    log_level: String
+    log_level: String,
 
     /// Run in foreground (don't daemonize)
     #[arg(long)]
-    foreground: bool
+    foreground: bool,
 
     /// Exit after idle seconds (0 = never)
     #[arg(long, default_value = "0")]
-    idle_exit: u64
+    idle_exit: u64,
 }
 
 fn main() -> Result<()> {
