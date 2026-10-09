@@ -96,7 +96,7 @@ pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64>
 /// Full initial scan of all roots.
 pub fn initial_scan(state: &SharedState) -> Result<u64> {
     info!("starting initial scan");
-    let start = std::time::Instant::now();
+    let _start = std::time::Instant::now();
 
     let roots: Vec<(PathBuf, usize)> = {
         let state = state.lock().unwrap();
@@ -108,7 +108,7 @@ pub fn initial_scan(state: &SharedState) -> Result<u64> {
             .collect()
     };
 
-    let mut total_entries = Arc::new(AtomicU64::new(0));
+    let total_entries = Arc::new(AtomicU64::new(0));
     let mut idx = Index::new();
 
     for (root_path, root_idx) in roots {

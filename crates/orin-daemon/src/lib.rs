@@ -15,7 +15,6 @@ pub mod watch;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::tempdir;
 
     #[test]
     fn daemon_modules_compile() {

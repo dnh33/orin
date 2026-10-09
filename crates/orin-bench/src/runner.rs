@@ -1,7 +1,6 @@
 //! Tool runner + timing.
 
 use anyhow::Context;
-use serde_json;
 use std::path::PathBuf;
 use std::process::Command;
 use std::time::{Duration, Instant};

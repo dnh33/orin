@@ -6,7 +6,6 @@ use orin_core::paths::socket_name;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use sysinfo::System;
-use tracing::info;
 
 /// Shared daemon state, guarded by a mutex for interior mutability.
 pub struct State {

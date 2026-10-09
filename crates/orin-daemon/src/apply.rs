@@ -95,15 +95,15 @@ fn apply_create(state: &SharedState, path: &Path, is_dir: bool) -> Result<bool> 
 }
 
 fn apply_modify(state: &SharedState, path: &Path) -> Result<bool> {
-    let mut state = state.lock().unwrap();
+    let state = state.lock().unwrap();
     if let Some(idx) = state.index.lookup_path(path) {
-        let metadata = match std::fs::metadata(path) {
+        let _metadata = match std::fs::metadata(path) {
             Ok(m) => m,
             Err(_) => return Ok(false),
         };
 
         // Update entry in place (simplified - real impl would handle this better)
-        let entry = state.index.entry(idx);
+        let _entry = state.index.entry(idx);
         // Note: Entry is immutable, so we'd need a different approach
         // For now, just log
         debug!("apply modify: {} (idx={})", path.display(), idx);
