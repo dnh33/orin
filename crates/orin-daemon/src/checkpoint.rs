@@ -70,7 +70,7 @@ impl Checkpoint {
         let tmp_path = self.data_dir.join("orin.snap.tmp");
 
         let mut state = state.lock().unwrap();
-        save_snapshot(&tmp_path, &state.index)?;
+        save_snapshot(&state.index, &tmp_path)?;
 
         // Atomic rename
         std::fs::rename(&tmp_path, &snapshot_path)?;
