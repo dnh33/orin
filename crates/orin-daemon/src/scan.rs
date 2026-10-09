@@ -143,6 +143,7 @@ pub fn rescan_root(state: &SharedState, root_idx: usize) -> Result<u64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use orin_core::index::Index;
     use tempfile::tempdir;
 
     #[test]
