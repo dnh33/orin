@@ -83,7 +83,10 @@ fn handle_event(event: Event, state: &SharedState) {
 }
 
 /// Polling fallback for platforms where notify doesn't work well.
-pub fn start_polling_watcher(roots: Vec<PathBuf>, state: SharedState) -> Result<thread::JoinHandle<()>> {
+pub fn start_polling_watcher(
+    roots: Vec<PathBuf>,
+    state: SharedState,
+) -> Result<thread::JoinHandle<()>> {
     let handle = thread::spawn(move || {
         let mut last_modified = std::collections::HashMap::new();
         loop {
@@ -98,7 +101,11 @@ pub fn start_polling_watcher(roots: Vec<PathBuf>, state: SharedState) -> Result<
     Ok(handle)
 }
 
-fn poll_root(root: &PathBuf, last_modified: &mut std::collections::HashMap<PathBuf, std::time::SystemTime>, state: &SharedState) -> Result<()> {
+fn poll_root(
+    root: &PathBuf,
+    last_modified: &mut std::collections::HashMap<PathBuf, std::time::SystemTime>,
+    state: &SharedState,
+) -> Result<()> {
     use ignore::WalkBuilder;
     let walker = WalkBuilder::new(root)
         .follow_links(false)

@@ -57,10 +57,14 @@ fn main() -> Result<()> {
 
     // Override env vars if provided
     if let Some(d) = args.data_dir {
-        unsafe { std::env::set_var("ORIN_DATA_DIR", &d); }
+        unsafe {
+            std::env::set_var("ORIN_DATA_DIR", &d);
+        }
     }
     if let Some(s) = args.socket {
-        unsafe { std::env::set_var("ORIN_SOCKET", &s); }
+        unsafe {
+            std::env::set_var("ORIN_SOCKET", &s);
+        }
     }
 
     let data_dir = data_dir();

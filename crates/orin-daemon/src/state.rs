@@ -33,8 +33,8 @@ pub struct State {
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RootEntry {
     pub path: PathBuf,
-    pub first: u32,   // index of first entry in this root
-    pub count: u32,   // number of entries in this root
+    pub first: u32,    // index of first entry in this root
+    pub count: u32,    // number of entries in this root
     pub watch: String, // "auto" | "notify" | "poll" | "none"
 }
 
