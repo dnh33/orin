@@ -57,7 +57,10 @@ pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
     }
     fs::create_dir_all(out).with_context(|| format!("create {}", out.display()))?;
 
-    let mut rng = StdRng::from_seed(seed.to_le_bytes());
+    // Expand 8-byte seed to 32-byte array for StdRng
+    let mut seed_bytes = [0u8; 32];
+    seed_bytes[..8].copy_from_slice(&seed.to_le_bytes());
+    let mut rng = StdRng::from_seed(seed_bytes);
 
     // Build directory tree
     let mut dirs: Vec<PathBuf> = vec![out.clone()];
