@@ -127,4 +127,3 @@ mod tests {
         assert!(state.listener.is_some());
     }
 }
-

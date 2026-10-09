@@ -86,5 +86,3 @@ fn main() -> Result<()> {
     info!("orin daemon stopped");
     Ok(())
 }
-
-

@@ -75,8 +75,10 @@ pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64>
         mtimes.push(mtime);
     }
 
-    let entries: Vec<NewEntry<'_>> = names.iter().enumerate().map(|(i, name)| {
-        NewEntry {
+    let entries: Vec<NewEntry<'_>> = names
+        .iter()
+        .enumerate()
+        .map(|(i, name)| NewEntry {
             name: name.as_str(),
             parent: None,
             kind: kinds[i],
@@ -84,8 +86,8 @@ pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64>
             size: sizes[i],
             mtime: mtimes[i],
             root: root_idx,
-        }
-    }).collect();
+        })
+        .collect();
 
     index.insert_batch(&entries, 0);
     index.finalize();

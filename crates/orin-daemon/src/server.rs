@@ -277,7 +277,9 @@ impl Server {
             RootsRemove { id, path } => {
                 let mut state = self.state.lock().unwrap();
                 let len_before = state.roots.len();
-                state.roots.retain(|r| r.path != std::path::Path::new(&path));
+                state
+                    .roots
+                    .retain(|r| r.path != std::path::Path::new(&path));
                 if state.roots.len() == len_before {
                     Response::Error {
                         id,
@@ -327,4 +329,3 @@ mod tests {
         assert_eq!(server.idle_exit_secs, 0);
     }
 }
-
