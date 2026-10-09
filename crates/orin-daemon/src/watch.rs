@@ -22,7 +22,7 @@ impl WatcherHandle {
     pub fn start(roots: Vec<PathBuf>, state: SharedState) -> Result<Self> {
         let (tx, rx) = mpsc::channel();
 
-        let watcher = RecommendedWatcher::new(tx.clone(), Config::default())?;
+        let mut watcher = RecommendedWatcher::new(tx.clone(), Config::default())?;
 
         // Watch each root
         for root in roots {
@@ -47,7 +47,7 @@ impl WatcherHandle {
 
         Ok(Self {
             watcher: Some(watcher),
-            rx: Some(rx),
+            rx: None, // rx only used internally, no need to expose
             thread: Some(thread),
         })
     }

@@ -11,14 +11,9 @@ use tracing::{debug, info, warn};
 
 use crate::state::{RootEntry, ScanProgress, SharedState};
 
-/// Scan a single root directory and return NewEntry items.
-pub fn scan_root(root: &Path, root_idx: usize) -> Result<Vec<NewEntry<'_>>> {
-    scan_root_seq(root, root_idx)
-}
-
-/// Sequential scan for initial implementation, inserts entries into index.
+/// Scan a single root directory and insert entries into index.
 /// Returns the number of entries inserted.
-pub fn scan_root_seq(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64> {
+pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64> {
     let walker = WalkBuilder::new(root)
         .follow_links(false)
         .hidden(false)
@@ -105,7 +100,7 @@ pub fn initial_scan(state: &SharedState) -> Result<u64> {
     let mut idx = Index::new();
 
     for (root_path, root_idx) in roots {
-        let count = scan_root_seq(&root_path, root_idx, &mut idx)?;
+        let count = scan_root(&root_path, root_idx, &mut idx)?;
         total_entries.fetch_add(count as u64, Ordering::Relaxed);
     }
 
@@ -152,7 +147,7 @@ mod tests {
         std::fs::create_dir(dir.path().join("subdir")).unwrap();
 
         let mut idx = Index::new();
-        let count = scan_root_seq(dir.path(), 0, &mut idx).unwrap();
+        let count = scan_root(dir.path(), 0, &mut idx).unwrap();
         assert_eq!(count, 2); // file.txt + subdir
     }
 }
