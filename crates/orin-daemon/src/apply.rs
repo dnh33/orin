@@ -8,6 +8,7 @@ use tracing::debug;
 use crate::state::SharedState;
 
 /// Apply a batch of filesystem events to the index.
+#[allow(dead_code)]
 pub fn apply_events(state: &SharedState, events: Vec<FsEvent>) -> Result<usize> {
     let mut applied = 0;
     for event in events {
@@ -38,7 +39,7 @@ pub enum FsEvent {
     },
 }
 
-/// Apply a single event.
+#[allow(dead_code)]
 fn apply_single(state: &SharedState, event: FsEvent) -> Result<bool> {
     match event {
         FsEvent::Create { path, is_dir } => apply_create(state, &path, is_dir),
@@ -48,6 +49,7 @@ fn apply_single(state: &SharedState, event: FsEvent) -> Result<bool> {
     }
 }
 
+#[allow(dead_code)]
 fn apply_create(state: &SharedState, path: &Path, is_dir: bool) -> Result<bool> {
     let mut state = state.lock().unwrap();
     let root_idx = find_root(&state, path)?;
@@ -95,6 +97,7 @@ fn apply_create(state: &SharedState, path: &Path, is_dir: bool) -> Result<bool> 
     Ok(true)
 }
 
+#[allow(dead_code)]
 fn apply_modify(state: &SharedState, path: &Path) -> Result<bool> {
     let state = state.lock().unwrap();
     if let Some(idx) = state.index.lookup_path(path) {
@@ -114,6 +117,7 @@ fn apply_modify(state: &SharedState, path: &Path) -> Result<bool> {
     }
 }
 
+#[allow(dead_code)]
 fn apply_remove(state: &SharedState, path: &Path) -> Result<bool> {
     let mut state = state.lock().unwrap();
     if let Some(idx) = state.index.lookup_path(path) {
@@ -126,6 +130,7 @@ fn apply_remove(state: &SharedState, path: &Path) -> Result<bool> {
     }
 }
 
+#[allow(dead_code)]
 fn apply_rename(state: &SharedState, from: &Path, to: &Path) -> Result<bool> {
     // Treat as remove + create
     apply_remove(state, from)?;
@@ -133,6 +138,7 @@ fn apply_rename(state: &SharedState, from: &Path, to: &Path) -> Result<bool> {
     apply_create(state, to, is_dir)
 }
 
+#[allow(dead_code)]
 fn find_root(state: &crate::state::State, path: &Path) -> Result<usize> {
     for (i, root) in state.roots.iter().enumerate() {
         if path.starts_with(&root.path) {
@@ -142,6 +148,7 @@ fn find_root(state: &crate::state::State, path: &Path) -> Result<usize> {
     anyhow::bail!("no root contains path: {}", path.display())
 }
 
+#[allow(dead_code)]
 fn find_parent(state: &crate::state::State, path: &Path, root_idx: usize) -> Result<u32> {
     let parent = path.parent().ok_or_else(|| anyhow::anyhow!("no parent"))?;
     if parent == state.roots[root_idx].path {

@@ -12,6 +12,7 @@ use tracing::{info, warn};
 use crate::state::SharedState;
 
 /// Checkpoint manager: handles periodic snapshots and recovery.
+#[allow(dead_code)]
 pub struct Checkpoint {
     data_dir: PathBuf,
     interval_secs: u64,
@@ -19,6 +20,7 @@ pub struct Checkpoint {
 }
 
 impl Checkpoint {
+    #[allow(dead_code)]
     /// Create a new checkpoint manager.
     pub fn new(data_dir: PathBuf, interval_secs: u64) -> Self {
         Self {
