@@ -19,6 +19,7 @@ pub fn apply_events(state: &SharedState, events: Vec<FsEvent>) -> Result<usize> 
 }
 
 /// A single filesystem event to apply.
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum FsEvent {
     Create {

@@ -10,6 +10,7 @@ use crate::state::SharedState;
 
 /// Revalidation manager: periodically verifies index against filesystem.
 pub struct Revalidate {
+    #[allow(dead_code)]
     interval_secs: u64,
     last_run: AtomicU64,
 }
