@@ -87,9 +87,10 @@ pub fn scan_root(root: &Path, root_idx: usize) -> Result<(Vec<NewEntry<'_>>, u64
         }
     }).collect();
 
-    Ok((entries, entries.len() as u64))
+    index.insert_batch(&entries, 0);
+    index.finalize();
+    Ok(entries.len() as u64)
 }
-
 
 /// Full initial scan of all roots.
 pub fn initial_scan(state: &SharedState) -> Result<u64> {
@@ -108,8 +109,7 @@ pub fn initial_scan(state: &SharedState) -> Result<u64> {
     let mut idx = Index::new();
 
     for (root_path, root_idx) in roots {
-        let (entries, count) = scan_root(&root_path, root_idx)?;
-        index.insert_batch(&entries, 0);
+        let count = scan_root(&root_path, root_idx, &mut idx)?;
         total_entries.fetch_add(count as u64, Ordering::Relaxed);
     }
 
@@ -130,13 +130,15 @@ pub fn rescan_root(state: &SharedState, root_idx: usize) -> Result<u64> {
         (state.roots[root_idx].path.clone(), root_idx)
     };
 
-    let (entries, count) = scan_root(&root_path, root_idx)?;
+    let mut index = Index::new();
+    let count = scan_root(&root_path, root_idx, &mut index)?;
 
     {
         let mut state = state.lock().unwrap();
-        state.index.insert_batch(&entries, 0);
+        // Note: full re-scan insertion simplified; real impl uses tombstones
+        state.index.insert_batch(&index.entries.iter().copied().collect::<Vec<_>>(), 0);
         state.index.finalize();
-        state.roots[root_idx].count = entries.len() as u32;
+        state.roots[root_idx].count = index.len() as u32;
     }
 
     Ok(count)
@@ -154,8 +156,7 @@ mod tests {
         std::fs::create_dir(dir.path().join("subdir")).unwrap();
 
         let mut idx = Index::new();
-        let (entries, count) = scan_root(dir.path(), 0).unwrap();
-        idx.insert_batch(&entries, 0);
+        let count = scan_root(dir.path(), 0, &mut idx).unwrap();
         assert_eq!(count, 2); // file.txt + subdir
     }
 }
