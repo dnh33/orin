@@ -2,8 +2,8 @@
 
 use anyhow::Result;
 use ignore::WalkBuilder;
+use orin_core::config::default_roots;
 use orin_core::index::{Index, NewEntry};
-use orin_core::paths::default_roots;
 use rayon::prelude::*;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};

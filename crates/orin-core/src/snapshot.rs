@@ -16,7 +16,7 @@ pub const SNAPSHOT_FORMAT: u32 = 1;
 
 /// Snapshot header (64 bytes).
 #[repr(C, packed)]
-struct SnapshotHeader {
+pub struct SnapshotHeader {
     magic: [u8; 8],
     format: u32,
     entry_count: u64,
@@ -32,12 +32,25 @@ struct SnapshotHeader {
 const _: () = assert!(std::mem::size_of::<SnapshotHeader>() == 64);
 
 /// Read packed header from bytes, copying all fields to avoid unaligned references.
-fn read_header(bytes: &[u8; 64]) -> SnapshotHeader {
+pub fn read_header(bytes: &[u8; 64]) -> SnapshotHeader {
     unsafe { std::ptr::read_unaligned(bytes.as_ptr() as *const SnapshotHeader) }
 }
 
 /// Save index to an atomic snapshot file.
-pub fn save(index: &crate::index::Index, path: &Path) -> std::io::Result<()> {
+pub fn save_snapshot(index: &crate::index::Index, path: &Path) -> std::io::Result<()> {
+    save(index, path)
+}
+
+/// Load index from a snapshot file.
+pub fn load_snapshot(path: &Path, index: &mut crate::index::Index) -> std::io::Result<bool> {
+    match load(path) {
+        Ok(loaded) => {
+            *index = loaded;
+            Ok(true)
+        }
+        Err(e) => Err(std::io::Error::new(std::io::ErrorKind::Other, e)),
+    }
+}
     let tmp_path = path.with_extension("snap.tmp");
 
     // Serialize roots to JSON

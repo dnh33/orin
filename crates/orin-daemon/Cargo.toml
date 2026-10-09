@@ -24,6 +24,8 @@ rayon = { workspace = true }
 bytemuck = { workspace = true }
 crc32fast = { workspace = true }
 sysinfo = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 tempfile = { workspace = true, optional = true }
 
 [features]
