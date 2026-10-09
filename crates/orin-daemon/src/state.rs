@@ -8,6 +8,7 @@ use std::sync::{Arc, Mutex};
 use sysinfo::System;
 
 /// Shared daemon state, guarded by a mutex for interior mutability.
+#[allow(dead_code)]
 pub struct State {
     /// The search index (entries + names arena + sorted keys).
     pub index: Index,
@@ -18,6 +19,7 @@ pub struct State {
     /// System info for memory/CPU reporting.
     pub sys: System,
     /// Total entries ever seen (for progress reporting).
+    #[allow(dead_code)]
     pub total_entries: u64,
     /// Unreadable paths encountered during scan.
     pub unreadable: u64,
@@ -80,6 +82,7 @@ impl State {
         Ok(listener)
     }
 
+    #[allow(dead_code)]
     /// Get the socket name for logging/status.
     pub fn socket_name(&self) -> String {
         // Use the listener name for reference; daemon was started with a known socket path
@@ -92,6 +95,7 @@ impl State {
         self.sys.refresh_cpu_all();
     }
 
+    #[allow(dead_code)]
     /// Memory usage in bytes (RSS).
     pub fn memory_bytes(&self) -> u64 {
         self.sys.used_memory()

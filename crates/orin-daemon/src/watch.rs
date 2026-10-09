@@ -11,6 +11,7 @@ use tracing::{debug, info, warn};
 use crate::state::SharedState;
 
 /// Watcher handle for managing the background watcher thread.
+#[allow(dead_code)]
 pub struct WatcherHandle {
     watcher: Option<RecommendedWatcher>,
     #[allow(dead_code)]
@@ -83,6 +84,7 @@ fn handle_event(event: Event, _state: &SharedState) {
     }
 }
 
+#[allow(dead_code)]
 /// Polling fallback for platforms where notify doesn't work well.
 pub fn start_polling_watcher(
     roots: Vec<PathBuf>,
@@ -102,6 +104,7 @@ pub fn start_polling_watcher(
     Ok(handle)
 }
 
+#[allow(dead_code)]
 fn poll_root(
     root: &Path,
     last_modified: &mut std::collections::HashMap<PathBuf, std::time::SystemTime>,

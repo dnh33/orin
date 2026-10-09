@@ -10,6 +10,7 @@ use tracing::{info, warn};
 
 use crate::state::SharedState;
 
+#[allow(dead_code)]
 /// Scan a single root directory and insert entries into index.
 /// Returns the number of entries inserted.
 pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64> {
@@ -93,6 +94,7 @@ pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64>
     Ok(entries.len() as u64)
 }
 
+#[allow(dead_code)]
 /// Full initial scan of all roots.
 pub fn initial_scan(state: &SharedState) -> Result<u64> {
     info!("starting initial scan");
@@ -125,6 +127,7 @@ pub fn initial_scan(state: &SharedState) -> Result<u64> {
     Ok(total_entries.load(Ordering::Relaxed))
 }
 
+#[allow(dead_code)]
 /// Incremental re-scan of a single root.
 pub fn rescan_root(state: &SharedState, root_idx: usize) -> Result<u64> {
     info!("rescanning root {}", root_idx);
