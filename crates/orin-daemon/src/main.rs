@@ -17,7 +17,7 @@ use clap::Parser;
 use orin_core::paths::{data_dir, socket_name};
 use std::path::PathBuf;
 use tracing::{info, warn};
-use tracing_subscriber::{fmt, filter::EnvFilter};
+use tracing_subscriber::{EnvFilter, fmt};
 
 #[derive(Parser, Debug)]
 #[command(name = "orind", version, about = "orin daemon — whole-disk instant file search")]
