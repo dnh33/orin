@@ -45,7 +45,7 @@ pub struct ScanProgress {
 
 impl State {
     /// Create a new state with an empty index and default roots.
-    pub fn new(data_dir: &Path) -> Result<Self> {
+    pub fn new(_data_dir: &Path) -> Result<Self> {
         let index = Index::new();
         let roots = orin_core::config::default_roots()
             .into_iter()

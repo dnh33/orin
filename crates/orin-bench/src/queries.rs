@@ -37,6 +37,7 @@ impl QueryMatrix {
         serde_json::from_str(&data).context("parse queries.json")
     }
 
+    #[allow(dead_code)]
     pub fn save(&self, path: &PathBuf) -> anyhow::Result<()> {
         std::fs::write(path, serde_json::to_string_pretty(&self)?)
             .with_context(|| format!("write {}", path.display()))
@@ -58,6 +59,7 @@ impl QueryMatrix {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct Queries {
     pub corpus_size: usize,
     pub queries: Vec<String>,

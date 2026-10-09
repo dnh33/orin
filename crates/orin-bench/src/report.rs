@@ -18,10 +18,10 @@ pub fn compare(results_dir: &PathBuf, out: &PathBuf) -> anyhow::Result<()> {
     ];
 
     for entry in &entries {
-        if let Ok(name) = entry.file_name().into_string() {
-            if name.ends_with(".json") {
-                lines.push(format!("| {} | ... | ... | ... | ... | ... |", name));
-            }
+        if let Ok(name) = entry.file_name().into_string()
+            && name.ends_with(".json")
+        {
+            lines.push(format!("| {} | ... | ... | ... | ... | ... |", name));
         }
     }
 

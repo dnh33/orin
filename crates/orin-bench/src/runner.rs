@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::time::{Duration, Instant};
 
+#[allow(dead_code)]
 pub struct RunResult {
     #[allow(dead_code)]
     pub tool: String,
@@ -124,6 +125,7 @@ pub fn run(
     Ok(())
 }
 
+#[allow(dead_code)]
 pub fn summarize(latencies: &[Duration]) -> (f64, f64, f64) {
     if latencies.is_empty() {
         return (0.0, 0.0, 0.0);

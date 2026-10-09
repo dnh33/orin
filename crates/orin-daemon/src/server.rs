@@ -168,7 +168,7 @@ impl Server {
                 root,
             } => {
                 use orin_core::query::{SearchResult, SortKey, parse_query};
-                let mut state = self.state.lock().unwrap();
+                let state = self.state.lock().unwrap();
 
                 let mut query = match parse_query(&q) {
                     Ok(q) => q,
@@ -301,7 +301,7 @@ impl Server {
                 }
             }
 
-            Rescan { id, root } => {
+            Rescan { id, _root } => {
                 let mut state = self.state.lock().unwrap();
                 state.scan_progress = Some(ScanProgress {
                     entries: 0,
