@@ -145,5 +145,3 @@ mod tests {
         assert!(loaded);
     }
 }
-
-
