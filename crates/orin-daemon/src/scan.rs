@@ -13,7 +13,7 @@ use crate::state::{RootEntry, ScanProgress, SharedState};
 
 /// Scan a single root directory and insert entries into index.
 /// Returns the number of entries inserted.
-pub fn scan_root(root: &Path, root_idx: usize) -> Result<(Vec<NewEntry<'_>>, u64)> {
+pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64> {
     let walker = WalkBuilder::new(root)
         .follow_links(false)
         .hidden(false)
