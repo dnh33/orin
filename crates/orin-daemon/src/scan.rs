@@ -13,14 +13,18 @@ use crate::state::{RootEntry, ScanProgress, SharedState};
 
 /// Scan a single root directory and insert entries into index.
 /// Returns the number of entries inserted.
-pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64> {
+pub fn scan_root(root: &Path, root_idx: usize) -> Result<(Vec<NewEntry<'_>>, u64)> {
     let walker = WalkBuilder::new(root)
         .follow_links(false)
         .hidden(false)
         .git_ignore(false)
         .build();
 
-    let mut entries: Vec<NewEntry<'_>> = Vec::new();
+    let mut names = Vec::new();
+    let mut kinds = Vec::new();
+    let mut hiddens = Vec::new();
+    let mut sizes = Vec::new();
+    let mut mtimes = Vec::new();
 
     for result in walker {
         let entry = match result {
@@ -31,7 +35,7 @@ pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64>
             }
         };
 
-        let path = entry.path();
+        let path = entry.path().to_path_buf();
         let metadata = match entry.metadata() {
             Ok(m) => m,
             Err(e) => {
@@ -41,7 +45,7 @@ pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64>
         };
 
         let name = match path.file_name().and_then(|n| n.to_str()) {
-            Some(n) => n,
+            Some(n) => n.to_string(),
             None => {
                 warn!("skipping entry with invalid file name: {}", path.display());
                 continue;
@@ -49,39 +53,43 @@ pub fn scan_root(root: &Path, root_idx: usize, index: &mut Index) -> Result<u64>
         };
 
         let kind = if metadata.is_dir() {
-            orin_core::entry::TYPE_DIR
+            1
         } else if metadata.file_type().is_symlink() {
-            orin_core::entry::TYPE_SYMLINK
+            2
         } else {
-            orin_core::entry::TYPE_FILE
+            0
         };
-
         let hidden = name.starts_with('.') || name.starts_with('$');
+        let size = metadata.len();
+        let mtime = metadata
+            .modified()
+            .ok()
+            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|d| d.as_secs() as u32)
+            .unwrap_or(0);
 
-        let new_entry = NewEntry {
-            name,
-            parent: None,
-            kind,
-            hidden,
-            size: metadata.len(),
-            mtime: metadata
-                .modified()
-                .ok()
-                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
-                .map(|d| d.as_secs() as u32)
-                .unwrap_or(0),
-            root: root_idx,
-        };
-
-        entries.push(new_entry);
+        names.push(name);
+        kinds.push(kind);
+        hiddens.push(hidden);
+        sizes.push(size);
+        mtimes.push(mtime);
     }
 
-    // Insert directly into the index (arena owns the names)
-    index.insert_batch(&entries, 0);
-    index.finalize();
+    let entries: Vec<NewEntry<'_>> = names.iter().enumerate().map(|(i, name)| {
+        NewEntry {
+            name: name.as_str(),
+            parent: None,
+            kind: kinds[i],
+            hidden: hiddens[i],
+            size: sizes[i],
+            mtime: mtimes[i],
+            root: root_idx,
+        }
+    }).collect();
 
-    Ok(entries.len() as u64)
+    Ok((entries, entries.len() as u64))
 }
+
 
 /// Full initial scan of all roots.
 pub fn initial_scan(state: &SharedState) -> Result<u64> {
@@ -100,7 +108,8 @@ pub fn initial_scan(state: &SharedState) -> Result<u64> {
     let mut idx = Index::new();
 
     for (root_path, root_idx) in roots {
-        let count = scan_root(&root_path, root_idx, &mut idx)?;
+        let (entries, count) = scan_root(&root_path, root_idx)?;
+        index.insert_batch(&entries, 0);
         total_entries.fetch_add(count as u64, Ordering::Relaxed);
     }
 
@@ -121,15 +130,13 @@ pub fn rescan_root(state: &SharedState, root_idx: usize) -> Result<u64> {
         (state.roots[root_idx].path.clone(), root_idx)
     };
 
-    let mut idx = Index::new();
-    let count = scan_root(&root_path, root_idx, &mut idx)?;
+    let (entries, count) = scan_root(&root_path, root_idx)?;
 
     {
         let mut state = state.lock().unwrap();
-        // Replace root's entries entirely (simplified - real impl uses tombstones)
-        state.index.insert_batch(&idx.entries.iter().copied().collect::<Vec<_>>(), 0);
+        state.index.insert_batch(&entries, 0);
         state.index.finalize();
-        state.roots[root_idx].count = idx.len() as u32;
+        state.roots[root_idx].count = entries.len() as u32;
     }
 
     Ok(count)
@@ -147,7 +154,8 @@ mod tests {
         std::fs::create_dir(dir.path().join("subdir")).unwrap();
 
         let mut idx = Index::new();
-        let count = scan_root(dir.path(), 0, &mut idx).unwrap();
+        let (entries, count) = scan_root(dir.path(), 0).unwrap();
+        idx.insert_batch(&entries, 0);
         assert_eq!(count, 2); // file.txt + subdir
     }
 }
