@@ -52,8 +52,8 @@ fn main() -> Result<()> {
     let args = Args::parse();
 
     // Initialize tracing
-    let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new(&args.log_level));
+    let filter =
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(&args.log_level));
     fmt().with_env_filter(filter).init();
 
     // Override env vars if provided
