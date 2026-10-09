@@ -48,7 +48,7 @@ pub fn load_snapshot(path: &Path, index: &mut crate::index::Index) -> std::io::R
             *index = loaded;
             Ok(true)
         }
-        Err(e) => Err(std::io::Error::new(std::io::ErrorKind::Other, e)),
+        Err(e) => Err(std::io::Error::other(e)),
     }
 }
 
@@ -341,7 +341,6 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::tempdir;
 
     #[test]
     fn snapshot_roundtrip_preserves_search() {
