@@ -1,7 +1,6 @@
 //! Daemon state: index, config, roots, watcher handle, metrics.
 
 use anyhow::Result;
-use interprocess::local_socket::GenericNamespaced;
 use orin_core::index::Index;
 use orin_core::paths::socket_name;
 use std::path::{Path, PathBuf};

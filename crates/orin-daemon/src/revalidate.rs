@@ -1,13 +1,12 @@
 //! Periodic revalidation: scan roots and reconcile with index.
 
 use anyhow::Result;
-use orin_core::index::Index;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tracing::{debug, info, warn};
 
-use crate::state::{SharedState, State};
+use crate::state::SharedState;
 
 /// Revalidation manager: periodically verifies index against filesystem.
 pub struct Revalidate {

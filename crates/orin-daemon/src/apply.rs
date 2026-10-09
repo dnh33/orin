@@ -3,7 +3,7 @@
 use anyhow::Result;
 use orin_core::index::NewEntry;
 use std::path::Path;
-use tracing::{debug, info};
+use tracing::debug;
 
 use crate::state::SharedState;
 

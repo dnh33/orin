@@ -1,14 +1,14 @@
 //! IPC server: accepts connections, reads frames, dispatches to handlers, writes responses.
 
 use anyhow::Result;
-use interprocess::local_socket::{ListenerNonblockingMode, ListenerOptions, Stream, prelude::*};
+use interprocess::local_socket::{ListenerNonblockingMode, Stream, prelude::*};
 use orin_core::protocol::{
     PROTOCOL_VERSION, Progress, Request, Response, RootWire, StatusData, read_frame, write_frame,
 };
 use std::io::{BufReader, BufWriter, Write};
 use std::sync::atomic::Ordering;
 use std::time::{Duration, Instant};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use crate::state::{ScanProgress, SharedState};
 

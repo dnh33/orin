@@ -7,9 +7,9 @@ use std::io::Read;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 
-use crate::state::{SharedState, State};
+use crate::state::SharedState;
 
 /// Checkpoint manager: handles periodic snapshots and recovery.
 pub struct Checkpoint {

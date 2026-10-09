@@ -2,14 +2,13 @@
 
 use anyhow::Result;
 use ignore::WalkBuilder;
-use orin_core::config::default_roots;
 use orin_core::index::{Index, NewEntry};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 
-use crate::state::{RootEntry, ScanProgress, SharedState};
+use crate::state::SharedState;
 
 /// Scan a single root directory and insert entries into index.
 /// Returns the number of entries inserted.
