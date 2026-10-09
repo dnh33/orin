@@ -97,7 +97,7 @@ pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
             _ => rng.gen_range(1..1_000),           // default
         };
 
-        let content: Vec<u8> = (0..size).map(|_| rng.gen()).collect();
+        let content: Vec<u8> = (0..size).map(|_| rng.gen_range(0..256u8)).collect();
         fs::write(&path, &content)?;
         written += 1;
         i += 1;
