@@ -26,7 +26,7 @@ rmcp = "3.5"
 bytemuck = { version = "1", features = ["derive"] }
 crc32fast = "1"
 unicode-normalization = "0.1"
-dirs = "6"
+dirs = "7"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 anyhow = "1"
