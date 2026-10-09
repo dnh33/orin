@@ -22,21 +22,7 @@ impl WatcherHandle {
     pub fn start(roots: Vec<PathBuf>, state: SharedState) -> Result<Self> {
         let (tx, rx) = mpsc::channel();
 
-        let watcher: Result<RecommendedWatcher, _> = RecommendedWatcher::new(
-            tx.clone(),
-            Config::default().with_poll_interval(Duration::from_secs(30)),
-        );
-        let watcher = match watcher {
-            Ok(w) => w,
-            Err(e) => {
-                warn!("notify watcher failed, falling back to poll: {}", e);
-                let poll_watcher = notify::PollWatcher::new(
-                    tx,
-                    Config::default().with_poll_interval(Duration::from_secs(30)),
-                )?;
-                RecommendedWatcher::Poll(poll_watcher)
-            }
-        };
+        let watcher = RecommendedWatcher::new(tx.clone(), Config::default())?;
 
         // Watch each root
         for root in roots {
