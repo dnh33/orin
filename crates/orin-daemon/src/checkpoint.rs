@@ -30,6 +30,7 @@ impl Checkpoint {
         }
     }
 
+    #[allow(dead_code)]
     /// Try to load a snapshot on startup.
     pub fn try_load(&self, state: &SharedState) -> Result<bool> {
         let snapshot_path = self.data_dir.join("orin.snap");
@@ -53,6 +54,7 @@ impl Checkpoint {
         Ok(loaded)
     }
 
+    #[allow(dead_code)]
     /// Save a snapshot if interval has elapsed.
     pub fn maybe_checkpoint(&self, state: &SharedState) -> Result<bool> {
         let now = SystemTime::now()
@@ -69,6 +71,7 @@ impl Checkpoint {
         Ok(true)
     }
 
+    #[allow(dead_code)]
     /// Force save a snapshot (called on shutdown).
     pub fn save(&self, state: &SharedState) -> Result<()> {
         let snapshot_path = self.data_dir.join("orin.snap");
@@ -95,6 +98,7 @@ impl Checkpoint {
         Ok(())
     }
 
+    #[allow(dead_code)]
     /// Get snapshot info for status.
     pub fn snapshot_info(&self) -> Option<SnapshotHeader> {
         let snapshot_path = self.data_dir.join("orin.snap");
@@ -109,6 +113,7 @@ impl Checkpoint {
     }
 }
 
+#[allow(dead_code)]
 /// Background checkpoint task.
 pub fn start_checkpoint_task(
     checkpoint: std::sync::Arc<Checkpoint>,

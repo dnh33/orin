@@ -9,6 +9,7 @@ use tracing::{debug, info, warn};
 use crate::state::SharedState;
 
 /// Revalidation manager: periodically verifies index against filesystem.
+#[allow(dead_code)]
 pub struct Revalidate {
     #[allow(dead_code)]
     interval_secs: u64,
@@ -16,6 +17,7 @@ pub struct Revalidate {
 }
 
 impl Revalidate {
+    #[allow(dead_code)]
     /// Create a new revalidation manager.
     pub fn new(interval_secs: u64) -> Self {
         Self {
@@ -24,6 +26,7 @@ impl Revalidate {
         }
     }
 
+    #[allow(dead_code)]
     /// Run revalidation if interval has elapsed.
     pub fn maybe_revalidate(&self, state: &SharedState) -> Result<bool> {
         let now = SystemTime::now()
@@ -41,6 +44,7 @@ impl Revalidate {
         Ok(true)
     }
 
+    #[allow(dead_code)]
     /// Run a full revalidation pass.
     fn run(&self, state: &SharedState) -> Result<()> {
         info!("starting revalidation");
@@ -72,7 +76,7 @@ impl Revalidate {
     }
 }
 
-/// Revalidate a single root: walk filesystem and compare with index.
+#[allow(dead_code)]
 fn revalidate_root(state: &SharedState, root: &Path) -> Result<(u64, u64)> {
     use ignore::WalkBuilder;
 
@@ -116,6 +120,7 @@ fn revalidate_root(state: &SharedState, root: &Path) -> Result<(u64, u64)> {
     Ok((checked, fixed))
 }
 
+#[allow(dead_code)]
 fn add_missing(state: &SharedState, path: &Path) -> Result<()> {
     let metadata = match std::fs::metadata(path) {
         Ok(m) => m,
@@ -181,6 +186,7 @@ fn add_missing(state: &SharedState, path: &Path) -> Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 /// Background revalidation task.
 pub fn start_revalidate_task(
     revalidate: std::sync::Arc<Revalidate>,
