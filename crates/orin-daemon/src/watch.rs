@@ -65,7 +65,7 @@ impl WatcherHandle {
 }
 
 /// Handle a filesystem event.
-fn handle_event(event: Event, state: &SharedState) {
+fn handle_event(event: Event, _state: &SharedState) {
     use EventKind::*;
 
     for path in event.paths {

@@ -301,7 +301,7 @@ impl Server {
                 }
             }
 
-            Rescan { id, _root } => {
+            Rescan { id, root: _root } => {
                 let mut state = self.state.lock().unwrap();
                 state.scan_progress = Some(ScanProgress {
                     entries: 0,

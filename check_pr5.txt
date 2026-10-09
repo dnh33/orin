@@ -1,0 +1,368 @@
+check	Run cargo check --workspace --all-targets	﻿2026-10-09T16:40:01.1908911Z ##[group]Run cargo check --workspace --all-targets
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.1909471Z [36;1mcargo check --workspace --all-targets[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.1944124Z shell: /usr/bin/bash -e {0}
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.1944560Z env:
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.1944957Z   CARGO_HOME: /home/runner/.cargo
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.1945304Z   CARGO_INCREMENTAL: 0
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.1945793Z   CARGO_TERM_COLOR: always
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.1946097Z   CACHE_ON_FAILURE: false
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.1946413Z ##[endgroup]
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.2685299Z [1m[92m    Updating[0m crates.io index
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.6735943Z [1m[92m     Locking[0m 331 packages to highest Rust 1.99.0 compatible versions
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.7051769Z [1m[92m      Adding[0m dirs v6.0.0 [1m[33m(available: v7.0.0)[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.7101224Z [1m[92m      Adding[0m generic-array v0.14.7 [1m[33m(available: v0.14.9)[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.7187620Z [1m[92m      Adding[0m nix v0.28.0 [1m[33m(available: v0.31.3)[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.7270848Z [1m[92m      Adding[0m psm v0.1.24 [1m[33m(available: v0.1.32)[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.7285259Z [1m[92m      Adding[0m rand v0.9.5 [1m[33m(available: v0.10.3)[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.7286740Z [1m[92m      Adding[0m rand_chacha v0.9.0 [1m[33m(available: v0.10.0)[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.7663130Z [1m[92m      Adding[0m sysinfo v0.31.4 [1m[33m(available: v0.39.6)[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.7756868Z [1m[92m      Adding[0m toml v0.9.12+spec-1.1.0 [1m[33m(available: v1.1.8+spec-1.1.0)[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.7818992Z [1m[92m      Adding[0m whoami v1.6.1 [1m[33m(available: v2.1.3)[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:01.9439747Z [1m[92m Downloading[0m crates ...
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2784045Z [1m[92m  Downloaded[0m indoc v2.0.8
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2797782Z [1m[92m  Downloaded[0m matchers v0.2.0
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2806791Z [1m[92m  Downloaded[0m ignore v0.4.33
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2823837Z [1m[92m  Downloaded[0m pest v2.9.3
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2866527Z [1m[92m  Downloaded[0m pest_derive v2.9.3
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2881054Z [1m[92m  Downloaded[0m pest_generator v2.9.3
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2891161Z [1m[92m  Downloaded[0m pest_meta v2.9.3
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2906802Z [1m[92m  Downloaded[0m rand_chacha v0.9.0
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2915456Z [1m[92m  Downloaded[0m ppv-lite86 v0.2.21
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2924984Z [1m[92m  Downloaded[0m psm v0.1.24
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2945990Z [1m[92m  Downloaded[0m rand v0.9.5
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2974653Z [1m[92m  Downloaded[0m rand_core v0.9.5
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2984547Z [1m[92m  Downloaded[0m stacker v0.1.25
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.2998146Z [1m[92m  Downloaded[0m tokio-util v0.7.20
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.3058024Z [1m[92m  Downloaded[0m toml_parser v1.1.5+spec-1.1.0
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.3076077Z [1m[92m  Downloaded[0m zerocopy v0.8.62
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.4011077Z [1m[92m    Checking[0m regex-automata v0.4.18
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.4044580Z [1m[92m    Checking[0m toml_parser v1.1.5+spec-1.1.0
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.4053842Z [1m[92m    Checking[0m iana-time-zone v0.1.65
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.4157248Z [1m[92m   Compiling[0m zerocopy v0.8.62
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.6130232Z [1m[92m    Checking[0m chrono v0.4.45
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.7702287Z [1m[92m    Checking[0m toml v0.9.12+spec-1.1.0
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:02.9543833Z [1m[92m   Compiling[0m indoc v2.0.8
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:03.1918489Z [1m[92m   Compiling[0m getrandom v0.3.4
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:03.2427369Z [1m[92m   Compiling[0m instability v0.3.14
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:03.4207338Z [1m[92m    Checking[0m schemars v1.2.2
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:03.6647432Z [1m[92m    Checking[0m tokio-util v0.7.20
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:03.8907473Z [1m[92m    Checking[0m ratatui-widgets v0.3.2
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:03.9787138Z [1m[92m    Checking[0m rmcp v3.5.1
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:04.1439253Z [1m[92m    Checking[0m globset v0.4.20
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:04.3157189Z [1m[92m    Checking[0m regex v1.13.1
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:04.5102231Z [1m[92m    Checking[0m orin-core v0.1.0 (/home/runner/work/orin/orin/crates/orin-core)
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:04.6217141Z [1m[92m    Checking[0m matchers v0.2.0
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:04.6640494Z [1m[92m    Checking[0m tracing-subscriber v0.3.23
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.0197204Z [1m[92m    Checking[0m ignore v0.4.33
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.3658038Z [1m[92m    Checking[0m rand_core v0.9.5
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.4450435Z [1m[92m    Checking[0m ratatui-crossterm v0.1.2
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.4577235Z [1m[92m    Checking[0m ratatui-macros v0.7.2
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.4854950Z [1m[92m    Checking[0m orin-daemon v0.1.0 (/home/runner/work/orin/orin/crates/orin-daemon)
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.5237069Z [1m[92m    Checking[0m ratatui v0.30.2
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.6964460Z [1m[91merror[E0026][0m[1m: variant `orin_core::protocol::Request::Rescan` does not have a field named `_root`[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.6976719Z    [1m[94m--> [0mcrates/orin-daemon/src/server.rs:304:26
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.6977188Z     [1m[94m|[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.6977616Z [1m[94m304[0m [1m[94m|[0m             Rescan { id, _root } => {
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.6978642Z     [1m[94m|[0m                          [1m[91m^^^^^[0m [1m[91mvariant `orin_core::protocol::Request::Rescan` does not have this field[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.6979532Z     [1m[94m|[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.7006716Z [1m[96mhelp[0m: a field with a similar name exists
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.7036501Z     [1m[94m|[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.7066719Z [1m[94m304[0m [91m- [0m            Rescan { id, [91m_root[0m } => {
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.7096686Z [1m[94m304[0m [92m+ [0m            Rescan { id, [92mroot[0m } => {
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.7126489Z     [1m[94m|[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.7155900Z 
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8292444Z [1m[33mwarning[0m[1m: unused variable: `state`[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8317366Z   [1m[94m--> [0mcrates/orin-daemon/src/watch.rs:68:31
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8335334Z    [1m[94m|[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8336311Z [1m[94m68[0m [1m[94m|[0m fn handle_event(event: Event, state: &SharedState) {
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8337773Z    [1m[94m|[0m                               [1m[33m^^^^^[0m [1m[33mhelp: if this is intentional, prefix it with an underscore: `_state`[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8339392Z    [1m[94m|[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8340331Z    [1m[94m= [0m[1mnote[0m: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8340975Z 
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8341532Z [1m[33mwarning[0m[1m: unused variable: `state`[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8342291Z    [1m[94m--> [0mcrates/orin-daemon/src/watch.rs:108:5
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8343279Z     [1m[94m|[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8344457Z [1m[94m108[0m [1m[94m|[0m     state: &SharedState,
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8345729Z     [1m[94m|[0m     [1m[33m^^^^^[0m [1m[33mhelp: if this is intentional, prefix it with an underscore: `_state`[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8346259Z 
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8487099Z [1mFor more information about this error, try `rustc --explain E0026`.[0m
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8527484Z [1m[33mwarning[0m: `orin-daemon` (lib) generated 2 warnings
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8528701Z [1m[91merror[0m: could not compile `orin-daemon` (lib) due to 1 previous error; 2 warnings emitted
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8529717Z [1m[33mwarning[0m: build failed, waiting for other jobs to finish...
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8538802Z [1m[33mwarning[0m: `orin-daemon` (lib test) generated 2 warnings (2 duplicates)
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:05.8548131Z [1m[91merror[0m: could not compile `orin-daemon` (lib test) due to 1 previous error; 2 warnings emitted
+check	Run cargo check --workspace --all-targets	2026-10-09T16:40:08.7227659Z ##[error]Process completed with exit code 101.
+test (ubuntu-latest)	Run cargo test --workspace	﻿2026-10-09T16:40:05.9431489Z ##[group]Run cargo test --workspace
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:05.9431927Z [36;1mcargo test --workspace[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:05.9479208Z shell: /usr/bin/bash -e {0}
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:05.9479733Z env:
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:05.9480050Z   CARGO_HOME: /home/runner/.cargo
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:05.9480570Z   CARGO_INCREMENTAL: 0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:05.9480933Z   CARGO_TERM_COLOR: always
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:05.9481308Z   CACHE_ON_FAILURE: false
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:05.9481668Z ##[endgroup]
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:06.4602149Z [1m[92m    Updating[0m crates.io index
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.3191209Z [1m[92m     Locking[0m 331 packages to highest Rust 1.99.0 compatible versions
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.3575741Z [1m[92m      Adding[0m dirs v6.0.0 [1m[33m(available: v7.0.0)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.3631749Z [1m[92m      Adding[0m generic-array v0.14.7 [1m[33m(available: v0.14.9)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.3730441Z [1m[92m      Adding[0m nix v0.28.0 [1m[33m(available: v0.31.3)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.3827335Z [1m[92m      Adding[0m psm v0.1.24 [1m[33m(available: v0.1.32)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.3845656Z [1m[92m      Adding[0m rand v0.9.5 [1m[33m(available: v0.10.3)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.3846819Z [1m[92m      Adding[0m rand_chacha v0.9.0 [1m[33m(available: v0.10.0)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.4280258Z [1m[92m      Adding[0m sysinfo v0.31.4 [1m[33m(available: v0.39.6)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.4387086Z [1m[92m      Adding[0m toml v0.9.12+spec-1.1.0 [1m[33m(available: v1.1.8+spec-1.1.0)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.4453720Z [1m[92m      Adding[0m whoami v1.6.1 [1m[33m(available: v2.1.3)[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:07.6318291Z [1m[92m Downloading[0m crates ...
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1256549Z [1m[92m  Downloaded[0m matchers v0.2.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1262219Z [1m[92m  Downloaded[0m ignore v0.4.33
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1280162Z [1m[92m  Downloaded[0m indoc v2.0.8
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1296819Z [1m[92m  Downloaded[0m pest v2.9.3
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1332948Z [1m[92m  Downloaded[0m pest_derive v2.9.3
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1345897Z [1m[92m  Downloaded[0m pest_generator v2.9.3
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1355493Z [1m[92m  Downloaded[0m pest_meta v2.9.3
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1369801Z [1m[92m  Downloaded[0m ppv-lite86 v0.2.21
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1378503Z [1m[92m  Downloaded[0m rand_chacha v0.9.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1386449Z [1m[92m  Downloaded[0m psm v0.1.24
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1413537Z [1m[92m  Downloaded[0m rand_core v0.9.5
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1423465Z [1m[92m  Downloaded[0m rand v0.9.5
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1447138Z [1m[92m  Downloaded[0m stacker v0.1.25
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1457964Z [1m[92m  Downloaded[0m tokio-util v0.7.20
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1506770Z [1m[92m  Downloaded[0m toml_parser v1.1.5+spec-1.1.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.1523605Z [1m[92m  Downloaded[0m zerocopy v0.8.62
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.5208123Z [1m[92m   Compiling[0m regex-automata v0.4.18
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.5244424Z [1m[92m   Compiling[0m toml_parser v1.1.5+spec-1.1.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.5293739Z [1m[92m   Compiling[0m iana-time-zone v0.1.65
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:08.5363555Z [1m[92m   Compiling[0m zerocopy v0.8.62
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:14.7435148Z [1m[92m   Compiling[0m toml v0.9.12+spec-1.1.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:15.0042678Z [1m[92m   Compiling[0m chrono v0.4.45
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:16.1795565Z [1m[92m   Compiling[0m globset v0.4.20
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:16.7228666Z [1m[92m   Compiling[0m regex v1.13.1
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:16.9148881Z [1m[92m   Compiling[0m getrandom v0.3.4
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:16.9558837Z [1m[92m   Compiling[0m indoc v2.0.8
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:17.0776496Z [1m[92m   Compiling[0m orin-core v0.1.0 (/home/runner/work/orin/orin/crates/orin-core)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:17.1075430Z [1m[92m   Compiling[0m schemars v1.2.2
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:17.4947507Z [1m[92m   Compiling[0m instability v0.3.14
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:17.9720356Z [1m[92m   Compiling[0m matchers v0.2.0
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:18.0474123Z [1m[92m   Compiling[0m tokio-util v0.7.20
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:18.2243871Z [1m[92m   Compiling[0m tracing-subscriber v0.3.23
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:18.8274222Z [1m[92m   Compiling[0m rmcp v3.5.1
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:19.0414402Z [1m[92m   Compiling[0m ignore v0.4.33
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:20.6498586Z [1m[92m   Compiling[0m ratatui-widgets v0.3.2
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:20.9534424Z [1m[92m   Compiling[0m rand_core v0.9.5
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.0924951Z [1m[92m   Compiling[0m ratatui-crossterm v0.1.2
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.2154212Z [1m[92m   Compiling[0m orin-daemon v0.1.0 (/home/runner/work/orin/orin/crates/orin-daemon)
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5685907Z [1m[91merror[E0026][0m[1m: variant `orin_core::protocol::Request::Rescan` does not have a field named `_root`[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5688420Z    [1m[94m--> [0mcrates/orin-daemon/src/server.rs:304:26
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5689593Z     [1m[94m|[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5690666Z [1m[94m304[0m [1m[94m|[0m             Rescan { id, _root } => {
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5692232Z     [1m[94m|[0m                          [1m[91m^^^^^[0m [1m[91mvariant `orin_core::protocol::Request::Rescan` does not have this field[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5693642Z     [1m[94m|[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5694164Z [1m[96mhelp[0m: a field with a similar name exists
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5694660Z     [1m[94m|[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5695251Z [1m[94m304[0m [91m- [0m            Rescan { id, [91m_root[0m } => {
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5695923Z [1m[94m304[0m [92m+ [0m            Rescan { id, [92mroot[0m } => {
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5696441Z     [1m[94m|[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.5696731Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7910881Z [1m[33mwarning[0m[1m: unused variable: `state`[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7934185Z   [1m[94m--> [0mcrates/orin-daemon/src/watch.rs:68:31
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7963411Z    [1m[94m|[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7980943Z [1m[94m68[0m [1m[94m|[0m fn handle_event(event: Event, state: &SharedState) {
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7982802Z    [1m[94m|[0m                               [1m[33m^^^^^[0m [1m[33mhelp: if this is intentional, prefix it with an underscore: `_state`[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7983975Z    [1m[94m|[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7985090Z    [1m[94m= [0m[1mnote[0m: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7985807Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7986447Z [1m[33mwarning[0m[1m: unused variable: `state`[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7987365Z    [1m[94m--> [0mcrates/orin-daemon/src/watch.rs:108:5
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7988172Z     [1m[94m|[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7988875Z [1m[94m108[0m [1m[94m|[0m     state: &SharedState,
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7990117Z     [1m[94m|[0m     [1m[33m^^^^^[0m [1m[33mhelp: if this is intentional, prefix it with an underscore: `_state`[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.7991100Z 
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.9517666Z [1mFor more information about this error, try `rustc --explain E0026`.[0m
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.9633154Z [1m[33mwarning[0m: `orin-daemon` (lib) generated 2 warnings
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.9697854Z [1m[91merror[0m: could not compile `orin-daemon` (lib) due to 1 previous error; 2 warnings emitted
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:21.9704996Z [1m[33mwarning[0m: build failed, waiting for other jobs to finish...
+test (ubuntu-latest)	Run cargo test --workspace	2026-10-09T16:40:27.2402091Z ##[error]Process completed with exit code 101.
+test (macos-latest)	Run cargo test --workspace	﻿2026-10-09T16:40:12.7172610Z ##[group]Run cargo test --workspace
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:12.7172870Z [36;1mcargo test --workspace[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:12.7207400Z shell: /bin/bash -e {0}
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:12.7207610Z env:
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:12.7207740Z   CARGO_HOME: /Users/runner/.cargo
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:12.7207960Z   CARGO_INCREMENTAL: 0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:12.7208160Z   CARGO_TERM_COLOR: always
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:12.7208350Z   CACHE_ON_FAILURE: false
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:12.7208510Z ##[endgroup]
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:12.9085110Z [1m[92m    Updating[0m crates.io index
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1195310Z [1m[92m     Locking[0m 331 packages to highest Rust 1.99.0 compatible versions
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1400050Z [1m[92m      Adding[0m dirs v6.0.0 [1m[33m(available: v7.0.0)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1437850Z [1m[92m      Adding[0m generic-array v0.14.7 [1m[33m(available: v0.14.9)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1501600Z [1m[92m      Adding[0m nix v0.28.0 [1m[33m(available: v0.31.3)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1566020Z [1m[92m      Adding[0m psm v0.1.24 [1m[33m(available: v0.1.32)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1575590Z [1m[92m      Adding[0m rand v0.9.5 [1m[33m(available: v0.10.3)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1576000Z [1m[92m      Adding[0m rand_chacha v0.9.0 [1m[33m(available: v0.10.0)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1842970Z [1m[92m      Adding[0m sysinfo v0.31.4 [1m[33m(available: v0.39.6)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1901210Z [1m[92m      Adding[0m toml v0.9.12+spec-1.1.0 [1m[33m(available: v1.1.8+spec-1.1.0)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.1945410Z [1m[92m      Adding[0m whoami v1.6.1 [1m[33m(available: v2.1.3)[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:13.6704420Z [1m[92m Downloading[0m crates ...
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.8756160Z [1m[92m  Downloaded[0m indoc v2.0.8
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.8830940Z [1m[92m  Downloaded[0m ignore v0.4.33
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.8873310Z [1m[92m  Downloaded[0m matchers v0.2.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.8892470Z [1m[92m  Downloaded[0m pest v2.9.3
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.8970640Z [1m[92m  Downloaded[0m pest_generator v2.9.3
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.8989190Z [1m[92m  Downloaded[0m pest_meta v2.9.3
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9025540Z [1m[92m  Downloaded[0m pest_derive v2.9.3
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9059180Z [1m[92m  Downloaded[0m ppv-lite86 v0.2.21
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9078720Z [1m[92m  Downloaded[0m psm v0.1.24
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9140070Z [1m[92m  Downloaded[0m rand_chacha v0.9.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9159050Z [1m[92m  Downloaded[0m rand_core v0.9.5
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9178540Z [1m[92m  Downloaded[0m rand v0.9.5
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9235860Z [1m[92m  Downloaded[0m stacker v0.1.25
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9267990Z [1m[92m  Downloaded[0m tokio-util v0.7.20
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9407250Z [1m[92m  Downloaded[0m toml_parser v1.1.5+spec-1.1.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:14.9449200Z [1m[92m  Downloaded[0m zerocopy v0.8.62
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:15.0166810Z [1m[92m   Compiling[0m regex-automata v0.4.18
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:15.0268740Z [1m[92m   Compiling[0m toml_parser v1.1.5+spec-1.1.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:15.0301910Z [1m[92m   Compiling[0m iana-time-zone v0.1.65
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:15.0368580Z [1m[92m   Compiling[0m indoc v2.0.8
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:15.0369320Z [1m[92m   Compiling[0m zerocopy v0.8.62
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:15.1322960Z [1m[92m   Compiling[0m chrono v0.4.45
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:15.4988760Z [1m[92m   Compiling[0m toml v0.9.12+spec-1.1.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:16.2832430Z [1m[92m   Compiling[0m getrandom v0.3.4
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:16.6256780Z [1m[92m   Compiling[0m schemars v1.2.2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:17.8887860Z [1m[92m   Compiling[0m globset v0.4.20
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:18.2668990Z [1m[92m   Compiling[0m regex v1.13.1
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:18.2771210Z [1m[92m   Compiling[0m instability v0.3.14
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:18.3100220Z [1m[92m   Compiling[0m matchers v0.2.0
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:18.3715540Z [1m[92m   Compiling[0m tokio-util v0.7.20
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:18.3822270Z [1m[92m   Compiling[0m tracing-subscriber v0.3.23
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:18.5164410Z [1m[92m   Compiling[0m orin-core v0.1.0 (/Users/runner/work/orin/orin/crates/orin-core)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:18.6205100Z [1m[92m   Compiling[0m rmcp v3.5.1
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:19.0201390Z [1m[92m   Compiling[0m ignore v0.4.33
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:19.5600730Z [1m[92m   Compiling[0m ratatui-widgets v0.3.2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:19.8447390Z [1m[92m   Compiling[0m rand_core v0.9.5
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:19.9416670Z [1m[92m   Compiling[0m ratatui-crossterm v0.1.2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.0281490Z [1m[92m   Compiling[0m orin-daemon v0.1.0 (/Users/runner/work/orin/orin/crates/orin-daemon)
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1341430Z [1m[91merror[E0026][0m[1m: variant `orin_core::protocol::Request::Rescan` does not have a field named `_root`[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1406500Z    [1m[94m--> [0mcrates/orin-daemon/src/server.rs:304:26
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1508410Z     [1m[94m|[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1622670Z [1m[94m304[0m [1m[94m|[0m             Rescan { id, _root } => {
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1647290Z     [1m[94m|[0m                          [1m[91m^^^^^[0m [1m[91mvariant `orin_core::protocol::Request::Rescan` does not have this field[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1647880Z     [1m[94m|[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1648240Z [1m[96mhelp[0m: a field with a similar name exists
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1648640Z     [1m[94m|[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1747290Z [1m[94m304[0m [91m- [0m            Rescan { id, [91m_root[0m } => {
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1764430Z [1m[94m304[0m [92m+ [0m            Rescan { id, [92mroot[0m } => {
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1870600Z     [1m[94m|[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.1985930Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2080330Z [1m[92m   Compiling[0m ratatui-macros v0.7.2
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2084160Z [1m[33mwarning[0m[1m: unused variable: `state`[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2128180Z   [1m[94m--> [0mcrates/orin-daemon/src/watch.rs:68:31
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2128790Z    [1m[94m|[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2129260Z [1m[94m68[0m [1m[94m|[0m fn handle_event(event: Event, state: &SharedState) {
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2129880Z    [1m[94m|[0m                               [1m[33m^^^^^[0m [1m[33mhelp: if this is intentional, prefix it with an underscore: `_state`[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2130420Z    [1m[94m|[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2130900Z    [1m[94m= [0m[1mnote[0m: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2131230Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2131510Z [1m[33mwarning[0m[1m: unused variable: `state`[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2131880Z    [1m[94m--> [0mcrates/orin-daemon/src/watch.rs:108:5
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2132200Z     [1m[94m|[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2132510Z [1m[94m108[0m [1m[94m|[0m     state: &SharedState,
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2133170Z     [1m[94m|[0m     [1m[33m^^^^^[0m [1m[33mhelp: if this is intentional, prefix it with an underscore: `_state`[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2133570Z 
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2133850Z [1mFor more information about this error, try `rustc --explain E0026`.[0m
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2134320Z [1m[33mwarning[0m: `orin-daemon` (lib) generated 2 warnings
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2134850Z [1m[91merror[0m: could not compile `orin-daemon` (lib) due to 1 previous error; 2 warnings emitted
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:20.2135370Z [1m[33mwarning[0m: build failed, waiting for other jobs to finish...
+test (macos-latest)	Run cargo test --workspace	2026-10-09T16:40:23.8410500Z ##[error]Process completed with exit code 101.
+test (windows-latest)	Run cargo test --workspace	﻿2026-10-09T16:40:51.0727716Z ##[group]Run cargo test --workspace
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:51.0727939Z [36;1mcargo test --workspace[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:51.1223613Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:51.1223830Z env:
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:51.1223955Z   CARGO_HOME: C:\Users\runneradmin\.cargo
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:51.1224120Z   CARGO_INCREMENTAL: 0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:51.1224248Z   CARGO_TERM_COLOR: always
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:51.1224376Z   CACHE_ON_FAILURE: false
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:51.1224506Z ##[endgroup]
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:51.4293151Z [1m[92m    Updating[0m crates.io index
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.4557752Z [1m[92m     Locking[0m 331 packages to highest Rust 1.99.0 compatible versions
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.4791068Z [1m[92m      Adding[0m dirs v6.0.0 [1m[93m(available: v7.0.0)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.4844920Z [1m[92m      Adding[0m generic-array v0.14.7 [1m[93m(available: v0.14.9)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.4932161Z [1m[92m      Adding[0m nix v0.28.0 [1m[93m(available: v0.31.3)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.5016629Z [1m[92m      Adding[0m psm v0.1.24 [1m[93m(available: v0.1.32)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.5030488Z [1m[92m      Adding[0m rand v0.9.5 [1m[93m(available: v0.10.3)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.5031372Z [1m[92m      Adding[0m rand_chacha v0.9.0 [1m[93m(available: v0.10.0)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.5440731Z [1m[92m      Adding[0m sysinfo v0.31.4 [1m[93m(available: v0.39.6)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.5530160Z [1m[92m      Adding[0m toml v0.9.12+spec-1.1.0 [1m[93m(available: v1.1.8+spec-1.1.0)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:52.5595016Z [1m[92m      Adding[0m whoami v1.6.1 [1m[93m(available: v2.1.3)[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:40:58.1129925Z [1m[92m Downloading[0m crates ...
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.8491745Z [1m[92m  Downloaded[0m ignore v0.4.33
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.8611309Z [1m[92m  Downloaded[0m indoc v2.0.8
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.8832824Z [1m[92m  Downloaded[0m matchers v0.2.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.8885945Z [1m[92m  Downloaded[0m pest v2.9.3
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.9062252Z [1m[92m  Downloaded[0m pest_generator v2.9.3
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.9170103Z [1m[92m  Downloaded[0m pest_meta v2.9.3
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.9275197Z [1m[92m  Downloaded[0m pest_derive v2.9.3
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.9400117Z [1m[92m  Downloaded[0m ppv-lite86 v0.2.21
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.9455005Z [1m[92m  Downloaded[0m psm v0.1.24
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.9629617Z [1m[92m  Downloaded[0m rand v0.9.5
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.9804383Z [1m[92m  Downloaded[0m rand_core v0.9.5
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.9863989Z [1m[92m  Downloaded[0m rand_chacha v0.9.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:16.9918753Z [1m[92m  Downloaded[0m stacker v0.1.25
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:17.0025065Z [1m[92m  Downloaded[0m tokio-util v0.7.20
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:17.0497135Z [1m[92m  Downloaded[0m toml_parser v1.1.5+spec-1.1.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:17.0606740Z [1m[92m  Downloaded[0m zerocopy v0.8.62
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:21.4673800Z [1m[92m   Compiling[0m regex-automata v0.4.18
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:21.4689702Z [1m[92m   Compiling[0m toml_parser v1.1.5+spec-1.1.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:21.4731304Z [1m[92m   Compiling[0m chrono v0.4.45
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:21.4765851Z [1m[92m   Compiling[0m zerocopy v0.8.62
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:22.1822664Z [1m[92m   Compiling[0m toml v0.9.12+spec-1.1.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:22.7275285Z [1m[92m   Compiling[0m indoc v2.0.8
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:23.6634924Z [1m[92m   Compiling[0m globset v0.4.20
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:23.8989053Z [1m[92m   Compiling[0m regex v1.13.1
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:23.8997665Z [1m[92m   Compiling[0m getrandom v0.3.4
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:24.2633835Z [1m[92m   Compiling[0m orin-core v0.1.0 (D:\a\orin\orin\crates\orin-core)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:24.3788334Z [1m[92m   Compiling[0m schemars v1.2.2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:24.7603039Z [1m[92m   Compiling[0m instability v0.3.14
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:25.4199521Z [1m[92m   Compiling[0m matchers v0.2.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:25.5299778Z [1m[92m   Compiling[0m tokio-util v0.7.20
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:26.1110847Z [1m[92m   Compiling[0m rmcp v3.5.1
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:26.4245176Z [1m[92m   Compiling[0m tracing-subscriber v0.3.23
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:27.7603364Z [1m[92m   Compiling[0m ignore v0.4.33
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:29.2884037Z [1m[92m   Compiling[0m ratatui-widgets v0.3.2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:29.9072453Z [1m[92m   Compiling[0m ppv-lite86 v0.2.21
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.2043069Z [1m[92m   Compiling[0m rand_core v0.9.5
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.3239826Z [1m[92m   Compiling[0m ratatui-macros v0.7.2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.3882524Z [1m[92m   Compiling[0m rand_chacha v0.9.0
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.3897470Z [1m[92m   Compiling[0m ratatui-crossterm v0.1.2
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.5500058Z [1m[92m   Compiling[0m orin-daemon v0.1.0 (D:\a\orin\orin\crates\orin-daemon)
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7530732Z [1m[91merror[E0026][0m[1m[97m: variant `orin_core::protocol::Request::Rescan` does not have a field named `_root`[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7531929Z    [1m[96m--> [0mcrates\orin-daemon\src\server.rs:304:26
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7532343Z     [1m[96m|[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7532726Z [1m[96m304[0m [1m[96m|[0m             Rescan { id, _root } => {
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7533563Z     [1m[96m|[0m                          [1m[91m^^^^^[0m [1m[91mvariant `orin_core::protocol::Request::Rescan` does not have this field[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7534141Z     [1m[96m|[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7534491Z [1m[96mhelp[0m: a field with a similar name exists
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7534854Z     [1m[96m|[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7535247Z [1m[96m304[0m [91m- [0m            Rescan { id, [91m_root[0m } => {
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7535762Z [1m[96m304[0m [92m+ [0m            Rescan { id, [92mroot[0m } => {
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7536161Z     [1m[96m|[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.7536527Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8055875Z [1m[92m   Compiling[0m rand v0.9.5
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8537466Z [1m[93mwarning[0m[1m[97m: unused variable: `state`[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8553050Z   [1m[96m--> [0mcrates\orin-daemon\src\watch.rs:68:31
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8646301Z    [1m[96m|[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8687968Z [1m[96m68[0m [1m[96m|[0m fn handle_event(event: Event, state: &SharedState) {
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8700693Z    [1m[96m|[0m                               [1m[93m^^^^^[0m [1m[93mhelp: if this is intentional, prefix it with an underscore: `_state`[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8701715Z    [1m[96m|[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8702232Z    [1m[96m= [0m[1m[97mnote[0m: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8702751Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8702992Z [1m[93mwarning[0m[1m[97m: unused variable: `state`[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8703414Z    [1m[96m--> [0mcrates\orin-daemon\src\watch.rs:108:5
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8703755Z     [1m[96m|[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8704076Z [1m[96m108[0m [1m[96m|[0m     state: &SharedState,
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8704683Z     [1m[96m|[0m     [1m[93m^^^^^[0m [1m[93mhelp: if this is intentional, prefix it with an underscore: `_state`[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8705078Z 
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8705374Z [1m[97mFor more information about this error, try `rustc --explain E0026`.[0m
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8790790Z [1m[93mwarning[0m: `orin-daemon` (lib) generated 2 warnings
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8813011Z [1m[91merror[0m: could not compile `orin-daemon` (lib) due to 1 previous error; 2 warnings emitted
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:30.8815045Z [1m[93mwarning[0m: build failed, waiting for other jobs to finish...
+test (windows-latest)	Run cargo test --workspace	2026-10-09T16:41:34.8525008Z ##[error]Process completed with exit code 1.
