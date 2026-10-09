@@ -314,13 +314,11 @@ impl Server {
                 }
             }
 
-            Stop { id } => {
-                Response::Ack {
-                    id,
-                    msg: "stopping".to_string(),
-                }
-            }
-        }
+            Stop { id } => Response::Ack {
+                            id,
+                            msg: "stopping".to_string(),
+                        },
+                    }
     }
 }
 
