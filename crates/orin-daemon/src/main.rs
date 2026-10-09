@@ -16,7 +16,7 @@ use anyhow::Result;
 use clap::Parser;
 use orin_core::paths::{data_dir, socket_name};
 use std::path::PathBuf;
-use tracing::{info, warn};
+use tracing::{info};
 use tracing_subscriber::{EnvFilter, fmt};
 
 #[derive(Parser, Debug)]
@@ -59,7 +59,7 @@ fn main() -> Result<()> {
         std::env::set_var("ORIN_SOCKET", &s);
     }
 
-    let data_dir = data_dir()?;
+    let data_dir = data_dir();
     info!("orin daemon starting");
     info!("data_dir: {}", data_dir.display());
     info!("socket: {:?}", socket_name()?);
