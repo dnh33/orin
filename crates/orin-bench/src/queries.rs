@@ -62,4 +62,3 @@ pub struct Queries {
     pub corpus_size: usize,
     pub queries: Vec<String>,
 }
-

@@ -121,4 +121,3 @@ pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
 
     Ok(())
 }
-

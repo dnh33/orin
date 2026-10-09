@@ -34,4 +34,3 @@ pub fn compare(results_dir: &PathBuf, out: &PathBuf) -> anyhow::Result<()> {
 
     Ok(())
 }
-

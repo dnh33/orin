@@ -135,4 +135,3 @@ pub fn summarize(latencies: &[Duration]) -> (f64, f64, f64) {
 
     (p50, p95, p99)
 }
-

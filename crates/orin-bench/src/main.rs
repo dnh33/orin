@@ -70,7 +70,13 @@ fn main() -> anyhow::Result<()> {
             let seed = u64::from_str_radix(seed.strip_prefix("0x").unwrap_or(&seed), 16)?;
             corpus::generate(&corpus, &out, seed)?;
         }
-        Commands::Run { tool, corpus, queries, iterations, out } => {
+        Commands::Run {
+            tool,
+            corpus,
+            queries,
+            iterations,
+            out,
+        } => {
             runner::run(&tool, &corpus, &queries, iterations, &out)?;
         }
         Commands::Compare { results, out } => {
@@ -80,5 +86,3 @@ fn main() -> anyhow::Result<()> {
 
     Ok(())
 }
-
-
