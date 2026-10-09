@@ -71,7 +71,7 @@ pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
     for _ in 0..cfg.depth {
         let mut new_dirs = Vec::new();
         for d in &dirs {
-            let n = rng.gen_range(2..=4);
+            let n = rng.random_range(2..=4);
             for i in 0..n {
                 let sub = d.join(format!("{}_{}_{}", cfg.prefix, d.iter().count(), i));
                 fs::create_dir_all(&sub)?;
@@ -89,19 +89,19 @@ pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
     let mut i = 0;
     while written < cfg.files {
         let dir = &dirs[i % dirs.len()];
-        let ext = cfg.extensions[rng.gen_range(0..cfg.extensions.len())];
+        let ext = cfg.extensions[rng.random_range(0..cfg.extensions.len())];
         let fname = format!("{}_{}_{}.{}", cfg.prefix, i, ext);
         let path = dir.join(&fname);
 
-        let size = match rng.gen_range(0..10) {
-            0 => rng.gen_range(1..100),                // tiny
-            1 => rng.gen_range(100..10_000),           // small
-            2 => rng.gen_range(10_000..1_000_000),     // medium
-            3 => rng.gen_range(1_000_000..50_000_000), // large
-            _ => rng.gen_range(1..1_000),              // default
+        let size = match rng.random_range(0..10) {
+            0 => rng.random_range(1..100),                // tiny
+            1 => rng.random_range(100..10_000),           // small
+            2 => rng.random_range(10_000..1_000_000),     // medium
+            3 => rng.random_range(1_000_000..50_000_000), // large
+            _ => rng.random_range(1..1_000),              // default
         };
 
-        let content: Vec<u8> = (0..size).map(|_| rng.gen_range(0..256u8)).collect();
+        let content: Vec<u8> = (0..size).map(|_| rng.random_range(0..256u8)).collect();
         fs::write(&path, &content)?;
         written += 1;
         i += 1;

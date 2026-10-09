@@ -131,7 +131,7 @@ pub fn summarize(latencies: &[Duration]) -> (f64, f64, f64) {
     let p99 = sorted[sorted.len() * 99 / 100];
 
     let total: f64 = sorted.iter().sum();
-    let qps = (latencies.len() as f64 / total) * 1_000_000.0;
+    let _qps = (latencies.len() as f64 / total) * 1_000_000.0;
 
     (p50, p95, p99)
 }
