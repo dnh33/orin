@@ -106,10 +106,10 @@ fn handle_event(event: Event, state: &SharedState) {
         _ => {}
     }
 
-    if !events.is_empty() {
-        if let Err(e) = crate::apply::apply_events(state, events) {
-            warn!("apply_events failed: {}", e);
-        }
+    if !events.is_empty()
+        && let Err(e) = crate::apply::apply_events(state, events)
+    {
+        warn!("apply_events failed: {}", e);
     }
 }
 
