@@ -134,8 +134,8 @@ pub fn start_checkpoint_task(
 
 #[cfg(test)]
 mod tests {
-    use crate::state::test_support::new_shared_hermetic;
     use super::*;
+    use crate::state::test_support::new_shared_hermetic;
     use tempfile::tempdir;
 
     #[test]

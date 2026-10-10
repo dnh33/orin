@@ -162,8 +162,8 @@ fn find_parent(state: &crate::state::State, path: &Path, root_idx: usize) -> Res
 
 #[cfg(test)]
 mod tests {
-    use crate::state::test_support::new_shared_hermetic;
     use super::*;
+    use crate::state::test_support::new_shared_hermetic;
     use tempfile::tempdir;
 
     #[test]

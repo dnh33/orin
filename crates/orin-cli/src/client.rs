@@ -115,7 +115,9 @@ fn handshake(name: Name<'_>) -> Option<Stream> {
     let _ = stream.set_recv_timeout(Some(PING_TIMEOUT));
     write_frame(&mut stream, &Request::Ping { id: REQ_ID }).ok()?;
     let response: Response = read_frame(&mut stream).ok().flatten()?;
-    if let Response::Pong { id, .. } = response && id == REQ_ID {
+    if let Response::Pong { id, .. } = response
+        && id == REQ_ID
+    {
         Some(stream)
     } else {
         None
@@ -135,7 +137,9 @@ fn orind_program() -> std::path::PathBuf {
     if cfg!(windows) {
         exe_name = "orind.exe";
     }
-    if let Ok(exe) = std::env::current_exe() && let Some(dir) = exe.parent() {
+    if let Ok(exe) = std::env::current_exe()
+        && let Some(dir) = exe.parent()
+    {
         let candidate = dir.join(exe_name);
         if candidate.is_file() {
             return candidate;
@@ -159,7 +163,10 @@ fn spawn_orind() -> anyhow::Result<std::process::Child> {
     }
     match command.spawn() {
         Ok(child) => Ok(child),
-        Err(err) => Err(anyhow::anyhow!("failed to start `{}`: {err}", program.display())),
+        Err(err) => Err(anyhow::anyhow!(
+            "failed to start `{}`: {err}",
+            program.display()
+        )),
     }
 }
 
@@ -170,7 +177,8 @@ fn scan_named_pipes() -> Option<Stream> {
     use interprocess::local_socket::ToNsName;
 
     let prefix = format!("orin-{}-", whoami::username());
-    let mut candidates: Vec<String> = std::fs::read_dir(r"\\.\pipe\").ok()?
+    let mut candidates: Vec<String> = std::fs::read_dir(r"\\.\pipe\")
+        .ok()?
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.file_name().to_string_lossy().into_owned())
         .filter(|name| name.starts_with(&prefix))
@@ -179,7 +187,9 @@ fn scan_named_pipes() -> Option<Stream> {
     for pipe in candidates {
         let full = format!(r"\\.\pipe\{pipe}");
         let candidate = full.to_ns_name::<GenericNamespaced>();
-        if let Ok(name) = candidate && let Some(stream) = handshake(name) {
+        if let Ok(name) = candidate
+            && let Some(stream) = handshake(name)
+        {
             return Some(stream);
         }
     }

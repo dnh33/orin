@@ -179,7 +179,10 @@ pub(crate) mod test_support {
         let name = if cfg!(windows) {
             format!("orin-test-{pid}-{id}-{label}")
         } else {
-            data_dir.join(format!("orin-test-{pid}-{id}.sock")).display().to_string()
+            data_dir
+                .join(format!("orin-test-{pid}-{id}.sock"))
+                .display()
+                .to_string()
         };
         // SAFETY: env mutation is serialized across all listener-creating
         // tests by LISTENER_LOCK, and the previous value is restored below

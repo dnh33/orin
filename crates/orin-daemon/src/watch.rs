@@ -77,7 +77,9 @@ fn handle_event(event: Event, state: &SharedState) {
     match event.kind {
         Create(_) => {
             for path in paths {
-                let is_dir = std::fs::metadata(&path).map(|m| m.is_dir()).unwrap_or(false);
+                let is_dir = std::fs::metadata(&path)
+                    .map(|m| m.is_dir())
+                    .unwrap_or(false);
                 debug!("create: {}", path.display());
                 events.push(crate::apply::FsEvent::Create { path, is_dir });
             }
@@ -176,8 +178,8 @@ fn poll_root(
 
 #[cfg(test)]
 mod tests {
-    use crate::state::test_support::new_shared_hermetic;
     use super::*;
+    use crate::state::test_support::new_shared_hermetic;
     use tempfile::tempdir;
 
     #[test]

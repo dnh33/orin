@@ -60,7 +60,8 @@ fn ensure_daemon(corpus_dir: &Path) -> anyhow::Result<std::process::Child> {
 
     let mut cmd = Command::new(&orind);
     let log_path = data_dir.join("orind-stderr.log");
-    let log = std::fs::File::create(&log_path).with_context(|| format!("create {}", log_path.display()))?;
+    let log = std::fs::File::create(&log_path)
+        .with_context(|| format!("create {}", log_path.display()))?;
     let log_err = log.try_clone().context("clone orind stderr log")?;
     cmd.env("ORIN_SOCKET", &socket)
         .env("ORIN_DATA_DIR", &data_dir)
@@ -110,7 +111,14 @@ fn ensure_daemon(corpus_dir: &Path) -> anyhow::Result<std::process::Child> {
         }
         if Instant::now() > deadline {
             let log_tail = std::fs::read_to_string(&log_path).unwrap_or_default();
-            let tail: String = log_tail.chars().rev().take(2000).collect::<Vec<_>>().into_iter().rev().collect();
+            let tail: String = log_tail
+                .chars()
+                .rev()
+                .take(2000)
+                .collect::<Vec<_>>()
+                .into_iter()
+                .rev()
+                .collect();
             anyhow::bail!(
                 "orind did not become ready within 30s\nlast status: {last}\norind stderr tail:\n{tail}"
             );

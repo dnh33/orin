@@ -109,11 +109,8 @@ fn main() -> Result<()> {
     };
 
     // Background checkpoint + revalidation loops
-    let _cp_task = checkpoint::start_checkpoint_task(
-        checkpoint.clone(),
-        state.clone(),
-        shutdown.clone(),
-    );
+    let _cp_task =
+        checkpoint::start_checkpoint_task(checkpoint.clone(), state.clone(), shutdown.clone());
     let _rv_task = revalidate::start_revalidate_task(
         std::sync::Arc::new(revalidate::Revalidate::new(300)),
         state.clone(),
