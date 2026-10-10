@@ -5,15 +5,15 @@ const base = import.meta.env.BASE_URL;
 <section class="hero">
   <div class="wrap grid">
     <div class="copy">
-      <p class="eyebrow" data-reveal>Whole-disk file search</p>
+      <p class="eyebrow" data-reveal>Agent-first whole-disk file search</p>
       <h1 data-reveal>orin<span class="caret" aria-hidden="true"></span></h1>
       <p class="truth" data-reveal>
-        orind keeps your drives indexed in memory. <code>orin</code> answers from that index
-        instead of walking the tree.
+        <code>orind</code> keeps the index in memory, so <code>orin</code> answers with JSON Lines
+        output, exit codes 0 / 1 / 2, and a p50 of 7.2 ms in the published run.
       </p>
       <div class="cta" data-reveal>
         <a class="btn btn-primary" href="#install">Install</a>
-        <a class="btn btn-ghost" href="https://github.com/dnh33/orin">View source</a>
+        <a class="btn btn-ghost" href="#agents">Built for agents</a>
       </div>
     </div>
 
@@ -22,12 +22,14 @@ const base = import.meta.env.BASE_URL;
         <span>powershell</span>
         <span class="term-tag">orin</span>
       </div>
-      <pre class="term-body"><span class="p">PS&gt;</span> orin query ext:rs type:f --limit 50
-<span class="note"># paths stream back from the resident index</span>
+      <pre class="term-body"><span class="p">PS&gt;</span> orin query ext:rs type:f --limit 50 --json
+<span class="note"># one JSON object per hit: path, name, type, size, mtime, score</span>
 <span class="p">PS&gt;</span> orin status --json
-<span class="note"># version, indexed entries, memory, roots</span>
+<span class="note"># version, entries, memory, roots: a health check</span>
 <span class="p">PS&gt;</span> on query size:&gt;10M
-<span class="note"># on is the short alias of orin</span></pre>
+<span class="note"># on is the short alias of orin</span>
+<span class="p">PS&gt;</span> echo $LASTEXITCODE
+<span class="note"># 0 results, 1 no match, 2 error</span></pre>
     </div>
   </div>
 </section>
@@ -132,25 +134,27 @@ const base = import.meta.env.BASE_URL;
     color: var(--faint);
   }
 
-  /* entry motion: only when JS is on and motion is allowed */
+  /* entry motion: only when JS is on and motion is allowed.
+     Hero leads the page, so it uses the fast end of the reveal range. */
   :global(.js) [data-reveal] {
     transition-delay: var(--d, 0ms);
+    transition-duration: 340ms;
   }
 
   .copy > :nth-child(1) {
     --d: 0ms;
   }
   .copy > :nth-child(2) {
-    --d: 70ms;
+    --d: 60ms;
   }
   .copy > :nth-child(3) {
-    --d: 140ms;
+    --d: 120ms;
   }
   .copy > :nth-child(4) {
-    --d: 210ms;
+    --d: 180ms;
   }
   .term {
-    --d: 240ms;
+    --d: 220ms;
   }
 
   @media (max-width: 960px) {
@@ -177,6 +181,7 @@ const base = import.meta.env.BASE_URL;
 
     :global(.js) [data-reveal] {
       transition-delay: 0ms;
+      transition-duration: 0ms;
     }
   }
 </style>

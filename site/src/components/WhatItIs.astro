@@ -30,7 +30,7 @@ const flow = stages.flatMap((stage, index) =>
 const facts = [
   {
     label: 'auto-spawn',
-    body: 'The first query starts orind when it is not running, so there is no service to install, start, or supervise.',
+    body: 'The first query starts <code>orind</code> when it is not running, so there is no service to install, start, or supervise.',
   },
   {
     label: 'platforms',
@@ -42,19 +42,14 @@ const facts = [
   },
 ];
 
-const exits = [
-  { code: '0', label: 'results printed' },
-  { code: '1', label: 'no match' },
-  { code: '2', label: 'error' },
-];
 ---
 
 <section class="section" id="what">
   <div class="wrap">
     <h2 class="h2" data-reveal>The whole disk, held in memory.</h2>
     <p class="lede" data-reveal>
-      orind scans the drives once and keeps the index resident, so a query reads structured entries
-      instead of walking the tree on every call.
+      <code>orind</code> scans the drives once and keeps the index resident, so a query reads
+      structured entries instead of walking the tree on every call.
     </p>
 
     <div class="flow" data-reveal>
@@ -68,7 +63,7 @@ const exits = [
             </div>
           ) : (
             <div class="stage panel">
-              <p class="stage-name">{item.stage.name}</p>
+              <p class="stage-name"><code>{item.stage.name}</code></p>
               <p class="stage-role">{item.stage.role}</p>
               <p class="stage-body">{item.stage.body}</p>
             </div>
@@ -82,24 +77,11 @@ const exits = [
         facts.map((fact) => (
           <div class="fact">
             <dt>{fact.label}</dt>
-            <dd>{fact.body}</dd>
+            <dd set:html={fact.body}></dd>
           </div>
         ))
       }
     </dl>
-
-    <div class="exits" data-reveal>
-      <p class="exits-label">Exit codes follow the ripgrep convention</p>
-      <div class="chips">
-        {
-          exits.map((exit) => (
-            <span class="chip">
-              <b>{exit.code}</b> {exit.label}
-            </span>
-          ))
-        }
-      </div>
-    </div>
   </div>
 </section>
 
@@ -115,11 +97,24 @@ const exits = [
   .stage {
     padding: 20px;
     min-width: 0;
+    transition:
+      border-color var(--t-fast) ease,
+      transform var(--t-fast) var(--ease-out),
+      background-color var(--t-fast) ease;
   }
 
   .stage-name {
     font: 600 17px/1.2 var(--mono);
     letter-spacing: -0.02em;
+  }
+
+  /* the stage title is already code type: no chip inside the card */
+  .stage-name code {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
   }
 
   .stage-role {
@@ -168,38 +163,22 @@ const exits = [
     max-width: 70ch;
   }
 
-  .exits {
-    margin-top: clamp(32px, 4vw, 44px);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 14px 20px;
+  @media (hover: hover) and (pointer: fine) {
+    .stage:hover {
+      border-color: var(--line-2);
+      background: var(--bg-2);
+      transform: translateY(-2px);
+    }
   }
 
-  .exits-label {
-    color: var(--faint);
-    font-size: 14px;
-  }
+  @media (prefers-reduced-motion: reduce) {
+    .stage {
+      transition: none;
+    }
 
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .chip {
-    font: 400 13px/1 var(--mono);
-    color: var(--dim);
-    border: 1px solid var(--line);
-    border-radius: var(--pill);
-    padding: 8px 14px;
-    background: var(--bg-1);
-  }
-
-  .chip b {
-    color: var(--accent);
-    font-weight: 600;
-    margin-right: 6px;
+    .stage:hover {
+      transform: none;
+    }
   }
 
   @media (max-width: 900px) {

@@ -177,6 +177,14 @@ const method: { label: string; value: string; key?: string }[] = [
     .loading .skel {
       animation: none;
     }
+
+    :global(.seg button) {
+      transition: none;
+    }
+
+    :global(.seg button:active) {
+      transform: none;
+    }
   }
 
   /* empty */
@@ -244,7 +252,14 @@ const method: { label: string; value: string; key?: string }[] = [
     border-radius: var(--r-sm);
     padding: 8px 12px;
     cursor: pointer;
-    transition: border-color 0.14s ease, color 0.14s ease;
+    transition:
+      border-color var(--t-fast) ease,
+      color var(--t-fast) ease,
+      transform var(--t-fast) var(--ease-out);
+  }
+
+  :global(.seg button:active) {
+    transform: scale(0.97);
   }
 
   :global(.seg button:hover) {
@@ -306,6 +321,43 @@ const method: { label: string; value: string; key?: string }[] = [
   .plot :global(.b-tool) {
     font: 500 13px var(--mono);
     letter-spacing: -0.01em;
+  }
+
+  /* bars grow from the zero axis when the chart is reached; labels settle in
+     after them. transform/opacity only, staggered 40ms per row, no layout
+     movement. The animation only exists once `.armed` is set, so data is
+     never hidden behind an animation that fails to run. */
+  @media (prefers-reduced-motion: no-preference) {
+    .plot.armed :global(.b-bar) {
+      transform-box: fill-box;
+      transform-origin: 0 50%;
+      animation: bar-grow 360ms var(--ease-out) both;
+      animation-delay: var(--bd, 0ms);
+    }
+
+    .plot.armed :global(.b-tool),
+    .plot.armed :global(.b-val) {
+      animation: label-in 200ms ease both;
+      animation-delay: calc(var(--bd, 0ms) + 140ms);
+    }
+  }
+
+  @keyframes bar-grow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes label-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .plot :global(.b-val) {
@@ -589,14 +641,14 @@ const method: { label: string; value: string; key?: string }[] = [
           const label50 = fmtUs(run.p50_us);
           const label95 = fmtUs(run.p95_us);
           return `
-            <g>
+            <g style="--bd: ${(index * 40).toFixed(0)}ms">
               <text x="76" y="${y + 18}" text-anchor="end" class="b-tool"
                 fill="${run.tool === 'orin' ? acc : '#c9ced3'}">${esc(run.tool)}</text>
-              <rect x="${x0}" y="${y + 6}" width="${w50.toFixed(1)}" height="11" rx="2" fill="${color}">
+              <rect class="b-bar" x="${x0}" y="${y + 6}" width="${w50.toFixed(1)}" height="11" rx="2" fill="${color}">
                 <title>${esc(run.tool)} p50 ${esc(label50)}</title>
               </rect>
               <text x="${x0 + w50 + 8}" y="${y + 15}" class="b-val">${esc(label50)}</text>
-              <rect x="${x0}" y="${y + 23}" width="${w95.toFixed(1)}" height="11" rx="2"
+              <rect class="b-bar" x="${x0}" y="${y + 23}" width="${w95.toFixed(1)}" height="11" rx="2"
                 fill="${color}" fill-opacity="0.18" stroke="${color}" stroke-opacity="0.75">
                 <title>${esc(run.tool)} p95 ${esc(label95)}</title>
               </rect>
@@ -797,11 +849,12 @@ const method: { label: string; value: string; key?: string }[] = [
         setState('empty');
         return;
       }
+      // reveal the data state first so the bar entrance plays while visible
+      setState('data');
       renderBars(subset);
       renderScale(selQuery);
       renderBadges(subset);
       updateMethod();
-      setState('data');
     };
 
     const refreshSegments = () => {
@@ -824,6 +877,24 @@ const method: { label: string; value: string; key?: string }[] = [
     };
 
     const boot = async () => {
+      // arm the bar entrance when the chart is reached, so the growth is seen
+      if (barsBox && 'IntersectionObserver' in window) {
+        const armObserver = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('armed');
+                armObserver.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.15 },
+        );
+        armObserver.observe(barsBox);
+      } else if (barsBox) {
+        barsBox.classList.add('armed');
+      }
+
       try {
         const response = await fetch(`${base}/data/benchmarks.json`, { cache: 'no-cache' });
         if (!response.ok) throw new Error(String(response.status));

@@ -2,7 +2,7 @@
 const command = 'irm https://github.com/dnh33/orin/raw/main/install.ps1 | iex';
 
 const steps = [
-  'Downloads orin.exe, orind.exe, and on.exe from the latest GitHub release.',
+  'Downloads <code>orin.exe</code>, <code>orind.exe</code>, and <code>on.exe</code> from the latest GitHub release.',
   'Runs each binary to verify it, then adds the install folder to your user PATH.',
   'Needs no admin rights; running it again replaces the files in place.',
 ];
@@ -30,7 +30,7 @@ const steps = [
         steps.map((step) => (
           <div class="step">
             <dt aria-hidden="true">&rsaquo;</dt>
-            <dd>{step}</dd>
+            <dd set:html={step}></dd>
           </div>
         ))
       }
@@ -134,7 +134,8 @@ const steps = [
   @media (max-width: 760px) {
     .cmd-text {
       white-space: normal;
-      overflow-wrap: break-word;
+      overflow-wrap: anywhere;
+      min-width: 0;
       font-size: 13.5px;
     }
 

@@ -18,6 +18,7 @@ this directory.
 | Section | Source |
 | --- | --- |
 | Hero, install command, query syntax | `src/components/*.astro` |
+| Built-for-agents contract (JSON Lines, exit codes, latency, health) | `src/components/Agents.astro` |
 | Benchmark charts | `src/components/Benchmarks.astro` |
 | Architecture diagram | `src/components/HowItWorks.astro` |
 | Benchmark data | `public/data/benchmarks.json` |

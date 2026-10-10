@@ -1,6 +1,7 @@
 ---
 const base = import.meta.env.BASE_URL;
 const links = [
+  { href: '#agents', label: 'Agents' },
   { href: '#install', label: 'Install' },
   { href: '#benchmarks', label: 'Benchmarks' },
   { href: '#syntax', label: 'Syntax' },
@@ -26,10 +27,22 @@ const links = [
     position: sticky;
     top: 0;
     z-index: 50;
-    border-bottom: 1px solid var(--line);
-    background: color-mix(in srgb, var(--bg) 82%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid transparent;
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition:
+      border-color var(--t-ui) var(--ease-out),
+      background-color var(--t-ui) var(--ease-out),
+      backdrop-filter var(--t-ui) var(--ease-out);
+  }
+
+  /* scrolled: the bar separates from the page it now sits over */
+  .nav.is-scrolled {
+    border-bottom-color: var(--line-2);
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .inner {
@@ -46,6 +59,7 @@ const links = [
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    transition: color var(--t-fast) ease;
   }
 
   .mark:hover {
@@ -73,8 +87,32 @@ const links = [
     color: var(--dim);
   }
 
+  .links a {
+    position: relative;
+    padding-block: 7px;
+    transition: color var(--t-fast) ease;
+  }
+
+  /* underline reveal: grows from the left edge of the word */
+  .links a:not(.src)::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 2px;
+    height: 1.5px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--t-ui) var(--ease-out);
+  }
+
   .links a:hover {
     color: var(--text);
+  }
+
+  .links a:not(.src):focus-visible::after {
+    transform: scaleX(1);
   }
 
   .links .src {
@@ -82,10 +120,21 @@ const links = [
     border-radius: var(--r-sm);
     padding: 7px 13px;
     color: var(--text);
+    transition:
+      border-color var(--t-fast) ease,
+      background-color var(--t-fast) ease,
+      color var(--t-fast) ease;
   }
 
   .links .src:hover {
     border-color: var(--accent-line);
+    background: var(--accent-soft);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .links a:not(.src):hover::after {
+      transform: scaleX(1);
+    }
   }
 
   @media (max-width: 560px) {
@@ -98,5 +147,21 @@ const links = [
     .caret {
       animation: none;
     }
+
+    .nav,
+    .links a,
+    .links a:not(.src)::after,
+    .links .src {
+      transition: none;
+    }
   }
 </style>
+
+<script>
+  const nav = document.querySelector('.nav');
+  if (nav) {
+    const sync = () => nav.classList.toggle('is-scrolled', window.scrollY > 8);
+    sync();
+    window.addEventListener('scroll', sync, { passive: true });
+  }
+</script>

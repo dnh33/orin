@@ -2,7 +2,7 @@
 const notes = [
   {
     label: 'auto-spawn',
-    body: 'The first query starts orind and waits until the index answers. Later queries reach the daemon that is already running.',
+    body: 'The first query starts <code>orind</code> and waits until the index answers. Later queries reach the daemon that is already running.',
   },
   {
     label: 'local pipe',
@@ -28,7 +28,7 @@ const notes = [
         class="diagram"
         viewBox="0 0 920 320"
         role="img"
-        aria-label="Architecture: the disk is scanned into the orind index, which the orin and on commands query over a local pipe."
+        aria-label="Architecture: the disk is scanned into the resident index, which the orin and on commands query over a local pipe."
       >
         <title>orin architecture</title>
         <defs>
@@ -72,26 +72,26 @@ const notes = [
 
         <!-- query arrows -->
         <g class="flowline live">
-          <path d="M644 122 H 716" marker-end="url(#ar)"></path>
-          <text class="f-label" x="680" y="110" text-anchor="middle">query</text>
-          <path d="M716 178 H 644" marker-end="url(#ar)"></path>
-          <text class="f-label" x="680" y="200" text-anchor="middle">paths</text>
+          <path d="M604 122 H 678" marker-end="url(#ar)"></path>
+          <text class="f-label" x="641" y="110" text-anchor="middle">query</text>
+          <path d="M678 178 H 604" marker-end="url(#ar)"></path>
+          <text class="f-label" x="641" y="200" text-anchor="middle">paths</text>
         </g>
 
         <!-- cli -->
         <g>
-          <rect class="node" x="726" y="70" width="186" height="176" rx="8"></rect>
-          <text class="n-name" x="748" y="104">orin / on</text>
-          <text class="n-role" x="748" y="126">command line</text>
-          <text class="n-dim" x="748" y="156">query &lt;terms&gt;</text>
-          <text class="n-dim" x="748" y="178">status --json</text>
-          <text class="n-dim" x="748" y="200">exit 0 / 1 / 2</text>
-          <text class="n-accent" x="748" y="228">spawns orind</text>
+          <rect class="node" x="688" y="70" width="224" height="176" rx="8"></rect>
+          <text class="n-name" x="710" y="104">orin / on</text>
+          <text class="n-role" x="710" y="126">command line</text>
+          <text class="n-dim" x="710" y="156">query &lt;terms&gt;</text>
+          <text class="n-dim" x="710" y="178">status --json</text>
+          <text class="n-dim" x="710" y="200">exit 0 / 1 / 2</text>
+          <text class="n-dim n-accent" x="710" y="228">spawns orind</text>
         </g>
 
         <!-- spawn arc -->
         <g class="flowline dashed">
-          <path d="M819 254 C 819 300, 456 306, 456 272" marker-end="url(#ar)"></path>
+          <path d="M800 254 C 800 300, 456 306, 456 272" marker-end="url(#ar)"></path>
         </g>
       </svg>
     </div>
@@ -101,7 +101,7 @@ const notes = [
         notes.map((note) => (
           <div class="note">
             <p class="note-label">{note.label}</p>
-            <p class="note-body">{note.body}</p>
+            <p class="note-body" set:html={note.body}></p>
           </div>
         ))
       }
@@ -228,6 +228,12 @@ const notes = [
     color: var(--dim);
     font-size: 15px;
     line-height: 1.6;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .note {
+      transition: none;
+    }
   }
 
   @media (max-width: 760px) {
