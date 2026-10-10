@@ -21,6 +21,9 @@ use serde::Serialize;
 /// Default number of paths returned by `find` when the caller omits `limit`.
 const DEFAULT_LIMIT: u32 = 20;
 
+/// Hard limit on hits per `find` call (spec §11: hard limit on hits per call).
+const MAX_LIMIT: u32 = 500;
+
 /// MCP server exposing the orin index as tools.
 #[derive(Debug, Clone)]
 pub struct OrinServer {
@@ -38,8 +41,10 @@ impl Default for OrinServer {
 pub struct FindParams {
     /// Search query (query language: ext:rs, size:>10M, path:src, ...).
     pub query: String,
-    /// Maximum number of paths to return; defaults to 20.
+    /// Maximum paths to return; defaults to 20, clamped to 500.
     pub limit: Option<u32>,
+    /// Opaque cursor from a previous call's `next_cursor`; omit for page one.
+    pub cursor: Option<String>,
 }
 
 /// Arguments for the `stat` tool.
@@ -74,6 +79,10 @@ pub struct FindResult {
     pub query: String,
     /// Matching paths, best match first.
     pub hits: Vec<HitResult>,
+    /// True while the index is still converging; retry after a scan.
+    pub partial: bool,
+    /// Cursor for the next page; absent on the last page.
+    pub next_cursor: Option<String>,
 }
 
 /// Structured payload returned by the `stat` tool.
@@ -209,18 +218,40 @@ impl OrinServer {
         }
     }
 
-    /// Search the index and return matching paths.
+    /// Search the index and return matching paths (paginated).
     #[tool(
         name = "find",
         description = "Search the index and return matching paths."
     )]
     async fn find(&self, params: Parameters<FindParams>) -> Result<Json<FindResult>, String> {
-        let limit = params.0.limit.unwrap_or(DEFAULT_LIMIT);
+        let limit = params.0.limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT);
+        let offset = parse_cursor(params.0.cursor.as_deref())?;
         let query = params.0.query;
         let search = query.clone();
-        let wire = daemon_call(move || client::query(&search, limit)).await?;
-        let hits = wire.into_iter().map(HitResult::from).collect();
-        Ok(Json(FindResult { query, hits }))
+        let want = offset.saturating_add(limit);
+        let wire = daemon_call(move || client::query(&search, want)).await?;
+        let page_len = wire.len().min(limit as usize);
+        // The daemon returns at most `want` hits: a full response means more
+        // may exist (one extra empty page is possible on an exact boundary).
+        let has_more = wire.len() >= want as usize;
+        let hits = wire
+            .into_iter()
+            .skip(offset as usize)
+            .take(page_len)
+            .map(HitResult::from)
+            .collect();
+        let next_cursor = has_more.then(|| (offset + limit).to_string());
+        // `partial` needs one status call: the query wire does not carry scan
+        // state, and silently claiming convergence would break agent retry
+        // semantics (spec §11: `partial` surfaced so agents can retry).
+        let status = daemon_call(client::status).await?;
+        let partial = status.state != "ready" || status.progress.is_some();
+        Ok(Json(FindResult {
+            query,
+            hits,
+            partial,
+            next_cursor,
+        }))
     }
 
     /// Return exists/kind/size/mtime for a path.
@@ -254,6 +285,16 @@ where
     match tokio::task::spawn_blocking(call).await {
         Ok(result) => result.map_err(|err| format!("{err:#}")),
         Err(err) => Err(format!("daemon call failed: {err}")),
+    }
+}
+
+/// Parse an opaque page cursor into a hit offset; `None` starts at zero.
+fn parse_cursor(cursor: Option<&str>) -> Result<u32, String> {
+    match cursor {
+        None => Ok(0),
+        Some(text) => text
+            .parse::<u32>()
+            .map_err(|_| format!("invalid cursor: {text}")),
     }
 }
 
