@@ -1,11 +1,10 @@
-//! Filesystem watcher using notify (with polling fallback).
+//! Filesystem watcher using notify: the live source of truth for the index.
 
 use anyhow::Result;
 use notify::{Config, Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::mpsc;
 use std::thread;
-use std::time::Duration;
 use tracing::{debug, info, warn};
 
 use crate::state::SharedState;
@@ -111,69 +110,6 @@ fn handle_event(event: Event, state: &SharedState) {
     {
         warn!("apply_events failed: {}", e);
     }
-}
-
-#[allow(dead_code)]
-/// Polling fallback for platforms where notify doesn't work well.
-pub fn start_polling_watcher(
-    roots: Vec<PathBuf>,
-    state: SharedState,
-) -> Result<thread::JoinHandle<()>> {
-    let handle = thread::spawn(move || {
-        let mut last_modified = std::collections::HashMap::new();
-        loop {
-            thread::sleep(Duration::from_secs(30));
-            for root in &roots {
-                if let Err(e) = poll_root(root, &mut last_modified, &state) {
-                    warn!("poll error for {}: {}", root.display(), e);
-                }
-            }
-        }
-    });
-    Ok(handle)
-}
-
-#[allow(dead_code)]
-fn poll_root(
-    root: &Path,
-    last_modified: &mut std::collections::HashMap<PathBuf, std::time::SystemTime>,
-    _state: &SharedState,
-) -> Result<()> {
-    use ignore::WalkBuilder;
-    let walker = WalkBuilder::new(root)
-        .follow_links(false)
-        .hidden(false)
-        .git_ignore(false)
-        .build();
-
-    for result in walker {
-        let entry = match result {
-            Ok(e) => e,
-            Err(_) => continue,
-        };
-        let path = entry.path().to_path_buf();
-        let meta = match entry.metadata() {
-            Ok(m) => m,
-            Err(_) => continue,
-        };
-        let modified = match meta.modified() {
-            Ok(t) => t,
-            Err(_) => continue,
-        };
-
-        let is_new_or_modified = last_modified
-            .get(&path)
-            .map(|&last| modified > last)
-            .unwrap_or(true);
-
-        if is_new_or_modified {
-            last_modified.insert(path.clone(), modified);
-            debug!("poll detected change: {}", path.display());
-            // Queue for apply.rs
-        }
-    }
-
-    Ok(())
 }
 
 #[cfg(test)]

@@ -1,52 +1,25 @@
-//! Periodic revalidation: scan roots and reconcile with index.
+//! On-demand revalidation: scan roots and reconcile with index.
+//!
+//! Revalidation is never periodic: it runs only when something asks for it —
+//! once at daemon startup after the initial scan/snapshot load, and when a
+//! client requests a Rescan. The filesystem watcher stays the live source of
+//! truth in between, so an idle daemon never wakes up to revalidate.
 
 use anyhow::Result;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::UNIX_EPOCH;
 use tracing::{debug, info, warn};
 
 use crate::state::SharedState;
 
-/// Revalidation manager: periodically verifies index against filesystem.
+/// Revalidation entry point. No timer and no background thread: callers
+/// decide when a pass runs.
 #[allow(dead_code)]
-pub struct Revalidate {
-    #[allow(dead_code)]
-    interval_secs: u64,
-    last_run: AtomicU64,
-}
+pub struct Revalidate;
 
 impl Revalidate {
-    #[allow(dead_code)]
-    /// Create a new revalidation manager.
-    pub fn new(interval_secs: u64) -> Self {
-        Self {
-            interval_secs,
-            last_run: AtomicU64::new(0),
-        }
-    }
-
-    #[allow(dead_code)]
-    /// Run revalidation if interval has elapsed.
-    pub fn maybe_revalidate(&self, state: &SharedState) -> Result<bool> {
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_secs();
-
-        let last = self.last_run.load(Ordering::Relaxed);
-        if now - last < self.interval_secs {
-            return Ok(false);
-        }
-
-        self.run(state)?;
-        self.last_run.store(now, Ordering::Relaxed);
-        Ok(true)
-    }
-
-    #[allow(dead_code)]
-    /// Run a full revalidation pass.
-    fn run(&self, state: &SharedState) -> Result<()> {
+    /// Run a full revalidation pass over every root right now.
+    pub fn run(state: &SharedState) -> Result<()> {
         info!("starting revalidation");
         let start = std::time::Instant::now();
 
@@ -76,7 +49,6 @@ impl Revalidate {
     }
 }
 
-#[allow(dead_code)]
 fn revalidate_root(state: &SharedState, root: &Path) -> Result<(u64, u64)> {
     use ignore::WalkBuilder;
 
@@ -120,7 +92,6 @@ fn revalidate_root(state: &SharedState, root: &Path) -> Result<(u64, u64)> {
     Ok((checked, fixed))
 }
 
-#[allow(dead_code)]
 fn add_missing(state: &SharedState, path: &Path) -> Result<()> {
     let metadata = match std::fs::metadata(path) {
         Ok(m) => m,
@@ -186,23 +157,6 @@ fn add_missing(state: &SharedState, path: &Path) -> Result<()> {
     Ok(())
 }
 
-#[allow(dead_code)]
-/// Background revalidation task.
-pub fn start_revalidate_task(
-    revalidate: std::sync::Arc<Revalidate>,
-    state: SharedState,
-    shutdown: std::sync::Arc<std::sync::atomic::AtomicBool>,
-) -> std::thread::JoinHandle<()> {
-    std::thread::spawn(move || {
-        while !shutdown.load(Ordering::SeqCst) {
-            std::thread::sleep(Duration::from_secs(60));
-            if let Err(e) = revalidate.maybe_revalidate(&state) {
-                warn!("revalidate error: {}", e);
-            }
-        }
-    })
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -213,7 +167,6 @@ mod tests {
     fn revalidate_basic() {
         let dir = tempdir().unwrap();
         let state = new_shared_hermetic(dir.path(), "revalidate_basic").unwrap();
-        let _rv = Revalidate::new(60);
 
         std::fs::write(dir.path().join("newfile.txt"), b"test").unwrap();
 

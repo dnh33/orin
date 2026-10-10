@@ -2,16 +2,20 @@
 
 use anyhow::Result;
 use interprocess::local_socket::{ListenerNonblockingMode, Name, Stream, prelude::*};
-use orin_core::paths::socket_name;
 use orin_core::protocol::{
     PROTOCOL_VERSION, Progress, Request, Response, RootWire, StatusData, read_frame, write_frame,
 };
 use std::io::{BufReader, BufWriter, Write};
+use std::sync::Arc;
+use std::sync::Condvar;
 use std::sync::Mutex;
+use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
 use std::time::{Duration, Instant};
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 
+use crate::priority;
+use crate::revalidate::Revalidate;
 use crate::state::{ScanProgress, SharedState};
 
 /// Main server loop.
@@ -32,7 +36,7 @@ impl Server {
     }
 
     /// Run the server until shutdown is signaled.
-    pub fn run(&mut self, shutdown: std::sync::Arc<std::sync::atomic::AtomicBool>) -> Result<()> {
+    pub fn run(&mut self, shutdown: Arc<AtomicBool>, waker: Arc<AcceptWaker>) -> Result<()> {
         let listener = {
             let mut state = self.state.lock().unwrap();
             state.listener.take().expect("listener not initialized")
@@ -40,13 +44,12 @@ impl Server {
 
         info!("server listening on {:?}", listener);
 
-        // Blocking accept: the kernel wakes us the moment a client connects,
-        // instead of the accept path sleeping through a polling interval. The
-        // waker thread keeps that wait interruptible by opening a dummy
-        // connection when shutdown is signaled or idle exit comes due.
+        // Blocking accept: the kernel wakes us the moment a client connects.
+        // The waker thread parks on a condvar (it polls nothing) and opens a
+        // dummy connection only when shutdown is signaled or the armed idle
+        // deadline comes due, which is what keeps this wait interruptible.
         listener.set_nonblocking(ListenerNonblockingMode::Neither)?;
-        let wake_at = std::sync::Arc::new(Mutex::new(None));
-        spawn_accept_waker(shutdown.clone(), wake_at.clone(), socket_name()?);
+        let _stop_waker = StopWaker(waker.clone());
 
         loop {
             if shutdown.load(Ordering::SeqCst) {
@@ -62,12 +65,13 @@ impl Server {
 
             // Arm the waker for the wait ahead: it fires the moment the idle
             // check above would start failing (never when idle exit is off).
-            *wake_at.lock().unwrap() = if self.idle_exit_secs > 0 {
+            let deadline = if self.idle_exit_secs > 0 {
                 self.last_activity
                     .checked_add(Duration::from_secs(self.idle_exit_secs))
             } else {
                 None
             };
+            waker.arm(deadline);
 
             match listener.accept() {
                 Ok(stream) => {
@@ -336,12 +340,33 @@ impl Server {
             }
 
             Rescan { id, root: _root } => {
-                let mut state = self.state.lock().unwrap();
-                state.scan_progress = Some(ScanProgress {
-                    entries: 0,
-                    since_ms: 0,
+                // Revalidation runs on demand only: here (client request) and
+                // once at startup. The filesystem watcher stays the live
+                // source of truth in between, so no periodic pass exists.
+                let shared = self.state.clone();
+                {
+                    let mut guard = shared.lock().unwrap();
+                    if guard.scan_progress.is_some() {
+                        return Response::Ack {
+                            id,
+                            msg: "rescan already running".to_string(),
+                        };
+                    }
+                    guard.scan_progress = Some(ScanProgress {
+                        entries: 0,
+                        since_ms: 0,
+                    });
+                }
+                // On its own below-normal thread: a full walk must never
+                // delay the request path or compete with a query in flight.
+                let _rescan = std::thread::spawn(move || {
+                    priority::set_below_normal();
+                    let result = Revalidate::run(&shared);
+                    shared.lock().unwrap().scan_progress = None;
+                    if let Err(e) = result {
+                        warn!("rescan revalidation failed: {}", e);
+                    }
                 });
-                // Actual rescan logic will be implemented in scan.rs
                 Response::Ack {
                     id,
                     msg: "rescan started".to_string(),
@@ -356,38 +381,112 @@ impl Server {
     }
 }
 
-/// Keep a blocked `accept()` interruptible.
+/// Stops the waker thread when the server loop exits, on every path.
+struct StopWaker(Arc<AcceptWaker>);
+
+impl Drop for StopWaker {
+    fn drop(&mut self) {
+        self.0.stop();
+    }
+}
+
+/// Event-driven interrupt for the server's blocking `accept()`.
 ///
-/// Polling the shutdown flag on this thread (100ms ticks) never touches the
-/// request path, so client latency is unaffected. When shutdown is signaled
-/// or the armed idle-exit deadline passes, a dummy connection to the
-/// listener's own name is what makes `accept()` return, letting the server
-/// loop re-check its exit conditions.
-fn spawn_accept_waker(
-    shutdown: std::sync::Arc<std::sync::atomic::AtomicBool>,
-    wake_at: std::sync::Arc<Mutex<Option<Instant>>>,
-    socket: Name<'static>,
-) {
-    let _waker = std::thread::spawn(move || {
+/// There is no polling loop: the waker thread parks on a [`Condvar`] and
+/// wakes only for a real event — the armed idle deadline coming due, a
+/// shutdown request, or the server re-arming the deadline. Between events it
+/// blocks with no timeout at all, so an idle daemon does no periodic work.
+pub struct AcceptWaker {
+    /// Every condition the waker thread waits on.
+    core: Mutex<WakerState>,
+    /// Signalled whenever `core` changes.
+    changed: Condvar,
+}
+
+/// Wake-up conditions shared by the server loop and the waker thread.
+struct WakerState {
+    /// Deadline at which the server must re-check its idle-exit condition.
+    wake_at: Option<Instant>,
+    /// One-shot request from the shutdown path to interrupt `accept()`.
+    shutdown: bool,
+    /// Set once the server loop is done and the waker may exit.
+    stop: bool,
+}
+
+impl AcceptWaker {
+    /// Create a waker for the listener `socket` and start its thread.
+    pub fn start(socket: Name<'static>) -> Arc<Self> {
+        let core = WakerState {
+            wake_at: None,
+            shutdown: false,
+            stop: false,
+        };
+        let waker = Arc::new(Self {
+            core: Mutex::new(core),
+            changed: Condvar::new(),
+        });
+        let for_thread = Arc::clone(&waker);
+        let _thread = std::thread::spawn(move || for_thread.run(socket));
+        waker
+    }
+
+    /// Arm the deadline at which `accept()` must be interrupted; `None`
+    /// means "never" (idle exit disabled).
+    pub fn arm(&self, wake_at: Option<Instant>) {
+        let mut core = self.core.lock().unwrap();
+        core.wake_at = wake_at;
+        self.changed.notify_all();
+    }
+
+    /// Report a shutdown request so the waker interrupts `accept()` once.
+    ///
+    /// The flag is set while holding the lock, so the notification cannot be
+    /// lost between the waker's condition check and its wait.
+    pub fn notify_shutdown(&self) {
+        let mut core = self.core.lock().unwrap();
+        core.shutdown = true;
+        core.wake_at = None;
+        self.changed.notify_all();
+    }
+
+    /// Tell the waker thread to exit; the server sets this on every exit path.
+    pub fn stop(&self) {
+        let mut core = self.core.lock().unwrap();
+        core.stop = true;
+        self.changed.notify_all();
+    }
+
+    /// Park until an armed event fires, then interrupt `accept()` once.
+    fn run(&self, socket: Name<'static>) {
         loop {
-            std::thread::sleep(Duration::from_millis(100));
-            if shutdown.load(Ordering::SeqCst) {
-                wake_accept(&socket);
-                break;
-            }
-            let due = {
-                let mut slot = wake_at.lock().unwrap();
-                let fired = matches!(*slot, Some(at) if Instant::now() > at);
-                if fired {
-                    *slot = None;
+            let mut core = self.core.lock().unwrap();
+            loop {
+                if core.stop {
+                    return;
                 }
-                fired
-            };
-            if due {
-                wake_accept(&socket);
+                if core.shutdown {
+                    // Consume the one-shot request, then sleep until stop.
+                    core.shutdown = false;
+                    core.wake_at = None;
+                    break;
+                }
+                let deadline = core.wake_at;
+                let Some(at) = deadline else {
+                    core = self.changed.wait(core).unwrap();
+                    continue;
+                };
+                let now = Instant::now();
+                if now >= at {
+                    core.wake_at = None;
+                    break;
+                }
+                let (next, _) = self.changed.wait_timeout(core, at - now);
+                core = next;
             }
+            drop(core);
+            wake_accept(&socket);
         }
-    });
+    }
 }
 
 /// Open a connection to `socket` so a blocked `accept()` returns.

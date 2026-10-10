@@ -6,6 +6,7 @@
 
 pub mod apply;
 pub mod checkpoint;
+pub mod priority;
 pub mod revalidate;
 pub mod scan;
 pub mod server;
@@ -25,7 +26,7 @@ mod tests {
             is_dir: false,
         };
         let _ = checkpoint::Checkpoint::new(std::path::PathBuf::new(), 60);
-        let _ = revalidate::Revalidate::new(60);
+        let _rv = revalidate::Revalidate::run;
         // Walk a small unique tempdir instead of the process cwd, which can
         // be the whole workspace (including target/) or the system dir on CI.
         let dir = tempdir().unwrap();
