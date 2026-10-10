@@ -101,3 +101,29 @@ jobs:
         with:
           name: bench-results-${{ matrix.os }}-${{ matrix.tool }}
           path: ${{ runner.temp }}/orin-bench/results_*.json
+
+  probes:
+    # Spec §2 measurement: cold scan rate, snapshot load, steady-state RSS.
+    # Runs only the orin daemon (no comparison tools needed).
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Generate corpus (deterministic, same seed = identical tree)
+        run: |
+          cargo run --release -p orin-bench gen \
+            --corpus ${{ inputs.corpus }} \
+            --out "$RUNNER_TEMP/orin-bench/corpus" \
+            --seed 0xC0FFEE
+      - name: Build bench + orin binaries
+        run: cargo build --release -p orin-bench -p orin-cli -p orin-daemon
+      - name: Run daemon probes (includes a 65s checkpoint wait)
+        run: |
+          cargo run --release -p orin-bench probes \
+            --corpus "$RUNNER_TEMP/orin-bench/corpus" \
+            --out "$RUNNER_TEMP/orin-bench/probes_${{ inputs.corpus }}.json"
+      - name: Upload probes
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-probes-${{ inputs.corpus }}
+          path: ${{ runner.temp }}/orin-bench/probes_*.json

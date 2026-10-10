@@ -64,5 +64,40 @@
     "re:^app_.*",
     "re:config.*\\.(toml|json)$",
     "re:.*[^a-zA-Z0-9]test[^a-zA-Z0-9].*"
+  ],
+  "multiword": [
+    "budget 2026",
+    "report final",
+    "project plan"
+  ],
+  "datever": [
+    "invoice-2026",
+    "v2",
+    "final_2"
+  ],
+  "camera": [
+    "IMG_2026",
+    "20261008_"
+  ],
+  "ext_scope": [
+    "annual-report.pdf",
+    "budget-summary.pdf",
+    "board-minutes.pdf"
+  ],
+  "ext_filter": [
+    "ext:pdf",
+    "ext:jpg,png"
+  ],
+  "deep_path": [
+    "invoices-2026",
+    "client-export"
+  ],
+  "case_mixed": [
+    "Main.rs",
+    "Makefile",
+    "Dockerfile"
+  ],
+  "realistic_miss": [
+    "bank-statement-2019"
   ]
 }

@@ -324,3 +324,148 @@ pub fn summarize(latencies: &[Duration]) -> (f64, f64, f64) {
 
     (p50, p95, p99)
 }
+
+
+/// Spec §2 daemon probes: cold scan rate, snapshot load, steady-state RSS.
+#[derive(Debug, serde::Serialize)]
+pub struct ProbeStats {
+    /// Files present in the corpus directory.
+    pub corpus_files: u64,
+    /// Entries reported by the daemon after the cold scan.
+    pub entries: u64,
+    /// Spawn -> first ready answer on a fresh data dir (cold build scan).
+    pub cold_ready_ms: u64,
+    /// entries / cold_ready_seconds (spec target: >= 300k entries/s).
+    pub scan_rate_eps: u64,
+    /// Spawn -> ready with an existing orin.snap (snapshot load path).
+    pub snapshot_ready_ms: u64,
+    /// Whether a snapshot file existed when the warm cycle started.
+    pub snapshot_used: bool,
+    /// Resident memory reported after indexing (bytes).
+    pub mem_bytes: u64,
+}
+
+/// Run the spec §2 probes against a corpus directory.
+///
+/// Two daemon cycles share one data dir: cold (fresh, no snapshot) then warm
+/// (after the 60s checkpoint cadence persisted `orin.snap`; killing the
+/// daemon skips the final save, so the wait is what makes a snapshot exist).
+/// `snapshot_ready_ms` is a snapshot measurement only when `snapshot_used`.
+pub fn probes(corpus_dir: &Path) -> anyhow::Result<ProbeStats> {
+    let orind = bin_dir().join(exe_name("orind"));
+    let orin = bin_dir().join(exe_name("orin"));
+    let data_dir =
+        std::env::temp_dir().join(format!("orin-bench-probes-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&data_dir);
+    std::fs::create_dir_all(&data_dir)
+        .with_context(|| format!("create {}", data_dir.display()))?;
+    let socket = bench_socket();
+
+    let corpus_files = count_files(corpus_dir);
+
+    // Cold cycle: fresh data dir, no snapshot. Time the full build scan.
+    let (mut cold, cold_ms, entries, mem_bytes) = spawn_ready(
+        &orind,
+        &orin,
+        &data_dir,
+        &socket,
+        corpus_dir,
+        "cold",
+    )?;
+    let scan_rate_eps = entries.saturating_mul(1000) / cold_ms.max(1);
+
+    // Wait out the checkpoint cadence (60s) so orin.snap is persisted.
+    std::thread::sleep(Duration::from_secs(65));
+    let snapshot_used = data_dir.join("orin.snap").exists();
+    let _ = cold.kill();
+
+    // Warm cycle: same data dir -> snapshot load path.
+    let (mut warm, warm_ms, _, _) = spawn_ready(
+        &orind,
+        &orin,
+        &data_dir,
+        &socket,
+        corpus_dir,
+        "warm",
+    )?;
+    let _ = warm.kill();
+
+    Ok(ProbeStats {
+        corpus_files,
+        entries,
+        cold_ready_ms: cold_ms,
+        scan_rate_eps,
+        snapshot_ready_ms: warm_ms,
+        snapshot_used,
+        mem_bytes,
+    })
+}
+
+/// Count files under a corpus directory (walkdir, best effort).
+fn count_files(dir: &Path) -> u64 {
+    walkdir::WalkDir::new(dir)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_file())
+        .count() as u64
+}
+
+/// Spawn `orind` and poll `orin status --json` until it answers with
+/// entries. Returns the child plus (ready_ms, entries, mem_bytes).
+///
+/// Self-contained by design: the benchmark's daemon harness stays untouched
+/// while these probes measure it (evidence, not refactoring).
+fn spawn_ready(
+    orind: &Path,
+    orin: &Path,
+    data_dir: &Path,
+    socket: &str,
+    corpus_dir: &Path,
+    label: &str,
+) -> anyhow::Result<(std::process::Child, u64, u64, u64)> {
+    let log_path = data_dir.join(format!("orind-stderr-{label}.log"));
+    let log = std::fs::File::create(&log_path)
+        .with_context(|| format!("create {}", log_path.display()))?;
+    let log_err = log.try_clone().context("clone orind stderr log")?;
+
+    let mut cmd = Command::new(orind);
+    cmd.env("ORIN_SOCKET", socket)
+        .env("ORIN_DATA_DIR", data_dir)
+        .env("ORIN_ROOTS", corpus_dir)
+        .env("RUST_LOG", "warn")
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(log_err);
+    const DETACHED_PROCESS: u32 = 0x0000_0008;
+    cmd.creation_flags(DETACHED_PROCESS);
+    let started = Instant::now();
+    let child = cmd
+        .spawn()
+        .with_context(|| format!("spawn {}", orind.display()))?;
+
+    let deadline = Instant::now() + Duration::from_secs(300);
+    let mut last = String::new();
+    loop {
+        if let Ok(out) = Command::new(orin)
+            .arg("status")
+            .arg("--json")
+            .env("ORIN_SOCKET", socket)
+            .env("ORIN_NO_SPAWN", "1")
+            .output()
+        {
+            let stdout = String::from_utf8_lossy(&out.stdout).into_owned();
+            last = format!("exit={:?} stdout={}", out.status.code(), stdout.trim());
+            if let Ok(v) = serde_json::from_str::<serde_json::Value>(&stdout) {
+                let entries = v.get("entries").and_then(|e| e.as_u64()).unwrap_or(0);
+                if entries > 0 {
+                    let mem = v.get("mem_bytes").and_then(|m| m.as_u64()).unwrap_or(0);
+                    return Ok((child, started.elapsed().as_millis() as u64, entries, mem));
+                }
+            }
+        }
+        if Instant::now() > deadline {
+            anyhow::bail!("orin daemon not ready within 300s ({label}): {last}");
+        }
+        std::thread::sleep(Duration::from_millis(100));
+    }
+}
