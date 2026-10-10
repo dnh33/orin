@@ -17,27 +17,7 @@ defaults:
     shell: bash
 
 jobs:
-  gen:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Generate corpus
-        run: |
-          mkdir -p "$RUNNER_TEMP/orin-bench/corpus"
-          cargo run --release -p orin-bench gen \
-            --corpus ${{ inputs.corpus }} \
-            --out "$RUNNER_TEMP/orin-bench/corpus" \
-            --seed 0xC0FFEE
-      - name: Upload corpus
-        uses: actions/upload-artifact@v4
-        with:
-          name: bench-corpus
-          path: ${{ runner.temp }}/orin-bench/corpus
-          retention-days: 1
-
   bench:
-    needs: gen
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -62,11 +42,12 @@ jobs:
         run: |
           choco install fd ripgrep -y
           refreshenv
-      - name: Download corpus
-        uses: actions/download-artifact@v4
-        with:
-          name: bench-corpus
-          path: ${{ runner.temp }}/orin-bench/corpus
+      - name: Generate corpus (deterministic, same seed = identical tree)
+        run: |
+          cargo run --release -p orin-bench gen \
+            --corpus ${{ inputs.corpus }} \
+            --out "$RUNNER_TEMP/orin-bench/corpus" \
+            --seed 0xC0FFEE
       - name: Build bench + orin binaries
         run: cargo build --release -p orin-bench -p orin-cli -p orin-daemon
       - name: Run benchmark
