@@ -6,7 +6,7 @@ const base = import.meta.env.BASE_URL;
   <div class="wrap grid">
     <div class="copy">
       <p class="eyebrow" data-reveal>Agent-first whole-disk file search</p>
-      <h1 data-reveal>orin<span class="caret" aria-hidden="true"></span></h1>
+      <h1 data-reveal aria-label="orin"><span class="word" aria-hidden="true"><span class="ch">o</span><span class="ch">r</span><span class="ch">i</span><span class="ch">n</span></span><span class="caret" aria-hidden="true"></span></h1>
       <p class="truth" data-reveal>
         <code>orind</code> keeps the index in memory, so <code>orin</code> answers with JSON Lines
         output, exit codes 0 / 1 / 2, and a p50 of 7.2 ms in the published run.
@@ -22,37 +22,67 @@ const base = import.meta.env.BASE_URL;
         <span>powershell</span>
         <span class="term-tag">orin</span>
       </div>
-      <pre class="term-body"><span class="p">PS&gt;</span> orin query ext:rs type:f --limit 50 --json
-<span class="note"># one JSON object per hit: path, name, type, size, mtime, score</span>
-<span class="p">PS&gt;</span> orin status --json
-<span class="note"># version, entries, memory, roots: a health check</span>
-<span class="p">PS&gt;</span> on query size:&gt;10M
-<span class="note"># on is the short alias of orin</span>
-<span class="p">PS&gt;</span> echo $LASTEXITCODE
-<span class="note"># 0 results, 1 no match, 2 error</span></pre>
+      <pre class="term-body"><span class="line" style="--i: 0"><span class="p">PS&gt;</span> orin query ext:rs type:f --limit 50 --json</span><span class="line note" style="--i: 1"># one JSON object per hit: path, name, type, size, mtime, score</span><span class="line" style="--i: 2"><span class="p">PS&gt;</span> orin status --json</span><span class="line note" style="--i: 3"># version, entries, memory, roots: a health check</span><span class="line" style="--i: 4"><span class="p">PS&gt;</span> on query size:&gt;10M</span><span class="line note" style="--i: 5"># on is the short alias of orin</span><span class="line" style="--i: 6"><span class="p">PS&gt;</span> echo $LASTEXITCODE</span><span class="line note" style="--i: 7"># 0 results, 1 no match, 2 error</span></pre>
     </div>
   </div>
 </section>
 
 <style>
   .hero {
+    position: relative;
     padding-block: clamp(56px, 9vh, 96px) clamp(64px, 9vw, 112px);
   }
 
+  /* Ambient wash: one low-opacity accent bloom sitting behind the terminal.
+     Static, pointer-events none, never close enough to the copy to touch contrast. */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      closest-side circle at 74% 48%,
+      rgba(255, 180, 84, 0.07),
+      rgba(255, 180, 84, 0) 72%
+    );
+  }
+
   .grid {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: 1.05fr 0.95fr;
     gap: clamp(32px, 5vw, 64px);
     align-items: center;
   }
 
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .eyebrow::before {
+    content: '';
+    flex: none;
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+  }
+
   h1 {
-    font-size: clamp(64px, 11vw, 132px);
+    font-size: clamp(58px, 10vw, 124px);
     letter-spacing: -0.045em;
     line-height: 0.94;
     display: inline-flex;
     align-items: baseline;
     gap: clamp(10px, 2vw, 18px);
+  }
+
+  .word {
+    white-space: nowrap;
   }
 
   .caret {
@@ -69,12 +99,34 @@ const base = import.meta.env.BASE_URL;
     }
   }
 
+  @keyframes lockOn {
+    from {
+      color: var(--accent);
+    }
+
+    to {
+      color: var(--text);
+    }
+  }
+
+  @keyframes lineIn {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   .truth {
-    margin-top: 22px;
-    max-width: 46ch;
+    margin-top: 26px;
+    max-width: 44ch;
     color: var(--dim);
-    font-size: clamp(17px, 1.8vw, 19px);
-    line-height: 1.6;
+    font-size: clamp(17px, 1.75vw, 19px);
+    line-height: 1.62;
   }
 
   .truth code {
@@ -96,16 +148,23 @@ const base = import.meta.env.BASE_URL;
   .term {
     overflow: hidden;
     min-width: 0;
+    /* shadow tinted to the page hue, never a pure black drop shadow */
+    box-shadow:
+      0 30px 60px -34px rgba(4, 5, 6, 0.9),
+      0 12px 26px -20px rgba(4, 5, 6, 0.85);
   }
 
   .term-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 14px;
+    padding: 9px 16px;
     border-bottom: 1px solid var(--line);
-    font: 500 11px/1 var(--mono);
-    letter-spacing: 0.16em;
+    background: rgba(255, 255, 255, 0.022);
+    /* 1px inner top highlight: the panel edge catches the room light */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+    font: 500 10.5px/1 var(--mono);
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--faint);
   }
@@ -125,8 +184,13 @@ const base = import.meta.env.BASE_URL;
     overflow-wrap: anywhere;
   }
 
+  .term-body .line {
+    display: block;
+  }
+
   .term-body .p {
     color: var(--accent);
+    font-weight: 500;
     user-select: none;
   }
 
@@ -157,6 +221,77 @@ const base = import.meta.env.BASE_URL;
     --d: 220ms;
   }
 
+  /* resolve choreography: the headline decodes, then the caret lands and blinks.
+     Nothing here applies without JS, and nothing here applies under reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .caret {
+      opacity: 0;
+      transform: translateY(-0.16em);
+      animation: none;
+    }
+
+    :global(.js) h1.is-resolved .caret {
+      opacity: 1;
+      transform: translateY(0.04em);
+      transition:
+        opacity 170ms var(--ease-out),
+        transform 320ms var(--ease-out);
+      animation: blink 1.15s steps(1) 0.42s infinite;
+    }
+
+    /* cycling glyphs sit back, each lock hits the accent once, then settles */
+    :global(.js) .ch.cyc {
+      color: var(--faint);
+    }
+
+    :global(.js) .ch.lock {
+      color: var(--text);
+      animation: lockOn 420ms var(--ease-out);
+    }
+
+    /* terminal transcript streams in once the panel has landed */
+    .term.in .line {
+      animation: lineIn 260ms var(--ease-out) backwards;
+      animation-delay: calc(300ms + var(--i, 0) * 40ms);
+    }
+
+    /* CTA light sweep, pointer devices only */
+    @media (hover: hover) and (pointer: fine) {
+      .cta .btn {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cta .btn::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          100deg,
+          transparent 28%,
+          rgba(255, 255, 255, 0.3) 50%,
+          transparent 72%
+        );
+        transform: translateX(-120%);
+        transition: transform 520ms var(--ease-out);
+        pointer-events: none;
+      }
+
+      .cta .btn-ghost::after {
+        background: linear-gradient(
+          100deg,
+          transparent 28%,
+          rgba(255, 180, 84, 0.26) 50%,
+          transparent 72%
+        );
+      }
+
+      .cta .btn:hover::after {
+        transform: translateX(120%);
+      }
+    }
+  }
+
   @media (max-width: 960px) {
     .grid {
       grid-template-columns: 1fr;
@@ -164,6 +299,14 @@ const base = import.meta.env.BASE_URL;
 
     .term {
       order: 3;
+    }
+
+    .hero::before {
+      background: radial-gradient(
+        closest-side circle at 50% 74%,
+        rgba(255, 180, 84, 0.07),
+        rgba(255, 180, 84, 0) 72%
+      );
     }
   }
 
@@ -185,3 +328,82 @@ const base = import.meta.env.BASE_URL;
     }
   }
 </style>
+
+<script>
+  // Signature moment: a search tool's headline should feel like a query
+  // resolving to a match. Glyphs cycle, lock left to right into "orin",
+  // each lock hits the accent once, and only then does the caret land
+  // and start blinking. Reduced motion, or no glyphs to work with: resolve
+  // instantly with no scramble at all.
+  const hero = document.querySelector('.hero');
+  const heading = hero ? hero.querySelector('h1') : null;
+  const glyphs = heading ? Array.from(heading.querySelectorAll('.ch')) : [];
+
+  const settle = () => {
+    if (!heading) return;
+    glyphs.forEach((node) => {
+      node.classList.remove('cyc');
+      node.classList.add('lock');
+    });
+    heading.classList.add('is-resolved');
+  };
+
+  try {
+    if (!heading || heading.dataset.decoding === '1') {
+      settle();
+    } else {
+      heading.dataset.decoding = '1';
+      const target = glyphs.map((node) => node.textContent.trim());
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduce || target.length === 0 || target.some((ch) => ch.length !== 1)) {
+        glyphs.forEach((node, i) => {
+          node.textContent = target[i] || node.textContent;
+        });
+        settle();
+      } else {
+        const POOL = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghiklmnorstuvwxz0123456789#/>|+*?=%~';
+        const DURATION = 560;
+        const START = 240;
+        const TICK = 46;
+        const n = glyphs.length;
+        const locks = glyphs.map((_, i) => DURATION * (0.3 + (0.7 * i) / (n - 1)));
+
+        window.setTimeout(() => {
+          const t0 = performance.now();
+          const done = glyphs.map(() => false);
+          const timer = window.setInterval(() => {
+            const t = performance.now() - t0;
+            for (let i = 0; i < n; i += 1) {
+              if (done[i]) continue;
+              if (t >= locks[i]) {
+                done[i] = true;
+                glyphs[i].textContent = target[i];
+                glyphs[i].classList.remove('cyc');
+                glyphs[i].classList.add('lock');
+              } else {
+                glyphs[i].textContent = POOL[(Math.random() * POOL.length) | 0];
+                glyphs[i].classList.add('cyc');
+              }
+            }
+            if (t >= DURATION) {
+              window.clearInterval(timer);
+              settle();
+            }
+          }, TICK);
+
+          // safety net: a throttled background tab still ends resolved
+          window.setTimeout(() => {
+            window.clearInterval(timer);
+            glyphs.forEach((node, i) => {
+              node.textContent = target[i];
+            });
+            settle();
+          }, START + DURATION + 1400);
+        }, START);
+      }
+    }
+  } catch {
+    settle();
+  }
+</script>
