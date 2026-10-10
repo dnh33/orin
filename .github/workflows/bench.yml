@@ -42,7 +42,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        # Windows-first: ubuntu/macos PARKED (2026-10-10 owner decision) —
+        # re-enable by uncommenting the os entries when Windows is solid.
+        os: [windows-latest]
+        # os: [ubuntu-latest, macos-latest, windows-latest]
         tool: [orin, fd, find, rg]
     steps:
       - uses: actions/checkout@v4

@@ -38,8 +38,9 @@ impl Server {
 
         info!("server listening on {:?}", listener);
 
-        // Set non-blocking accept with a timeout so we can check shutdown
-        listener.set_nonblocking(ListenerNonblockingMode::Both)?;
+        // Non-blocking accept so we can check shutdown; accepted streams stay
+        // BLOCKING so request reads wait for the client instead of racing it.
+        listener.set_nonblocking(ListenerNonblockingMode::Listener)?;
 
         loop {
             if shutdown.load(Ordering::SeqCst) {
@@ -95,6 +96,12 @@ impl Server {
                     return Ok(());
                 }
                 Err(e) => {
+                    // A request not yet arriving is not fatal (defensive: streams
+                    // are blocking, but platforms may still surface WouldBlock).
+                    if e.kind() == std::io::ErrorKind::WouldBlock {
+                        std::thread::sleep(Duration::from_millis(5));
+                        continue;
+                    }
                     error!("read frame error: {}", e);
                     return Err(e.into());
                 }
