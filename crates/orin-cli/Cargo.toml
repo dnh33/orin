@@ -15,6 +15,7 @@ path = "src/bin/on.rs"
 
 [dependencies]
 orin-core = { path = "../orin-core" }
+orin-mcp = { path = "../orin-mcp" }
 clap = { workspace = true, features = ["derive"] }
 clap_complete = { workspace = true }
 anyhow = { workspace = true }

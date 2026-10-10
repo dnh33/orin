@@ -44,6 +44,8 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Run the orin MCP server on stdio for AI agents
+    Mcp,
 }
 
 pub fn main() -> ExitCode {
@@ -61,6 +63,7 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
     match cli.command {
         Commands::Query { terms, limit, json } => query_cmd(&terms, limit, json),
         Commands::Status { json } => status_cmd(json),
+        Commands::Mcp => mcp_cmd(),
     }
 }
 
@@ -90,6 +93,11 @@ fn status_cmd(json: bool) -> anyhow::Result<ExitCode> {
     } else {
         print_status(&data);
     }
+    Ok(ExitCode::SUCCESS)
+}
+
+fn mcp_cmd() -> anyhow::Result<ExitCode> {
+    orin_mcp::run_stdio()?;
     Ok(ExitCode::SUCCESS)
 }
 
