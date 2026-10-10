@@ -2,9 +2,9 @@
 
 use anyhow::Context;
 use std::fs;
-use std::path::PathBuf;
+use std::path::Path;
 
-pub fn compare(results_dir: &PathBuf, out: &PathBuf) -> anyhow::Result<()> {
+pub fn compare(results_dir: &Path, out: &Path) -> anyhow::Result<()> {
     let entries = fs::read_dir(results_dir)?
         .filter_map(|e| e.ok())
         .collect::<Vec<_>>();

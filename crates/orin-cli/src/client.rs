@@ -12,6 +12,7 @@ use orin_core::protocol::Response;
 use orin_core::protocol::StatusData;
 use orin_core::protocol::read_frame;
 use orin_core::protocol::write_frame;
+use std::os::windows::process::CommandExt;
 use std::time::Duration;
 use std::time::Instant;
 
@@ -23,8 +24,7 @@ const PING_TIMEOUT: Duration = Duration::from_secs(3);
 const RESPONSE_TIMEOUT: Duration = Duration::from_secs(30);
 /// Total retry budget while waiting for a freshly spawned daemon.
 const SPAWN_WAIT: Duration = Duration::from_secs(3);
-/// Windows `DETACHED_PROCESS`: spawn the daemon without a console window.
-#[cfg(windows)]
+/// `DETACHED_PROCESS`: spawn the daemon without a console window.
 const DETACHED_PROCESS: u32 = 0x0000_0008;
 
 /// Run a search query against the daemon, auto-spawning it when absent.
@@ -100,11 +100,8 @@ fn try_connect() -> anyhow::Result<Option<Stream>> {
     if let Some(stream) = handshake(name) {
         return Ok(Some(stream));
     }
-    #[cfg(windows)]
-    {
-        if let Some(stream) = scan_named_pipes() {
-            return Ok(Some(stream));
-        }
+    if let Some(stream) = scan_named_pipes() {
+        return Ok(Some(stream));
     }
     Ok(None)
 }
@@ -133,10 +130,7 @@ fn send(stream: &mut Stream, req: &Request) -> anyhow::Result<Response> {
 
 /// Locate `orind` next to this executable, else rely on PATH.
 fn orind_program() -> std::path::PathBuf {
-    let mut exe_name = "orind";
-    if cfg!(windows) {
-        exe_name = "orind.exe";
-    }
+    let exe_name = "orind.exe";
     if let Ok(exe) = std::env::current_exe()
         && let Some(dir) = exe.parent()
     {
@@ -156,11 +150,7 @@ fn spawn_orind() -> anyhow::Result<std::process::Child> {
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null());
-    #[cfg(windows)]
-    {
-        use std::os::windows::process::CommandExt;
-        command.creation_flags(DETACHED_PROCESS);
-    }
+    command.creation_flags(DETACHED_PROCESS);
     match command.spawn() {
         Ok(child) => Ok(child),
         Err(err) => Err(anyhow::anyhow!(
@@ -170,8 +160,7 @@ fn spawn_orind() -> anyhow::Result<std::process::Child> {
     }
 }
 
-/// Windows only: scan the named-pipe namespace for a live orin daemon.
-#[cfg(windows)]
+/// Scan the named-pipe namespace for a live orin daemon.
 fn scan_named_pipes() -> Option<Stream> {
     use interprocess::local_socket::GenericNamespaced;
     use interprocess::local_socket::ToNsName;

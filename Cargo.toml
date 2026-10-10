@@ -38,7 +38,6 @@ ctrlc = "3"
 sysinfo = { version = "0.31", default-features = false, features = ["system"] }
 regex = "1"
 whoami = "1.4"
-nix = { version = "0.28", features = ["user"] }
 
 [profile.release]
 lto = "thin"

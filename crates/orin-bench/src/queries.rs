@@ -2,7 +2,7 @@
 
 use anyhow::Context;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::Path;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct QueryMatrix {
@@ -31,14 +31,14 @@ pub struct QueryMatrix {
 }
 
 impl QueryMatrix {
-    pub fn load(path: &PathBuf) -> anyhow::Result<Self> {
+    pub fn load(path: &Path) -> anyhow::Result<Self> {
         let data =
             std::fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
         serde_json::from_str(&data).context("parse queries.json")
     }
 
     #[allow(dead_code)]
-    pub fn save(&self, path: &PathBuf) -> anyhow::Result<()> {
+    pub fn save(&self, path: &Path) -> anyhow::Result<()> {
         std::fs::write(path, serde_json::to_string_pretty(&self)?)
             .with_context(|| format!("write {}", path.display()))
     }

@@ -1,7 +1,6 @@
 //! Configuration model (TOML) and platform defaults.
 
 use crate::paths::default_config_dir;
-use std::path::PathBuf;
 
 /// Daemon configuration.
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -88,11 +87,10 @@ pub struct Config {
 
 /// Get default roots for the current platform.
 pub fn default_roots() -> Vec<String> {
-    // Env override: ORIN_ROOTS (`;`-separated on Windows, `:`-separated on Unix).
+    // Env override: ORIN_ROOTS (`;`-separated).
     if let Ok(env_roots) = std::env::var("ORIN_ROOTS") {
-        let sep = if cfg!(windows) { ';' } else { ':' };
         let roots: Vec<String> = env_roots
-            .split(sep)
+            .split(';')
             .map(|s| s.trim().to_string())
             .filter(|s| !s.is_empty())
             .collect();
@@ -100,26 +98,17 @@ pub fn default_roots() -> Vec<String> {
             return roots;
         }
     }
-    if cfg!(windows) {
-        let mut roots = Vec::new();
-        for c in b'C'..=b'Z' {
-            let drive = format!("{}:\\", c as char);
-            if std::path::Path::new(&drive).exists() {
-                roots.push(drive);
-            }
+    let mut roots = Vec::new();
+    for c in b'C'..=b'Z' {
+        let drive = format!("{}:\\", c as char);
+        if std::path::Path::new(&drive).exists() {
+            roots.push(drive);
         }
-        if roots.is_empty() {
-            roots.push("C:\\".into());
-        }
-        roots
-    } else {
-        vec![
-            dirs::home_dir()
-                .unwrap_or_else(|| PathBuf::from("/"))
-                .to_string_lossy()
-                .into_owned(),
-        ]
     }
+    if roots.is_empty() {
+        roots.push("C:\\".into());
+    }
+    roots
 }
 
 /// Load configuration from disk, returning config and any warnings.

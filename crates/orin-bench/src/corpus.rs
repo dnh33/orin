@@ -5,7 +5,7 @@ use rand::Rng;
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub struct CorpusConfig {
     pub files: usize,
@@ -53,7 +53,7 @@ fn config_for(name: &str) -> CorpusConfig {
     }
 }
 
-pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
+pub fn generate(name: &str, out: &Path, seed: u64) -> anyhow::Result<()> {
     let cfg = config_for(name);
 
     if out.exists() {
@@ -67,7 +67,7 @@ pub fn generate(name: &str, out: &PathBuf, seed: u64) -> anyhow::Result<()> {
     let mut rng = StdRng::from_seed(seed_bytes);
 
     // Build directory tree
-    let mut dirs: Vec<PathBuf> = vec![out.clone()];
+    let mut dirs: Vec<PathBuf> = vec![out.to_path_buf()];
     for _ in 0..cfg.depth {
         let mut new_dirs = Vec::new();
         for d in &dirs {

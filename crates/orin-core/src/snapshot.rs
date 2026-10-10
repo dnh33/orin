@@ -177,11 +177,13 @@ pub fn load(path: &Path) -> Result<Index, Error> {
     // The file buffers are byte-aligned; copy out element-by-element with
     // read_unaligned instead of casting unaligned pointers to typed slices (UB).
     let mut entries = Vec::with_capacity(entries_len);
-    for chunk in entries_bytes.chunks_exact(ENTRY_SIZE).take(entries_len) {
+    let (chunks, _rest) = entries_bytes.as_chunks::<ENTRY_SIZE>();
+    for chunk in chunks.iter().take(entries_len) {
         entries.push(unsafe { std::ptr::read_unaligned(chunk.as_ptr() as *const Entry) });
     }
-    let sorted = sorted_bytes
-        .chunks_exact(4)
+    let (sorted_chunks, _sorted_rest) = sorted_bytes.as_chunks::<4>();
+    let sorted = sorted_chunks
+        .iter()
         .take(sorted_len_usize)
         .map(|c| unsafe { std::ptr::read_unaligned(c.as_ptr() as *const u32) })
         .collect::<Vec<u32>>();
@@ -318,11 +320,13 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
     // The file buffers are byte-aligned; copy out element-by-element with
     // read_unaligned instead of casting unaligned pointers to typed slices (UB).
     let mut entries = Vec::with_capacity(entries_len);
-    for chunk in entries_bytes.chunks_exact(ENTRY_SIZE).take(entries_len) {
+    let (chunks, _rest) = entries_bytes.as_chunks::<ENTRY_SIZE>();
+    for chunk in chunks.iter().take(entries_len) {
         entries.push(unsafe { std::ptr::read_unaligned(chunk.as_ptr() as *const Entry) });
     }
-    let sorted = sorted_bytes
-        .chunks_exact(4)
+    let (sorted_chunks, _sorted_rest) = sorted_bytes.as_chunks::<4>();
+    let sorted = sorted_chunks
+        .iter()
         .take(sorted_len_usize)
         .map(|c| unsafe { std::ptr::read_unaligned(c.as_ptr() as *const u32) })
         .collect::<Vec<u32>>();

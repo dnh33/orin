@@ -1,6 +1,7 @@
 //! Tool runner + timing.
 
 use anyhow::Context;
+use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{Duration, Instant};
@@ -30,23 +31,12 @@ fn bin_dir() -> PathBuf {
 }
 
 fn exe_name(base: &str) -> String {
-    if cfg!(windows) {
-        format!("{base}.exe")
-    } else {
-        base.to_string()
-    }
+    format!("{base}.exe")
 }
 
-/// Unique socket name for the benchmark daemon per runner process.
+/// Unique pipe name for the benchmark daemon per runner process.
 fn bench_socket() -> String {
-    if cfg!(windows) {
-        format!("orin-bench-{}", std::process::id())
-    } else {
-        std::env::temp_dir()
-            .join(format!("orin-bench-{}.sock", std::process::id()))
-            .to_string_lossy()
-            .into_owned()
-    }
+    format!("orin-bench-{}", std::process::id())
 }
 
 /// Spawn `orind` indexing the corpus and wait until it serves results.
@@ -70,12 +60,8 @@ fn ensure_daemon(corpus_dir: &Path) -> anyhow::Result<std::process::Child> {
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
         .stderr(log_err);
-    #[cfg(windows)]
-    {
-        use std::os::windows::process::CommandExt;
-        const DETACHED_PROCESS: u32 = 0x0000_0008;
-        cmd.creation_flags(DETACHED_PROCESS);
-    }
+    const DETACHED_PROCESS: u32 = 0x0000_0008;
+    cmd.creation_flags(DETACHED_PROCESS);
     let child = cmd
         .spawn()
         .with_context(|| format!("spawn {}", orind.display()))?;
@@ -120,7 +106,8 @@ fn ensure_daemon(corpus_dir: &Path) -> anyhow::Result<std::process::Child> {
                 .rev()
                 .collect();
             anyhow::bail!(
-                "orind did not become ready within 30s\nlast status: {last}\norind stderr tail:\n{tail}"
+                "orind did not become ready within 30s\nlast status: {last}\n\
+                 orind stderr tail:\n{tail}"
             );
         }
         std::thread::sleep(Duration::from_millis(100));
@@ -129,7 +116,7 @@ fn ensure_daemon(corpus_dir: &Path) -> anyhow::Result<std::process::Child> {
 
 pub fn run_tool(
     tool: &str,
-    corpus_dir: &PathBuf,
+    corpus_dir: &Path,
     query: &str,
     iterations: usize,
 ) -> anyhow::Result<Vec<Duration>> {
@@ -153,7 +140,7 @@ pub fn run_tool(
 
 fn run_single(
     tool: &str,
-    corpus_dir: &PathBuf,
+    corpus_dir: &Path,
     query: &str,
 ) -> anyhow::Result<std::process::Output> {
     let mut tool_cmd = match tool {
@@ -168,12 +155,7 @@ fn run_single(
             cmd
         }
         "fd" => {
-            // apt ships `fdfind`, brew/choco ship `fd`.
-            let mut cmd = Command::new(if cfg!(target_os = "linux") {
-                "fdfind"
-            } else {
-                "fd"
-            });
+            let mut cmd = Command::new("fd");
             cmd.arg(query);
             cmd
         }
@@ -201,10 +183,10 @@ fn run_single(
 
 pub fn run(
     tool: &str,
-    corpus_dir: &PathBuf,
-    queries_path: &PathBuf,
+    corpus_dir: &Path,
+    queries_path: &Path,
     iterations: usize,
-    out_path: &PathBuf,
+    out_path: &Path,
 ) -> anyhow::Result<()> {
     use crate::queries;
     let qmatrix = queries::QueryMatrix::load(queries_path)?;
@@ -231,7 +213,8 @@ pub fn run(
         let latencies = run_tool(tool, corpus_dir, q, iterations)?;
         let stat = crate::stats::from_durations(&latencies);
         results.push(format!(
-            "{{\"query\":{},\"tool\":\"{}\",\"p50_us\":{},\"p95_us\":{},\"p99_us\":{},\"qps\":{:.2}}}",
+            "{{\"query\":{},\"tool\":\"{}\",\"p50_us\":{},\"p95_us\":{},\"p99_us\":{},\
+             \"qps\":{:.2}}}",
             serde_json::to_string(&q)?,
             tool,
             stat.latency_p50_us,

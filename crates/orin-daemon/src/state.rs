@@ -73,7 +73,7 @@ impl State {
         })
     }
 
-    /// Create the IPC listener (Unix socket or Windows named pipe).
+    /// Create the IPC listener (Windows named pipe).
     fn create_listener() -> Result<interprocess::local_socket::Listener> {
         let name = socket_name()?;
         let listener = interprocess::local_socket::ListenerOptions::new()
@@ -160,7 +160,6 @@ pub(crate) mod test_support {
     /// prepends `\\.\pipe\` itself, and a pre-prefixed value would be doubled
     /// into an invalid pipe path (backslashes are rejected inside the pipe
     /// name; that doubling is the historical source of "Access is denied").
-    /// Unix: a socket file inside the caller's own tempdir.
     ///
     /// The name is unique per call (pid + bind counter + test label), so
     /// parallel tests never collide with "Address already in use" (os error
@@ -171,19 +170,12 @@ pub(crate) mod test_support {
     /// only the name lookup + bind — not the slow `System::new_all()` pass —
     /// and parallel tests reading the ambient `ORIN_SOCKET` (e.g.
     /// `server::tests`) essentially never observe a hermetic name.
-    pub(crate) fn new_shared_hermetic(data_dir: &Path, label: &str) -> Result<SharedState> {
+    pub(crate) fn new_shared_hermetic(_data_dir: &Path, label: &str) -> Result<SharedState> {
         let _lock = LISTENER_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         let prev = std::env::var("ORIN_SOCKET").ok();
         let pid = std::process::id();
         let id = NEXT_BIND_ID.fetch_add(1, Ordering::Relaxed);
-        let name = if cfg!(windows) {
-            format!("orin-test-{pid}-{id}-{label}")
-        } else {
-            data_dir
-                .join(format!("orin-test-{pid}-{id}.sock"))
-                .display()
-                .to_string()
-        };
+        let name = format!("orin-test-{pid}-{id}-{label}");
         // SAFETY: env mutation is serialized across all listener-creating
         // tests by LISTENER_LOCK, and the previous value is restored below
         // before the lock is released.

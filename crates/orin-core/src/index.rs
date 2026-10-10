@@ -279,8 +279,9 @@ impl Index {
             parts.push(name.to_string());
             if e.parent == u32::MAX {
                 let root_idx = self.find_root_for_entry(cur);
-                let root_path = &self.roots[root_idx].path;
-                parts.push(root_path.to_string_lossy().into_owned());
+                if let Some(r) = self.roots.get(root_idx) {
+                    parts.push(r.path.to_string_lossy().into_owned());
+                }
                 break;
             }
             cur = e.parent;
