@@ -1,0 +1,79 @@
+name: release
+
+# Builds the single-binary Windows release and publishes it on a version tag.
+# Asset contract (install.ps1 consumes it): a BARE `orin.exe` asset named
+# exactly `orin.exe`, fetched from /releases/latest via the GitHub API.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to build and publish (e.g. v0.1.0)
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Resolve version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
+
+      - name: Build release binaries (locked)
+        run: cargo build --release --locked -p orin-cli
+
+      - name: Verify binary matches the tag
+        run: |
+          ./target/release/orin.exe --version
+          ./target/release/orin.exe --version | grep -F "${VERSION}" \
+            || { echo "orin.exe --version does not report ${VERSION}"; exit 1; }
+          # Single-binary layout: the daemon is a subcommand, on.exe is a copy.
+          ./target/release/orin.exe daemon --help > /dev/null
+          ./target/release/orin.exe tui --help > /dev/null
+          ./target/release/orin.exe mcp --help > /dev/null
+
+      - name: Stage assets
+        run: |
+          mkdir -p dist
+          cp target/release/orin.exe dist/orin.exe
+          cp target/release/orin.exe dist/on.exe
+          cp install.ps1 dist/install.ps1
+          cp README.md dist/README.md
+          cd dist
+          7z a "../orin-${VERSION}-windows-x86_64.zip" orin.exe on.exe install.ps1 README.md
+          cd ..
+          sha256sum dist/orin.exe dist/on.exe "orin-${VERSION}-windows-x86_64.zip" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$TAG" \
+            dist/orin.exe \
+            dist/on.exe \
+            "orin-${VERSION}-windows-x86_64.zip" \
+            SHA256SUMS.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "orin $VERSION" \
+            --notes "Single-binary Windows release: orin.exe (query, status, tui, mcp, daemon) plus an on.exe copy of the same binary. Install with: irm https://github.com/dnh33/orin/raw/main/install.ps1 | iex" \
+            --latest
