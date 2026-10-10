@@ -1,11 +1,13 @@
 //! IPC server: accepts connections, reads frames, dispatches to handlers, writes responses.
 
 use anyhow::Result;
-use interprocess::local_socket::{ListenerNonblockingMode, Stream, prelude::*};
+use interprocess::local_socket::{ListenerNonblockingMode, Name, Stream, prelude::*};
+use orin_core::paths::socket_name;
 use orin_core::protocol::{
     PROTOCOL_VERSION, Progress, Request, Response, RootWire, StatusData, read_frame, write_frame,
 };
 use std::io::{BufReader, BufWriter, Write};
+use std::sync::Mutex;
 use std::sync::atomic::Ordering;
 use std::time::{Duration, Instant};
 use tracing::{debug, error, info};
@@ -38,9 +40,13 @@ impl Server {
 
         info!("server listening on {:?}", listener);
 
-        // Non-blocking accept so we can check shutdown; accepted streams stay
-        // BLOCKING so request reads wait for the client instead of racing it.
-        listener.set_nonblocking(ListenerNonblockingMode::Accept)?;
+        // Blocking accept: the kernel wakes us the moment a client connects,
+        // instead of the accept path sleeping through a polling interval. The
+        // waker thread keeps that wait interruptible by opening a dummy
+        // connection when shutdown is signaled or idle exit comes due.
+        listener.set_nonblocking(ListenerNonblockingMode::Neither)?;
+        let wake_at = std::sync::Arc::new(Mutex::new(None));
+        spawn_accept_waker(shutdown.clone(), wake_at.clone(), socket_name()?);
 
         loop {
             if shutdown.load(Ordering::SeqCst) {
@@ -49,15 +55,32 @@ impl Server {
             }
 
             // Check idle exit
-            if self.idle_exit_secs > 0
-                && self.last_activity.elapsed() > Duration::from_secs(self.idle_exit_secs)
-            {
+            if self.idle_expired() {
                 info!("idle exit after {}s", self.idle_exit_secs);
                 break;
             }
 
+            // Arm the waker for the wait ahead: it fires the moment the idle
+            // check above would start failing (never when idle exit is off).
+            *wake_at.lock().unwrap() = if self.idle_exit_secs > 0 {
+                self.last_activity.checked_add(Duration::from_secs(self.idle_exit_secs))
+            } else {
+                None
+            };
+
             match listener.accept() {
                 Ok(stream) => {
+                    // Shutdown and idle wake-ups arrive as ordinary
+                    // connections; test both before this one counts as
+                    // activity and gets served.
+                    if shutdown.load(Ordering::SeqCst) {
+                        info!("shutdown signaled");
+                        break;
+                    }
+                    if self.idle_expired() {
+                        info!("idle exit after {}s", self.idle_exit_secs);
+                        break;
+                    }
                     self.last_activity = Instant::now();
                     // Handle each connection in a blocking manner (simple, single-threaded)
                     // For higher concurrency, we'd spawn a thread or use async.
@@ -66,18 +89,22 @@ impl Server {
                     }
                 }
                 Err(e) => {
-                    // Non-blocking accept returns WouldBlock when no connection
-                    if e.kind() == std::io::ErrorKind::WouldBlock {
-                        std::thread::sleep(Duration::from_millis(100));
-                        continue;
-                    }
+                    // In blocking mode accept() only returns here when the
+                    // listener is broken; there is nothing left to poll, so
+                    // surface the error instead of sleeping on it.
                     error!("accept error: {}", e);
-                    std::thread::sleep(Duration::from_millis(500));
+                    return Err(e.into());
                 }
             }
         }
 
         Ok(())
+    }
+
+    /// True once the daemon has been idle longer than `idle_exit_secs` allows.
+    fn idle_expired(&self) -> bool {
+        self.idle_exit_secs > 0
+            && self.last_activity.elapsed() > Duration::from_secs(self.idle_exit_secs)
     }
 
     /// Handle a single client connection.
@@ -326,6 +353,55 @@ impl Server {
             },
         }
     }
+}
+
+/// Keep a blocked `accept()` interruptible.
+///
+/// Polling the shutdown flag on this thread (100ms ticks) never touches the
+/// request path, so client latency is unaffected. When shutdown is signaled
+/// or the armed idle-exit deadline passes, a dummy connection to the
+/// listener's own name is what makes `accept()` return, letting the server
+/// loop re-check its exit conditions.
+fn spawn_accept_waker(
+    shutdown: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    wake_at: std::sync::Arc<Mutex<Option<Instant>>>,
+    socket: Name<'static>,
+) {
+    let _waker = std::thread::spawn(move || loop {
+        std::thread::sleep(Duration::from_millis(100));
+        if shutdown.load(Ordering::SeqCst) {
+            wake_accept(&socket);
+            break;
+        }
+        let due = {
+            let mut slot = wake_at.lock().unwrap();
+            let fired = matches!(*slot, Some(at) if Instant::now() > at);
+            if fired {
+                *slot = None;
+            }
+            fired
+        };
+        if due {
+            wake_accept(&socket);
+        }
+    });
+}
+
+/// Open a connection to `socket` so a blocked `accept()` returns.
+///
+/// The connection is held briefly before dropping: closing it first would
+/// turn the wake-up into a dead-on-arrival connection that `accept()`
+/// discards internally, losing the wake-up entirely.
+fn wake_accept(socket: &Name<'static>) {
+    for _ in 0..20 {
+        if let Ok(stream) = Stream::connect(socket.clone()) {
+            std::thread::sleep(Duration::from_millis(500));
+            drop(stream);
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    debug!("accept waker could not reach the listener");
 }
 
 #[cfg(test)]
