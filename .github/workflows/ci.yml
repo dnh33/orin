@@ -20,8 +20,8 @@ jobs:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --check
-      - run: cargo check --workspace --all-targets
-      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo check --workspace --all-targets --locked
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
   test:
     # windows-first: other OS parked 2026-10-10
     strategy: { fail-fast: false, matrix: { os: [windows-latest] } }
@@ -32,5 +32,13 @@ jobs:
         with:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test --workspace
-      - run: cargo build --release
+      - run: cargo test --workspace --locked
+      - run: cargo build --release --locked
+  audit:
+    # Supply-chain poison/vuln check: RustSec advisory DB against the pinned lockfile.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
