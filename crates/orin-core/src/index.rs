@@ -274,12 +274,19 @@ impl Index {
             let Ok(rest) = abs.strip_prefix(&r.path) else {
                 continue;
             };
-            // Seed at the root directory entry when the scan placed one at
-            // the head of the range (children key under it). Indexes without
-            // a root entry (incremental/test indexes) key root-level children
-            // under u32::MAX instead: seed virtually and walk from there.
-            let mut cur = match self.entries.get(r.first as usize) {
-                Some(e) if e.parent == u32::MAX => r.first,
+            // Seed at the root directory entry only when the head of the
+            // range actually IS the root dir (its name matches): scan-built
+            // indexes key children under it. Root-level entries with no root
+            // entry at all (incremental/test inserts) key under u32::MAX, so
+            // seed virtually and walk from there.
+            let root_name = r.path.file_name().and_then(|n| n.to_str());
+            let mut cur = match (self.entries.get(r.first as usize), root_name) {
+                (Some(e), Some(name))
+                    if e.parent == u32::MAX && self.name_of(r.first) == name =>
+                {
+                    r.first
+                }
+                (Some(e), None) if e.parent == u32::MAX => r.first,
                 _ => u32::MAX,
             };
             if rest.as_os_str().is_empty() {

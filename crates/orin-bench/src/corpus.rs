@@ -8,11 +8,11 @@
 //!
 //! Synthetic machinery classes (unchanged counts, index-arithmetic only):
 //! - exact:     Cargo.toml, README.md, main.rs, LICENSE, .gitignore at the
-//!              root + the first 2 leaf dirs (3 hits per name)
+//!   root + the first 2 leaf dirs (3 hits per name)
 //! - prefix:    test_/app_/config_/src_ x50, pkg_ via node_modules x50
 //! - substring: test/util/mod/fn/struct x20
 //! - case:      App.tsx x3, APP x3 (fd smart-case and rg globs are
-//!              case-sensitive on the uppercase needles `App`/`APP`)
+//!   case-sensitive on the uppercase needles `App`/`APP`)
 //!
 //! Realistic classes - every needle gets >= 3 deterministic hits per corpus
 //! size (the bench preflight refuses empty searches, so this is mandatory):
