@@ -2,16 +2,19 @@
 #
 #   irm https://github.com/dnh33/orin/raw/main/install.ps1 | iex
 #
-# Downloads orin.exe, orind.exe and on.exe from the newest GitHub release,
-# verifies each binary starts, and puts the install folder on the user PATH.
-# Running it again replaces the files in place. Administrator rights are never
-# required: everything lands under %LOCALAPPDATA%\orin.
+# Downloads orin.exe from the newest GitHub release, drops the byte-identical
+# `on.exe` copy beside it, verifies the binary starts, and puts the install
+# folder on the user PATH. Running it again replaces the files in place.
+# Administrator rights are never required: everything lands under
+# %LOCALAPPDATA%\orin.
 
 $ErrorActionPreference = 'Stop'
 
 $homeUrl = 'https://github.com/dnh33/orin'
 $ownerRepo = ($homeUrl -replace '^https://github\.com/', '')
-$binaries = @('orin.exe', 'orind.exe', 'on.exe')
+# One product binary is downloaded; the short names are local copies of it.
+$binaries = @('orin.exe')
+$aliases = @('on.exe')
 $installDir = Join-Path $env:LOCALAPPDATA 'orin'
 $assetPattern = '*x86_64-pc-windows-msvc.zip'
 
@@ -40,8 +43,9 @@ if (-not $asset) {
 }
 Write-Step "found $($asset.name) in $($release.tag_name)"
 
-# 2. Replace files on disk: stop the daemon first so nothing is locked.
-$running = @(Get-Process -Name 'orind' -ErrorAction SilentlyContinue)
+# 2. Replace files on disk: stop the running daemon (the orin process) first
+#    so nothing is locked.
+$running = @(Get-Process -Name 'orin' -ErrorAction SilentlyContinue)
 if ($running.Count -gt 0) {
     Write-Step 'stopping the running daemon so its files can be replaced'
     $running | Stop-Process -Force
@@ -67,12 +71,21 @@ try {
         }
         Copy-Item -Path $found.FullName -Destination (Join-Path $installDir $name) -Force
     }
+
+    # Short names are byte-identical copies of orin.exe, never separate
+    # downloads: the argv[0] stem `on` makes the copy run `orin query`.
+    # Copy-Item -Force makes this idempotent on re-runs.
+    $product = Join-Path $installDir 'orin.exe'
+    foreach ($name in $aliases) {
+        Copy-Item -Path $product -Destination (Join-Path $installDir $name) -Force
+        Write-Step "  $name is a byte-identical copy of orin.exe"
+    }
 } finally {
     Remove-Item -Path $stage -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-# 4. Verify every binary actually starts.
-Write-Step 'verifying binaries'
+# 4. Verify the product binary actually starts.
+Write-Step 'verifying the binary'
 foreach ($name in $binaries) {
     $exe = Join-Path $installDir $name
     $output = (& $exe --version)
@@ -98,3 +111,4 @@ if (-not $known) {
 
 Write-Step "installed to $installDir"
 Write-Step 'open a new terminal, then run:  orin status'
+Write-Step 'short alias:                  on <terms> (== orin query <terms>)'

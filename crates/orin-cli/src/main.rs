@@ -1,25 +1,40 @@
 //! orin — CLI client for the orin search daemon.
 //!
 //! Speaks the orin-core wire protocol (4-byte little-endian length prefix +
-//! JSON frames) to `orind` over its local socket / named pipe, spawning the
-//! daemon in the background when it is not already running.
+//! JSON frames) to `orin daemon` over its local socket / named pipe,
+//! spawning the daemon in the background when it is not already running.
+//!
+//! One shipped binary, two names: `on.exe` is a byte-identical copy of
+//! `orin.exe`, and argv[0] picks the default subcommand (see `parse_cli`).
 
 mod client;
 mod tui;
 
+use clap::CommandFactory;
 use clap::Parser;
 use clap::Subcommand;
 use orin_core::protocol::HitWire;
 use orin_core::protocol::StatusData;
+use orin_daemon::DaemonArgs;
+use orin_daemon::run_daemon;
+use std::ffi::OsString;
 use std::process::ExitCode;
 
 /// rg-like exit code: the command worked but found nothing.
 const NO_RESULTS: u8 = 1;
 /// Exit code for runtime failures (daemon unreachable, protocol errors).
 const ERROR: u8 = 2;
+/// Root flags the `on` alias must not rewrite into `orin query <flag>`.
+const ROOT_FLAGS: [&str; 4] = ["-h", "--help", "-V", "--version"];
+/// `--help` epilog: what the byte-identical `on` copy does.
+const ON_EPILOG: &str = "\
+`on` is a byte-identical copy of `orin`, so argv[0] picks the subcommand:
+  on <terms>  ==  orin query <terms>   (`on foo` == `orin query foo`)
+  on status   ==  orin status          (explicit subcommands always win)";
 
 #[derive(Debug, Parser)]
 #[command(name = "orin", version, about = "instant whole-disk file search")]
+#[command(after_help = ON_EPILOG)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -53,10 +68,15 @@ enum Commands {
         #[arg(long)]
         open: bool,
     },
+    /// Run the search daemon in the foreground (index + serve until stopped)
+    Daemon {
+        #[command(flatten)]
+        args: DaemonArgs,
+    },
 }
 
-pub fn main() -> ExitCode {
-    let cli = Cli::parse();
+fn main() -> ExitCode {
+    let cli = parse_cli();
     match run(cli) {
         Ok(code) => code,
         Err(err) => {
@@ -72,7 +92,50 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
         Commands::Status { json } => status_cmd(json),
         Commands::Mcp => mcp_cmd(),
         Commands::Tui { open } => tui::run(open),
+        Commands::Daemon { args } => {
+            run_daemon(args)?;
+            Ok(ExitCode::SUCCESS)
+        }
     }
+}
+
+/// Parse this process's arguments, honoring the `on` argv[0] alias.
+///
+/// `on` is a byte-identical copy of `orin`, so argv[0] picks the default
+/// subcommand: `on foo` parses as `orin query foo`. An explicit subcommand
+/// typed after `on` (`on status`) still wins, as do the root flags
+/// (`on --version`). Any other argv[0] parses as plain `orin`.
+fn parse_cli() -> Cli {
+    let argv: Vec<OsString> = std::env::args_os().collect();
+    if on_alias(&argv) {
+        let mut aliased = Vec::with_capacity(argv.len() + 2);
+        aliased.push(OsString::from("orin"));
+        aliased.push(OsString::from("query"));
+        aliased.extend(argv.into_iter().skip(1));
+        Cli::parse_from(aliased)
+    } else {
+        Cli::parse_from(argv)
+    }
+}
+
+/// True when argv[0] is the `on` copy and no explicit subcommand follows it.
+fn on_alias(argv: &[OsString]) -> bool {
+    let Some(argv0) = argv.first() else {
+        return false;
+    };
+    let stem = std::path::Path::new(argv0).file_stem().unwrap_or(argv0);
+    if !stem.to_str().is_some_and(|name| name.eq_ignore_ascii_case("on")) {
+        return false;
+    }
+    let Some(first) = argv.get(1) else {
+        // Bare `on`: show the product's usage rather than an empty query.
+        return false;
+    };
+    let first = first.to_string_lossy().into_owned();
+    let mut command = Cli::command();
+    command.build();
+    let explicit = command.get_subcommands().any(|sub| sub.get_name() == first.as_str());
+    !explicit && !ROOT_FLAGS.contains(&first.as_str())
 }
 
 fn query_cmd(terms: &[String], limit: u32, json: bool) -> anyhow::Result<ExitCode> {
@@ -110,7 +173,7 @@ fn mcp_cmd() -> anyhow::Result<ExitCode> {
 }
 
 fn print_status(data: &StatusData) {
-    println!("orind {} (protocol {})", data.version, data.protocol);
+    println!("orin daemon {} (protocol {})", data.version, data.protocol);
     println!("state: {}", data.state);
     println!("entries: {}", data.entries);
     println!("memory: {}", human_size(data.mem_bytes));
@@ -186,6 +249,17 @@ mod tests {
     #[test]
     fn query_requires_terms() {
         assert!(Cli::try_parse_from(["orin", "query"]).is_err());
+    }
+
+    #[test]
+    fn on_alias_rewrites_query_but_not_subcommands() {
+        let argv = |argv0: &str, arg: &str| [OsString::from(argv0), OsString::from(arg)];
+        assert!(on_alias(&argv("on", "foo")));
+        assert!(on_alias(&argv("on.exe", "--json")));
+        assert!(on_alias(&argv("ON.EXE", "foo")));
+        assert!(!on_alias(&argv("on.exe", "status")));
+        assert!(!on_alias(&argv("on.exe", "--version")));
+        assert!(!on_alias(&argv("orin.exe", "foo")));
     }
 
     #[test]

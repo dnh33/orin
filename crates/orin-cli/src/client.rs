@@ -73,7 +73,7 @@ fn ensure_connected() -> anyhow::Result<Stream> {
     if no_spawn.is_ok_and(|value| value == "1") {
         bail!("daemon not running; ORIN_NO_SPAWN=1 forbids auto-spawn");
     }
-    let _child = spawn_orind()?;
+    let _child = spawn_daemon()?;
     let deadline = Instant::now() + SPAWN_WAIT;
     let mut delay = Duration::from_millis(50);
     loop {
@@ -88,7 +88,7 @@ fn ensure_connected() -> anyhow::Result<Stream> {
         delay = (delay * 2).min(Duration::from_millis(400));
     }
     let secs = SPAWN_WAIT.as_secs();
-    bail!("spawned `orind` but the daemon did not answer in {secs}s");
+    bail!("spawned `orin daemon` but the daemon did not answer in {secs}s");
 }
 
 /// Try each plausible socket name; the first listener to accept wins.
@@ -114,9 +114,9 @@ fn send(stream: &mut Stream, req: &Request) -> anyhow::Result<Response> {
     response.context("daemon closed the connection")
 }
 
-/// Locate `orind` next to this executable, else rely on PATH.
-fn orind_program() -> std::path::PathBuf {
-    let exe_name = "orind.exe";
+/// Locate `orin` next to this executable, else rely on PATH.
+fn orin_program() -> std::path::PathBuf {
+    let exe_name = "orin.exe";
     if let Ok(exe) = std::env::current_exe()
         && let Some(dir) = exe.parent()
     {
@@ -125,13 +125,14 @@ fn orind_program() -> std::path::PathBuf {
             return candidate;
         }
     }
-    std::path::PathBuf::from("orind")
+    std::path::PathBuf::from("orin")
 }
 
-/// Start `orind` in the background, detached from this console.
-fn spawn_orind() -> anyhow::Result<std::process::Child> {
-    let program = orind_program();
+/// Start `orin daemon` in the background, detached from this console.
+fn spawn_daemon() -> anyhow::Result<std::process::Child> {
+    let program = orin_program();
     let mut command = std::process::Command::new(&program);
+    command.arg("daemon");
     command
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
