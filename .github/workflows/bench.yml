@@ -33,7 +33,7 @@ jobs:
         # tool filter via inputs (matrix is NOT available in job-level `if`):
         tool: ${{ fromJSON(inputs.tool == 'all' && '["orin","fd","find","rg"]' || format('["{0}"]', inputs.tool)) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - name: Install fd/rg (windows)
         if: runner.os == 'Windows'
@@ -97,7 +97,7 @@ jobs:
             --iterations ${{ inputs.iterations }} \
             --out "$RUNNER_TEMP/orin-bench/results_${{ matrix.tool }}_${{ matrix.os }}.json"
       - name: Upload results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bench-results-${{ matrix.os }}-${{ matrix.tool }}
           path: ${{ runner.temp }}/orin-bench/results_*.json
