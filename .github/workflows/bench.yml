@@ -9,8 +9,12 @@ on:
         default: tiny
       tool:
         type: choice
-        options: [orin, fd, find, rg]
-        default: orin
+        options: [all, orin, fd, find, rg]
+        default: all
+      iterations:
+        description: Iterations per query (100-200 = fast perf-fix loop, 1000 = full run)
+        type: string
+        default: "1000"
 
 defaults:
   run:
@@ -19,6 +23,7 @@ defaults:
 jobs:
   bench:
     runs-on: ${{ matrix.os }}
+    if: ${{ inputs.tool == 'all' || inputs.tool == matrix.tool }}
     strategy:
       fail-fast: false
       matrix:
@@ -89,7 +94,7 @@ jobs:
             --tool ${{ matrix.tool }} \
             --corpus "$RUNNER_TEMP/orin-bench/corpus" \
             --queries crates/orin-bench/queries.json \
-            --iterations 1000 \
+            --iterations ${{ inputs.iterations }} \
             --out "$RUNNER_TEMP/orin-bench/results_${{ matrix.tool }}_${{ matrix.os }}.json"
       - name: Upload results
         uses: actions/upload-artifact@v4
