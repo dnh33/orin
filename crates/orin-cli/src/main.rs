@@ -5,6 +5,7 @@
 //! daemon in the background when it is not already running.
 
 mod client;
+mod tui;
 
 use clap::Parser;
 use clap::Subcommand;
@@ -46,6 +47,12 @@ enum Commands {
     },
     /// Run the orin MCP server on stdio for AI agents
     Mcp,
+    /// Interactive fuzzy picker over the daemon index (TUI)
+    Tui {
+        /// Open the selected path instead of printing it to stdout
+        #[arg(long)]
+        open: bool,
+    },
 }
 
 pub fn main() -> ExitCode {
@@ -64,6 +71,7 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
         Commands::Query { terms, limit, json } => query_cmd(&terms, limit, json),
         Commands::Status { json } => status_cmd(json),
         Commands::Mcp => mcp_cmd(),
+        Commands::Tui { open } => tui::run(open),
     }
 }
 
