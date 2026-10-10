@@ -9,3 +9,8 @@ orin-bench-*.json
 *.swo
 *~
 .DS_Store
+# CI debug artifacts (never commit)
+ci_log*.txt
+check_pr*.txt
+pr_check*.txt
+latest_run.txt
