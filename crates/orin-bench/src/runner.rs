@@ -74,7 +74,9 @@ fn ensure_daemon(corpus_dir: &Path) -> anyhow::Result<std::process::Child> {
     cmd.env("ORIN_SOCKET", &socket)
         .env("ORIN_DATA_DIR", &data_dir)
         .env("ORIN_ROOTS", corpus_dir)
-        .env("RUST_LOG", "warn")
+        // info: the daemon logs scan/snapshot phases with timestamps - the
+        // probe timelines need them for root-cause work.
+        .env("RUST_LOG", "info")
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
         .stderr(log_err);
@@ -420,7 +422,9 @@ fn spawn_ready(
     cmd.env("ORIN_SOCKET", socket)
         .env("ORIN_DATA_DIR", data_dir)
         .env("ORIN_ROOTS", corpus_dir)
-        .env("RUST_LOG", "warn")
+        // info: the daemon logs scan/snapshot phases with timestamps - the
+        // probe timelines need them for root-cause work.
+        .env("RUST_LOG", "info")
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
         .stderr(log_err);
@@ -431,9 +435,13 @@ fn spawn_ready(
         .spawn()
         .with_context(|| format!("spawn {}", daemon.display()))?;
 
-    let deadline = Instant::now() + Duration::from_secs(300);
+    let deadline = Instant::now() + Duration::from_secs(600);
     let mut last = String::new();
+    let mut polls = 0u32;
+    let timeline = data_dir.join(format!("probe-timeline-{label}.log"));
     loop {
+        polls += 1;
+        let call_started = Instant::now();
         if let Ok(out) = Command::new(orin)
             .arg("status")
             .arg("--json")
@@ -441,18 +449,36 @@ fn spawn_ready(
             .env("ORIN_NO_SPAWN", "1")
             .output()
         {
+            let call_ms = call_started.elapsed().as_millis();
             let stdout = String::from_utf8_lossy(&out.stdout).into_owned();
             last = format!("exit={:?} stdout={}", out.status.code(), stdout.trim());
             if let Ok(v) = serde_json::from_str::<serde_json::Value>(&stdout) {
                 let entries = v.get("entries").and_then(|e| e.as_u64()).unwrap_or(0);
-                if entries > 0 {
+                let state = v.get("state").and_then(|s| s.as_str()).unwrap_or("");
+                let _ = std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(&timeline)
+                    .and_then(|mut f| {
+                        use std::io::Write;
+                        writeln!(
+                            f,
+                            "poll={polls} call_ms={call_ms} elapsed_ms={} \
+state={state} entries={entries}",
+                            started.elapsed().as_millis()
+                        )
+                    });
+                // Readiness = the daemon reports a COMPLETE index (state
+                // "ready"), not merely first entries: a scan in progress
+                // must never be timed as a completed one.
+                if state == "ready" && entries > 0 {
                     let mem = v.get("mem_bytes").and_then(|m| m.as_u64()).unwrap_or(0);
                     return Ok((child, started.elapsed().as_millis() as u64, entries, mem));
                 }
             }
         }
         if Instant::now() > deadline {
-            anyhow::bail!("orin daemon not ready within 300s ({label}): {last}");
+            anyhow::bail!("orin daemon not ready within 600s ({label}): {last}");
         }
         std::thread::sleep(Duration::from_millis(100));
     }

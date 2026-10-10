@@ -123,7 +123,11 @@ jobs:
             --corpus "$RUNNER_TEMP/orin-bench/corpus" \
             --out "$RUNNER_TEMP/orin-bench/probes_${{ inputs.corpus }}.json"
       - name: Upload probes
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: bench-probes-${{ inputs.corpus }}
-          path: ${{ runner.temp }}/orin-bench/probes_*.json
+          path: |
+            ${{ runner.temp }}/orin-bench/probes_*.json
+            ${{ runner.temp }}/orin-bench-probes-*/probe-timeline-*.log
+            ${{ runner.temp }}/orin-bench-probes-*/daemon-stderr-*.log
