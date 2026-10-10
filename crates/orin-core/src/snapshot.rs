@@ -174,15 +174,17 @@ pub fn load(path: &Path) -> Result<Index, Error> {
 
     // Deserialize
     let roots: Vec<Root> = serde_json::from_slice(&roots_json)?;
+    // The file buffers are byte-aligned; copy out element-by-element with
+    // read_unaligned instead of casting unaligned pointers to typed slices (UB).
     let mut entries = Vec::with_capacity(entries_len);
-    let entries_slice = unsafe {
-        std::slice::from_raw_parts_mut(entries_bytes.as_mut_ptr() as *mut Entry, entries_len)
-    };
-    entries.extend_from_slice(entries_slice);
-
-    let sorted = unsafe {
-        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len_usize).to_vec()
-    };
+    for chunk in entries_bytes.chunks_exact(ENTRY_SIZE).take(entries_len) {
+        entries.push(unsafe { std::ptr::read_unaligned(chunk.as_ptr() as *const Entry) });
+    }
+    let sorted = sorted_bytes
+        .chunks_exact(4)
+        .take(sorted_len_usize)
+        .map(|c| unsafe { std::ptr::read_unaligned(c.as_ptr() as *const u32) })
+        .collect::<Vec<u32>>();
 
     // Reconstruct NamesArena
     let names = crate::arena::NamesArena { bytes: names_bytes };
@@ -313,15 +315,17 @@ pub fn decode(bytes: &[u8]) -> Result<Index, Error> {
 
     // Deserialize
     let roots: Vec<Root> = serde_json::from_slice(&roots_json)?;
+    // The file buffers are byte-aligned; copy out element-by-element with
+    // read_unaligned instead of casting unaligned pointers to typed slices (UB).
     let mut entries = Vec::with_capacity(entries_len);
-    let entries_slice = unsafe {
-        std::slice::from_raw_parts_mut(entries_bytes.as_mut_ptr() as *mut Entry, entries_len)
-    };
-    entries.extend_from_slice(entries_slice);
-
-    let sorted = unsafe {
-        std::slice::from_raw_parts(sorted_bytes.as_ptr() as *const u32, sorted_len_usize).to_vec()
-    };
+    for chunk in entries_bytes.chunks_exact(ENTRY_SIZE).take(entries_len) {
+        entries.push(unsafe { std::ptr::read_unaligned(chunk.as_ptr() as *const Entry) });
+    }
+    let sorted = sorted_bytes
+        .chunks_exact(4)
+        .take(sorted_len_usize)
+        .map(|c| unsafe { std::ptr::read_unaligned(c.as_ptr() as *const u32) })
+        .collect::<Vec<u32>>();
 
     // Reconstruct NamesArena
     let names = crate::arena::NamesArena { bytes: names_bytes };

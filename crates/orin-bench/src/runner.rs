@@ -59,13 +59,16 @@ fn ensure_daemon(corpus_dir: &Path) -> anyhow::Result<std::process::Child> {
     let socket = bench_socket();
 
     let mut cmd = Command::new(&orind);
+    let log_path = data_dir.join("orind-stderr.log");
+    let log = std::fs::File::create(&log_path).with_context(|| format!("create {}", log_path.display()))?;
+    let log_err = log.try_clone().context("clone orind stderr log")?;
     cmd.env("ORIN_SOCKET", &socket)
         .env("ORIN_DATA_DIR", &data_dir)
         .env("ORIN_ROOTS", corpus_dir)
         .env("RUST_LOG", "warn")
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null());
+        .stderr(log_err);
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
@@ -76,30 +79,41 @@ fn ensure_daemon(corpus_dir: &Path) -> anyhow::Result<std::process::Child> {
         .spawn()
         .with_context(|| format!("spawn {}", orind.display()))?;
 
-    // Poll `orin status --json` until the index reports entries (scan done).
+    // Poll `orin status --json` until the daemon answers with indexed entries.
+    // Parse stdout regardless of exit code: a status call may exit non-zero
+    // on "no results" semantics even while the daemon is answering.
     let deadline = Instant::now() + Duration::from_secs(30);
+    let mut last = String::new();
     loop {
-        let out = Command::new(&orin)
+        if let Ok(out) = Command::new(&orin)
             .arg("status")
             .arg("--json")
             .env("ORIN_SOCKET", &socket)
             .env("ORIN_NO_SPAWN", "1")
-            .output();
-        if let Ok(out) = out {
-            if out.status.success() {
-                let v: Option<serde_json::Value> = serde_json::from_slice(&out.stdout).ok();
-                let entries = v
-                    .as_ref()
-                    .and_then(|v| v.get("entries"))
-                    .and_then(|e| e.as_u64())
-                    .unwrap_or(0);
-                if entries > 0 || v.is_none() {
+            .output()
+        {
+            let stdout = String::from_utf8_lossy(&out.stdout).into_owned();
+            let stderr = String::from_utf8_lossy(&out.stderr).into_owned();
+            last = format!(
+                "exit={:?} stdout={} stderr={}",
+                out.status.code(),
+                stdout.trim(),
+                stderr.trim()
+            );
+            if let Ok(v) = serde_json::from_str::<serde_json::Value>(&stdout) {
+                let entries = v.get("entries").and_then(|e| e.as_u64()).unwrap_or(0);
+                if entries > 0 || std::env::var("ORIN_BENCH_ALLOW_EMPTY").is_ok() {
                     return Ok(child);
                 }
+                // JSON answer but empty index: scan still in progress, keep polling.
             }
         }
         if Instant::now() > deadline {
-            anyhow::bail!("orind did not become ready within 30s");
+            let log_tail = std::fs::read_to_string(&log_path).unwrap_or_default();
+            let tail: String = log_tail.chars().rev().take(2000).collect::<Vec<_>>().into_iter().rev().collect();
+            anyhow::bail!(
+                "orind did not become ready within 30s\nlast status: {last}\norind stderr tail:\n{tail}"
+            );
         }
         std::thread::sleep(Duration::from_millis(100));
     }
