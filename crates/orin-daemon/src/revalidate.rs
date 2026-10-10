@@ -55,33 +55,60 @@ fn revalidate_root(state: &SharedState, root: &Path) -> Result<(u64, u64)> {
     let mut checked = 0u64;
     let mut fixed = 0u64;
 
+    // One lookup map for the whole pass. A per-entry lookup_path call was
+    // O(n) with full-path allocations: revalidation became O(n^2) and a
+    // 25k-entry corpus needed ~6.5 minutes (measured 2026-10-10).
+    let map: std::collections::HashMap<(u32, String), u32> = {
+        let state = state.lock().unwrap();
+        state.index.lookup_map_owned()
+    };
+
     let walker = WalkBuilder::new(root)
         .follow_links(false)
         .hidden(false)
         .git_ignore(false)
         .build();
 
+    // Pre-order walk: a stack of (depth, entry idx) resolves parents without
+    // touching the index. Entries added during the pass are stacked too, so
+    // their children resolve against the fresh parent instead of the stale
+    // map and get added in order.
+    let mut stack: Vec<(usize, u32)> = Vec::new();
     for result in walker {
         let entry = match result {
             Ok(e) => e,
             Err(_) => continue,
         };
-
         let path = entry.path();
+        let depth = entry.depth();
+        while stack.last().is_some_and(|(d, _)| *d >= depth) {
+            stack.pop();
+        }
         checked += 1;
 
-        let in_index = {
-            let state = state.lock().unwrap();
-            state.index.lookup_path(path).is_some()
+        let found = match entry.file_name().to_str() {
+            Some(name) => match stack.last() {
+                Some(&(_, parent)) => map.get(&(parent, name.to_string())).copied(),
+                // The walk root: its entry key is (u32::MAX, name).
+                None => map.get(&(u32::MAX, name.to_string())).copied(),
+            },
+            None => None,
         };
 
-        if !in_index {
-            // File exists on disk but not in index - add it
-            if let Err(e) = add_missing(state, path) {
-                warn!("failed to add missing {}: {}", path.display(), e);
-            } else {
-                fixed += 1;
-                debug!("revalidate added: {}", path.display());
+        match found {
+            Some(idx) => stack.push((depth, idx)),
+            None => {
+                // File exists on disk but not in index - add it.
+                let parent = stack.last().map(|&(_, i)| i).unwrap_or(u32::MAX);
+                match add_missing(state, path, parent) {
+                    Ok(Some(idx)) => {
+                        stack.push((depth, idx));
+                        fixed += 1;
+                        debug!("revalidate added: {}", path.display());
+                    }
+                    Ok(None) => {}
+                    Err(e) => warn!("failed to add missing {}: {}", path.display(), e),
+                }
             }
         }
     }
@@ -92,15 +119,17 @@ fn revalidate_root(state: &SharedState, root: &Path) -> Result<(u64, u64)> {
     Ok((checked, fixed))
 }
 
-fn add_missing(state: &SharedState, path: &Path) -> Result<()> {
+/// Insert one on-disk entry under `parent_idx` (`u32::MAX` = root level).
+/// Returns the new entry's index, or `None` when metadata was unreadable.
+fn add_missing(state: &SharedState, path: &Path, parent_idx: u32) -> Result<Option<u32>> {
     let metadata = match std::fs::metadata(path) {
         Ok(m) => m,
-        Err(_) => return Ok(()),
+        Err(_) => return Ok(None),
     };
 
     let name = match path.file_name().and_then(|n| n.to_str()) {
         Some(n) => n,
-        None => return Ok(()),
+        None => return Ok(None),
     };
 
     let kind = if metadata.is_dir() {
@@ -112,7 +141,6 @@ fn add_missing(state: &SharedState, path: &Path) -> Result<()> {
     };
 
     let hidden = name.starts_with('.') || name.starts_with('$');
-
     let root_idx = {
         let state = state.lock().unwrap();
         state
@@ -122,19 +150,13 @@ fn add_missing(state: &SharedState, path: &Path) -> Result<()> {
             .unwrap_or(0)
     };
 
-    let parent_idx = {
-        let state = state.lock().unwrap();
-        let parent = path.parent().unwrap_or(path);
-        if parent == state.roots[root_idx].path {
-            u32::MAX
-        } else {
-            state.index.lookup_path(parent).unwrap_or(u32::MAX)
-        }
-    };
-
     let new_entry = orin_core::index::NewEntry {
         name,
-        parent: Some(parent_idx),
+        parent: if parent_idx == u32::MAX {
+            None
+        } else {
+            Some(parent_idx)
+        },
         kind,
         hidden,
         size: metadata.len(),
@@ -147,14 +169,14 @@ fn add_missing(state: &SharedState, path: &Path) -> Result<()> {
         root: root_idx,
     };
 
-    {
-        let mut state = state.lock().unwrap();
-        let indices = state.index.insert_batch(&[new_entry], 0);
-        state.index.finalize();
-        debug!("revalidate added entry at idx={}", indices[0]);
-    }
-
-    Ok(())
+    let mut state = state.lock().unwrap();
+    let indices = state.index.insert_batch(&[new_entry], 0);
+    // Incremental order maintenance: a full finalize() re-sort per added
+    // entry made sparse additions O(n log n) each.
+    let idx = indices[0];
+    state.index.sorted_insert(idx);
+    debug!("revalidate added entry at idx={idx}");
+    Ok(Some(idx))
 }
 
 #[cfg(test)]

@@ -124,12 +124,14 @@ impl Index {
         for item in items {
             let global_idx = self.entries.len() as u32;
 
-            // Determine parent index
+            // Determine parent index. Keys are batch-local (pre-order batches
+            // see their parent first); a parent absent from the batch is a
+            // pre-existing global entry (incremental inserts).
             let parent_idx = match item.parent {
-                Some(local_parent) => parent_map
-                    .get(&(item.root, local_parent))
+                Some(parent_key) => parent_map
+                    .get(&(item.root, parent_key))
                     .copied()
-                    .unwrap_or(u32::MAX),
+                    .unwrap_or(parent_key),
                 None => u32::MAX,
             };
 
@@ -257,16 +259,66 @@ impl Index {
         self.names.get(e.name_off, e.name_len)
     }
 
-    /// Resolve an absolute path to an entry index.
-    pub fn lookup_path(&self, abs: &std::path::Path) -> Option<u32> {
-        // Linear scan (slow but correct for tests)
-        for &idx in &self.sorted {
-            let path = self.path_of(idx);
-            if path == abs {
-                return Some(idx);
+    /// Resolve an absolute path to an entry index via a prebuilt lookup map.
+    ///
+    /// Component-wise: strip the owning root, then walk `(parent, name)`
+    /// steps. O(depth) once the map exists. The previous implementation
+    /// scanned every entry and rebuilt a full path per comparison: O(n)
+    /// allocations per call and O(n^2) for a revalidation pass.
+    pub fn lookup_in(
+        &self,
+        map: &std::collections::HashMap<(u32, String), u32>,
+        abs: &std::path::Path,
+    ) -> Option<u32> {
+        for r in &self.roots {
+            let Ok(rest) = abs.strip_prefix(&r.path) else {
+                continue;
+            };
+            // Seed at the root directory entry (first in its range when the
+            // scan placed it there), falling back to the map for hand-built
+            // indexes. An empty index resolves nothing: callers add entries.
+            let mut cur = match self.entries.get(r.first as usize) {
+                Some(e) if e.parent == u32::MAX => r.first,
+                _ => {
+                    let root_name = r.path.file_name().and_then(|n| n.to_str())?;
+                    *map.get(&(u32::MAX, root_name.to_string()))?
+                }
+            };
+            if rest.as_os_str().is_empty() {
+                return Some(cur);
             }
+            for comp in rest.components() {
+                let name = comp.as_os_str().to_str()?;
+                cur = *map.get(&(cur, name.to_string()))?;
+            }
+            return Some(cur);
         }
         None
+    }
+
+    /// Transient `(parent, name) -> idx` map with owned keys.
+    ///
+    /// Build once per bulk pass (revalidation, imports) and resolve paths in
+    /// O(1) with [`Index::lookup_in`]. Owned keys let the map outlive the
+    /// index lock it was built under. O(n) memory, dropped after the pass.
+    pub fn lookup_map_owned(&self) -> std::collections::HashMap<(u32, String), u32> {
+        let mut map = std::collections::HashMap::with_capacity(self.entries.len());
+        for &idx in &self.sorted {
+            let e = &self.entries[idx as usize];
+            let name = self.names.get(e.name_off, e.name_len);
+            map.insert((e.parent, name.to_string()), idx);
+        }
+        map
+    }
+
+    /// Resolve an absolute path to an entry index.
+    ///
+    /// Spends one O(n) map build per call; callers resolving many paths in a
+    /// row should build the map once with [`Index::lookup_map_owned`] and use
+    /// [`Index::lookup_in`] (this is what revalidation does).
+    pub fn lookup_path(&self, abs: &std::path::Path) -> Option<u32> {
+        let map = self.lookup_map_owned();
+        self.lookup_in(&map, abs)
     }
 
     /// Build the full path for an entry by walking parents to root.
