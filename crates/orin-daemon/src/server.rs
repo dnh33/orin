@@ -40,7 +40,7 @@ impl Server {
 
         // Non-blocking accept so we can check shutdown; accepted streams stay
         // BLOCKING so request reads wait for the client instead of racing it.
-        listener.set_nonblocking(ListenerNonblockingMode::Listener)?;
+        listener.set_nonblocking(ListenerNonblockingMode::Accept)?;
 
         loop {
             if shutdown.load(Ordering::SeqCst) {
