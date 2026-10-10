@@ -122,7 +122,13 @@ pub fn generate(name: &str, out: &Path, seed: u64) -> anyhow::Result<()> {
     // Plant names for EVERY shared-table query class (exact / prefix / substring),
     // deterministically. The harness refuses to time queries that match nothing,
     // so the corpus must cover all of them. (pkg_ is covered by node_modules above.)
-    for name in ["Cargo.toml", "README.md", "main.rs", "LICENSE", ".gitignore"] {
+    for name in [
+        "Cargo.toml",
+        "README.md",
+        "main.rs",
+        "LICENSE",
+        ".gitignore",
+    ] {
         fs::write(out.join(name), b"planted\n")?;
         for d in dirs.iter().take(2) {
             fs::write(d.join(name), b"planted\n")?;
