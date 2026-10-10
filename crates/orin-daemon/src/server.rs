@@ -63,7 +63,8 @@ impl Server {
             // Arm the waker for the wait ahead: it fires the moment the idle
             // check above would start failing (never when idle exit is off).
             *wake_at.lock().unwrap() = if self.idle_exit_secs > 0 {
-                self.last_activity.checked_add(Duration::from_secs(self.idle_exit_secs))
+                self.last_activity
+                    .checked_add(Duration::from_secs(self.idle_exit_secs))
             } else {
                 None
             };
@@ -367,22 +368,24 @@ fn spawn_accept_waker(
     wake_at: std::sync::Arc<Mutex<Option<Instant>>>,
     socket: Name<'static>,
 ) {
-    let _waker = std::thread::spawn(move || loop {
-        std::thread::sleep(Duration::from_millis(100));
-        if shutdown.load(Ordering::SeqCst) {
-            wake_accept(&socket);
-            break;
-        }
-        let due = {
-            let mut slot = wake_at.lock().unwrap();
-            let fired = matches!(*slot, Some(at) if Instant::now() > at);
-            if fired {
-                *slot = None;
+    let _waker = std::thread::spawn(move || {
+        loop {
+            std::thread::sleep(Duration::from_millis(100));
+            if shutdown.load(Ordering::SeqCst) {
+                wake_accept(&socket);
+                break;
             }
-            fired
-        };
-        if due {
-            wake_accept(&socket);
+            let due = {
+                let mut slot = wake_at.lock().unwrap();
+                let fired = matches!(*slot, Some(at) if Instant::now() > at);
+                if fired {
+                    *slot = None;
+                }
+                fired
+            };
+            if due {
+                wake_accept(&socket);
+            }
         }
     });
 }
