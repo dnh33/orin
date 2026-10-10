@@ -97,10 +97,10 @@ pub fn generate(name: &str, out: &Path, seed: u64) -> anyhow::Result<()> {
         // Realistic small-file-dominant distribution (bounded totals so the
         // medium/large corpora fit on a runner disk): ~5.4KB average.
         let size = match rng.random_range(0..1000) {
-            0..=699 => rng.random_range(1..500),               // tiny (70%)
-            700..=949 => rng.random_range(500..10_000),        // small (25%)
-            950..=994 => rng.random_range(10_000..100_000),    // medium (4.5%)
-            _ => rng.random_range(100_000..500_000),           // large (0.5%)
+            0..=699 => rng.random_range(1..500),            // tiny (70%)
+            700..=949 => rng.random_range(500..10_000),     // small (25%)
+            950..=994 => rng.random_range(10_000..100_000), // medium (4.5%)
+            _ => rng.random_range(100_000..500_000),        // large (0.5%)
         };
 
         let mut content = vec![0u8; size];
