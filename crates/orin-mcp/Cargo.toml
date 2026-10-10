@@ -10,6 +10,9 @@ orin-core = { path = "../orin-core" }
 anyhow = { workspace = true }
 interprocess = { workspace = true }
 rmcp = { workspace = true, features = ["transport-io"] }
+# Direct dep required: #[derive(JsonSchema)] expands to schemars:: paths
+# (same 1.x line rmcp 3.5.1 pins; no additional download).
+schemars = "1.2"
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { version = "1", features = ["rt-multi-thread"] }

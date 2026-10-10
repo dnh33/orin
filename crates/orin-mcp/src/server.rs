@@ -210,7 +210,10 @@ impl OrinServer {
     }
 
     /// Search the index and return matching paths.
-    #[tool(name = "find", description = "Search the index and return matching paths.")]
+    #[tool(
+        name = "find",
+        description = "Search the index and return matching paths."
+    )]
     async fn find(&self, params: Parameters<FindParams>) -> Result<Json<FindResult>, String> {
         let limit = params.0.limit.unwrap_or(DEFAULT_LIMIT);
         let query = params.0.query;
@@ -221,7 +224,10 @@ impl OrinServer {
     }
 
     /// Return exists/kind/size/mtime for a path.
-    #[tool(name = "stat", description = "Return exists/kind/size/mtime for a path.")]
+    #[tool(
+        name = "stat",
+        description = "Return exists/kind/size/mtime for a path."
+    )]
     async fn stat(&self, params: Parameters<StatParams>) -> Result<Json<StatResult>, String> {
         let path = params.0.path;
         let info = daemon_call(move || client::stat(&path)).await?;
@@ -229,7 +235,10 @@ impl OrinServer {
     }
 
     /// Return daemon status: version, entries, roots, progress.
-    #[tool(name = "status", description = "Return daemon status: entries, roots, version.")]
+    #[tool(
+        name = "status",
+        description = "Return daemon status: entries, roots, version."
+    )]
     async fn status(&self) -> Result<Json<StatusResult>, String> {
         let data = daemon_call(client::status).await?;
         Ok(Json(StatusResult::from(data)))
