@@ -301,6 +301,7 @@ impl Index {
 
     /// Search the index with a parsed query.
     pub fn search(&self, q: &crate::query::Query, _now_unix: u64) -> crate::query::SearchResult {
+        use std::borrow::Cow;
         use std::time::Instant;
         let start = Instant::now();
 
@@ -316,23 +317,25 @@ impl Index {
                 .join(" "),
         );
 
-        // Collect matching candidates
-        let mut candidates = Vec::new();
+        // Collect matching candidates as entry indices only (no name clones).
+        let mut candidates: Vec<u32> = Vec::new();
+        let mut buf = [0u8; 4096];
 
         for &idx in &self.sorted {
             if !self.is_live(idx) {
                 continue;
             }
             let name = self.name_of(idx);
-            let folded_name = crate::fold::fold_vec(name);
+            // Fold into a reusable stack buffer; oversized names fall back to
+            // a heap fold, so the folded bytes always equal `fold_vec(name)`.
+            let folded: Cow<'_, [u8]> = match crate::fold::fold_try(name, &mut buf) {
+                Some(n) => Cow::Borrowed(&buf[..n]),
+                None => Cow::Owned(crate::fold::fold_vec(name)),
+            };
 
             // Simple literal substring match on folded bytes
-            if folded_name
-                .windows(folded_query.len())
-                .any(|w| w == folded_query)
-            {
-                let e = &self.entries[idx as usize];
-                candidates.push((idx, name.to_string(), e));
+            if memchr::memmem::find(&folded, &folded_query).is_some() {
+                candidates.push(idx);
             }
         }
 
@@ -342,16 +345,21 @@ impl Index {
         let start_idx = q.offset.min(candidates.len());
         let end_idx = (start_idx + q.limit).min(candidates.len());
 
+        // Build Hit structs only for the paginated slice.
         let hits: Vec<crate::query::Hit> = candidates[start_idx..end_idx]
             .iter()
-            .map(|(idx, name, e)| crate::query::Hit {
-                idx: *idx,
-                score: crate::query::score::score_entry(e, name, &folded_query, e.flags & 3),
-                path: self.path_of(*idx),
-                name: name.clone(),
-                kind: e.flags & 3,
-                size: e.size as u64,
-                mtime: e.mtime,
+            .map(|&idx| {
+                let name = self.name_of(idx);
+                let e = &self.entries[idx as usize];
+                crate::query::Hit {
+                    idx,
+                    score: crate::query::score::score_entry(e, name, &folded_query, e.flags & 3),
+                    path: self.path_of(idx),
+                    name: name.to_string(),
+                    kind: e.flags & 3,
+                    size: e.size as u64,
+                    mtime: e.mtime,
+                }
             })
             .collect();
 

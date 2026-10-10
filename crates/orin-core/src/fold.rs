@@ -28,6 +28,36 @@ pub fn fold_vec(s: &str) -> Vec<u8> {
     out
 }
 
+/// Fold `s` into the caller-provided `buf` without allocating.
+///
+/// Returns the number of bytes written, or `None` if `buf` is too small.
+/// When `Some(n)` is returned, `buf[..n]` is byte-identical to `fold_vec(s)`,
+/// so callers can keep using a fixed stack buffer and only fall back to
+/// `fold_vec` for names whose folded form exceeds the buffer.
+pub fn fold_try(s: &str, buf: &mut [u8]) -> Option<usize> {
+    let mut i = 0;
+    for ch in s.chars() {
+        if ch.is_ascii() {
+            if i >= buf.len() {
+                return None;
+            }
+            buf[i] = ch.to_ascii_lowercase() as u8;
+            i += 1;
+        } else {
+            for c in ch.to_lowercase() {
+                let mut tmp = [0u8; 4];
+                let bytes = c.encode_utf8(&mut tmp).as_bytes();
+                if i + bytes.len() > buf.len() {
+                    return None;
+                }
+                buf[i..i + bytes.len()].copy_from_slice(bytes);
+                i += bytes.len();
+            }
+        }
+    }
+    Some(i)
+}
+
 /// Compare two strings case-insensitively (folded comparison).
 ///
 /// Returns `Less`, `Equal`, or `Greater` based on folded byte order.
@@ -105,6 +135,23 @@ mod tests {
         // Unicode simple lowercase
         assert_eq!(fold_vec("ÄÖÜ"), b"\xc3\xa4\xc3\xb6\xc3\xbc"); // "äöü"
         assert_eq!(fold_vec("ß"), b"\xc3\x9f"); // "ß" (stays ß in simple lowercase)
+    }
+
+    #[test]
+    fn fold_try_matches_fold_vec() {
+        let mut buf = [0u8; 16];
+        let n = fold_try("HeLlO ÄÖÜ", &mut buf).unwrap();
+        assert_eq!(&buf[..n], &fold_vec("HeLlO ÄÖÜ")[..]);
+        assert_eq!(fold_try("", &mut buf), Some(0));
+    }
+
+    #[test]
+    fn fold_try_reports_overflow() {
+        let mut buf = [0u8; 4];
+        assert_eq!(fold_try("hello", &mut buf), None);
+        // A non-ASCII char that does not fit must report None, not truncate.
+        let mut tiny = [0u8; 1];
+        assert_eq!(fold_try("Ä", &mut tiny), None);
     }
 
     #[test]
