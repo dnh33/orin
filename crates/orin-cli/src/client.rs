@@ -2,7 +2,6 @@
 
 use anyhow::Context;
 use anyhow::bail;
-use interprocess::local_socket::Name;
 use interprocess::local_socket::Stream;
 use interprocess::local_socket::prelude::*;
 use orin_core::paths::socket_name;
@@ -18,8 +17,6 @@ use std::time::Instant;
 
 /// Id used for every one-shot request; responses must echo it back.
 const REQ_ID: u64 = 1;
-/// Recv timeout for the handshake ping.
-const PING_TIMEOUT: Duration = Duration::from_secs(3);
 /// Recv timeout for real responses (long searches on big indexes).
 const RESPONSE_TIMEOUT: Duration = Duration::from_secs(30);
 /// Total retry budget while waiting for a freshly spawned daemon.
@@ -94,31 +91,20 @@ fn ensure_connected() -> anyhow::Result<Stream> {
     bail!("spawned `orind` but the daemon did not answer in {secs}s");
 }
 
-/// Try each plausible socket name; first daemon to answer a ping wins.
+/// Try each plausible socket name; the first listener to accept wins.
+///
+/// Accepting the connection is the reachability probe: Query and Status
+/// validate the far end by their own read/write, so no Ping round trip is
+/// spent before the real request.
 fn try_connect() -> anyhow::Result<Option<Stream>> {
     let name = socket_name().context("invalid ORIN_SOCKET value")?;
-    if let Some(stream) = handshake(name) {
+    if let Ok(stream) = Stream::connect(name) {
         return Ok(Some(stream));
     }
     if let Some(stream) = scan_named_pipes() {
         return Ok(Some(stream));
     }
     Ok(None)
-}
-
-/// Connect and verify the far end speaks the orin wire protocol.
-fn handshake(name: Name<'_>) -> Option<Stream> {
-    let mut stream = Stream::connect(name).ok()?;
-    let _ = stream.set_recv_timeout(Some(PING_TIMEOUT));
-    write_frame(&mut stream, &Request::Ping { id: REQ_ID }).ok()?;
-    let response: Response = read_frame(&mut stream).ok().flatten()?;
-    if let Response::Pong { id, .. } = response
-        && id == REQ_ID
-    {
-        Some(stream)
-    } else {
-        None
-    }
 }
 
 /// Send one request frame, read one response frame.
@@ -175,9 +161,8 @@ fn scan_named_pipes() -> Option<Stream> {
     candidates.sort();
     for pipe in candidates {
         let full = format!(r"\\.\pipe\{pipe}");
-        let candidate = full.to_ns_name::<GenericNamespaced>();
-        if let Ok(name) = candidate
-            && let Some(stream) = handshake(name)
+        if let Ok(name) = full.to_ns_name::<GenericNamespaced>()
+            && let Ok(stream) = Stream::connect(name)
         {
             return Some(stream);
         }
