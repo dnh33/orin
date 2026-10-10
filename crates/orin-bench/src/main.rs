@@ -95,8 +95,7 @@ fn main() -> anyhow::Result<()> {
         Commands::Probes { corpus, out } => {
             let stats = runner::probes(&corpus)?;
             let json = serde_json::to_string_pretty(&stats)?;
-            std::fs::write(&out, json)
-                .with_context(|| format!("write {}", out.display()))?;
+            std::fs::write(&out, json).with_context(|| format!("write {}", out.display()))?;
             println!("{}", serde_json::to_string(&stats)?);
         }
     }

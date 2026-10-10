@@ -326,7 +326,6 @@ pub fn summarize(latencies: &[Duration]) -> (f64, f64, f64) {
     (p50, p95, p99)
 }
 
-
 /// Spec §2 daemon probes: cold scan rate, snapshot load, steady-state RSS.
 #[derive(Debug, serde::Serialize)]
 pub struct ProbeStats {
@@ -355,24 +354,16 @@ pub struct ProbeStats {
 pub fn probes(corpus_dir: &Path) -> anyhow::Result<ProbeStats> {
     let orind = bin_dir().join(exe_name("orind"));
     let orin = bin_dir().join(exe_name("orin"));
-    let data_dir =
-        std::env::temp_dir().join(format!("orin-bench-probes-{}", std::process::id()));
+    let data_dir = std::env::temp_dir().join(format!("orin-bench-probes-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&data_dir);
-    std::fs::create_dir_all(&data_dir)
-        .with_context(|| format!("create {}", data_dir.display()))?;
+    std::fs::create_dir_all(&data_dir).with_context(|| format!("create {}", data_dir.display()))?;
     let socket = bench_socket();
 
     let corpus_files = count_files(corpus_dir);
 
     // Cold cycle: fresh data dir, no snapshot. Time the full build scan.
-    let (mut cold, cold_ms, entries, mem_bytes) = spawn_ready(
-        &orind,
-        &orin,
-        &data_dir,
-        &socket,
-        corpus_dir,
-        "cold",
-    )?;
+    let (mut cold, cold_ms, entries, mem_bytes) =
+        spawn_ready(&orind, &orin, &data_dir, &socket, corpus_dir, "cold")?;
     let scan_rate_eps = entries.saturating_mul(1000) / cold_ms.max(1);
 
     // Wait out the checkpoint cadence (60s) so orin.snap is persisted.
@@ -381,14 +372,8 @@ pub fn probes(corpus_dir: &Path) -> anyhow::Result<ProbeStats> {
     let _ = cold.kill();
 
     // Warm cycle: same data dir -> snapshot load path.
-    let (mut warm, warm_ms, _, _) = spawn_ready(
-        &orind,
-        &orin,
-        &data_dir,
-        &socket,
-        corpus_dir,
-        "warm",
-    )?;
+    let (mut warm, warm_ms, _, _) =
+        spawn_ready(&orind, &orin, &data_dir, &socket, corpus_dir, "warm")?;
     let _ = warm.kill();
 
     Ok(ProbeStats {

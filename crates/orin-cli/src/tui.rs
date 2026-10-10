@@ -7,6 +7,7 @@
 //! the chosen path to stdout only after the terminal is restored, which
 //! keeps `PATH=$(orin tui)` free of escape codes.
 
+use super::client;
 use anyhow::Context;
 use crossterm::cursor::Show;
 use crossterm::event::Event;
@@ -44,7 +45,6 @@ use std::process::ExitCode;
 use std::sync::mpsc;
 use std::time::Duration;
 use std::time::Instant;
-use super::client;
 
 /// Debounce: one daemon query per pause in typing, never one per keystroke.
 const DEBOUNCE: Duration = Duration::from_millis(40);
@@ -255,9 +255,7 @@ impl App {
 
     /// A query may go out once typing has paused and the worker is free.
     fn should_dispatch(&self, now: Instant) -> bool {
-        !self.busy
-            && self.debounce_at.is_some_and(|at| now >= at)
-            && !self.query.trim().is_empty()
+        !self.busy && self.debounce_at.is_some_and(|at| now >= at) && !self.query.trim().is_empty()
     }
 
     /// Hand the current query to the worker; exactly one runs at a time.
@@ -700,7 +698,10 @@ mod tests {
         assert_eq!(query_needles("main"), ["main".to_string()]);
         assert_eq!(query_needles("ext:rs"), [".rs".to_string()]);
         assert_eq!(query_needles("path:src"), ["src".to_string()]);
-        assert_eq!(query_needles("\"hello world\""), ["hello world".to_string()]);
+        assert_eq!(
+            query_needles("\"hello world\""),
+            ["hello world".to_string()]
+        );
         assert!(query_needles("size:>10M").is_empty());
         assert!(query_needles("mtime:<7d").is_empty());
         assert!(query_needles("!tmp").is_empty());

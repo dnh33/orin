@@ -67,8 +67,16 @@ const PY_MODULES: &[&str] = &["utils", "helpers", "models", "views"];
 /// Fixed 10-level chain: files land 8-12 levels deep, and the deep-path
 /// query class plants two of its directories inside it.
 const CHAIN: &[&str] = &[
-    "projects", "client-portal", "src", "features", "billing", "handlers", "tests", "fixtures",
-    "2026", "qa",
+    "projects",
+    "client-portal",
+    "src",
+    "features",
+    "billing",
+    "handlers",
+    "tests",
+    "fixtures",
+    "2026",
+    "qa",
 ];
 
 fn pick<'a>(rng: &mut StdRng, table: &[&'a str]) -> &'a str {
@@ -86,7 +94,13 @@ fn realistic_name(rng: &mut StdRng, cfg: &CorpusConfig, i: usize) -> String {
         // kebab-case: report-42.md
         50..=61 => format!("{}-{}.{}", pick(rng, SLUGS), i, pick(rng, exts)),
         // snake_case: tiny_notes_42.txt
-        62..=70 => format!("{}_{}_{}.{}", cfg.prefix, pick(rng, SLUGS), i, pick(rng, exts)),
+        62..=70 => format!(
+            "{}_{}_{}.{}",
+            cfg.prefix,
+            pick(rng, SLUGS),
+            i,
+            pick(rng, exts)
+        ),
         // dated: 2026-03-15-notes-42.md
         71..=78 => {
             let m = rng.random_range(1..13);
@@ -109,7 +123,13 @@ fn realistic_name(rng: &mut StdRng, cfg: &CorpusConfig, i: usize) -> String {
         86..=90 => {
             let m = rng.random_range(1..13);
             let d = rng.random_range(1..29);
-            format!("IMG_2026{:02}{:02}_{:06}.{}", m, d, i, pick(rng, PHOTO_EXTS))
+            format!(
+                "IMG_2026{:02}{:02}_{:06}.{}",
+                m,
+                d,
+                i,
+                pick(rng, PHOTO_EXTS)
+            )
         }
         // names with spaces: quarterly notes 42.docx
         91..=96 => {
@@ -164,7 +184,11 @@ fn add_noise(out: &Path, dirs: &[PathBuf]) -> anyhow::Result<()> {
         }
     }
     // AppData/Local/Temp-like tree (fixed user name; nothing env-derived)
-    let temp = out.join("Users").join("Admin").join("AppData").join("Local");
+    let temp = out
+        .join("Users")
+        .join("Admin")
+        .join("AppData")
+        .join("Local");
     fs::create_dir_all(temp.join("Temp"))?;
     for j in 0..200 {
         fs::write(temp.join("Temp").join(format!("~DF{j:04X}.tmp")), b"tmp")?;
@@ -279,7 +303,10 @@ fn plant_realistic(
     let photos = out.join("Photos").join("2026").join("10");
     fs::create_dir_all(&photos)?;
     for k in 0..20 {
-        fs::write(photos.join(format!("IMG_20261008_{k:06}.jpg")), b"planted\n")?;
+        fs::write(
+            photos.join(format!("IMG_20261008_{k:06}.jpg")),
+            b"planted\n",
+        )?;
     }
     // extension-scoped cross-tool arm (pdf is plant-only: no generated pdfs)
     leaf_plant(dirs, "annual-report.pdf", 8, 6)?;
