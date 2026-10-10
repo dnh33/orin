@@ -79,7 +79,8 @@ mod tests {
         let query = arg_schema(find, "query").expect("query argument");
         let limit = arg_schema(find, "limit").expect("limit argument");
         assert_eq!(query.get("type"), Some(&json!("string")));
-        assert_eq!(limit.get("type"), Some(&json!("integer")));
+        // Option<u64> generates a nullable union in JSON Schema.
+        assert_eq!(limit.get("type"), Some(&json!(["integer", "null"])));
 
         let stat = schema_for(&tools, "stat");
         assert_eq!(arg_names(stat), ["path"]);

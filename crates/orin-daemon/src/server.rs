@@ -472,10 +472,7 @@ impl AcceptWaker {
                 }
                 let deadline = core.wake_at;
                 let Some(at) = deadline else {
-                    core = self
-                        .changed
-                        .wait(core)
-                        .unwrap_or_else(|p| p.into_inner());
+                    core = self.changed.wait(core).unwrap_or_else(|p| p.into_inner());
                     continue;
                 };
                 let now = Instant::now();
