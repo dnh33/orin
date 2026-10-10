@@ -138,11 +138,7 @@ pub fn run_tool(
     Ok(latencies)
 }
 
-fn run_single(
-    tool: &str,
-    corpus_dir: &Path,
-    query: &str,
-) -> anyhow::Result<std::process::Output> {
+fn run_single(tool: &str, corpus_dir: &Path, query: &str) -> anyhow::Result<std::process::Output> {
     let mut tool_cmd = match tool {
         "orin" => {
             let mut cmd = Command::new(bin_dir().join(exe_name("orin")));

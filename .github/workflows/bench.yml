@@ -30,18 +30,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Install fd/rg (ubuntu)
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y fd-find ripgrep
-      - name: Install fd/rg (macos)
-        if: runner.os == 'macOS'
-        run: brew install fd ripgrep
       - name: Install fd/rg (windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          choco install fd ripgrep -y
-          refreshenv
+          # Official install methods:
+          #   sharkdp/fd README     -> choco install fd       | winget install sharkdp.fd
+          #   BurntSushi/ripgrep README -> choco install ripgrep | winget install BurntSushi.ripgrep.MSVC
+          # choco community feed 504s occasionally (seen 2026-10-10), so per-tool fallback to
+          # winget, then HARD verification - fail here loudly, never mid-benchmark.
+          foreach ($tool in @(
+            @{ name = 'fd'; choco = 'fd';      winget = 'sharkdp.fd' },
+            @{ name = 'rg'; choco = 'ripgrep'; winget = 'BurntSushi.ripgrep.MSVC' }
+          )) {
+            if (-not (Get-Command $tool.name -ErrorAction SilentlyContinue)) {
+              choco install $tool.choco -y
+            }
+            if (-not (Get-Command $tool.name -ErrorAction SilentlyContinue)) {
+              Write-Host "choco did not provide $($tool.name) - falling back to winget (official)"
+              winget install --id $tool.winget -e --disable-interactivity `
+                --accept-source-agreements --accept-package-agreements
+            }
+            if (-not (Get-Command $tool.name -ErrorAction SilentlyContinue)) {
+              Write-Error "$($tool.name) not on PATH after choco + winget"; exit 1
+            }
+            & $tool.name --version
+          }
       - name: Generate corpus (deterministic, same seed = identical tree)
         run: |
           cargo run --release -p orin-bench gen \
