@@ -21,8 +21,7 @@ pub struct Server {
 
 impl Server {
     /// Create a new server with the given shared state.
-    pub fn new(data_dir: std::path::PathBuf, idle_exit_secs: u64) -> Result<Self> {
-        let state = crate::state::new_shared(&data_dir)?;
+    pub fn new(state: crate::state::SharedState, idle_exit_secs: u64) -> Result<Self> {
         Ok(Self {
             state,
             idle_exit_secs,
@@ -330,7 +329,9 @@ mod tests {
     #[test]
     fn server_creation() {
         let dir = tempdir().unwrap();
-        let server = Server::new(dir.path().to_path_buf(), 0).unwrap();
+        let state =
+            crate::state::test_support::new_shared_hermetic(dir.path(), "server_creation").unwrap();
+        let server = Server::new(state, 0).unwrap();
         assert_eq!(server.idle_exit_secs, 0);
     }
 }

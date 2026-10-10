@@ -68,21 +68,45 @@ impl WatcherHandle {
 }
 
 #[allow(dead_code)]
-/// Handle a filesystem event.
-fn handle_event(event: Event, _state: &SharedState) {
+/// Handle a filesystem event: translate to FsEvent and apply to the index.
+fn handle_event(event: Event, state: &SharedState) {
     use EventKind::*;
 
-    for path in event.paths {
-        match event.kind {
-            Create(_) | Modify(_) => {
-                debug!("create/modify: {}", path.display());
-                // Queue for apply.rs to process
+    let mut events = Vec::new();
+    let paths = event.paths.clone();
+    match event.kind {
+        Create(_) => {
+            for path in paths {
+                let is_dir = std::fs::metadata(&path).map(|m| m.is_dir()).unwrap_or(false);
+                debug!("create: {}", path.display());
+                events.push(crate::apply::FsEvent::Create { path, is_dir });
             }
-            Remove(_) => {
+        }
+        Modify(notify::event::ModifyKind::Name(_)) if paths.len() == 2 => {
+            debug!("rename: {} -> {}", paths[0].display(), paths[1].display());
+            events.push(crate::apply::FsEvent::Rename {
+                from: paths[0].clone(),
+                to: paths[1].clone(),
+            });
+        }
+        Modify(_) => {
+            for path in paths {
+                debug!("modify: {}", path.display());
+                events.push(crate::apply::FsEvent::Modify { path });
+            }
+        }
+        Remove(_) => {
+            for path in paths {
                 debug!("remove: {}", path.display());
-                // Queue for apply.rs to process
+                events.push(crate::apply::FsEvent::Remove { path });
             }
-            _ => {}
+        }
+        _ => {}
+    }
+
+    if !events.is_empty() {
+        if let Err(e) = crate::apply::apply_events(state, events) {
+            warn!("apply_events failed: {}", e);
         }
     }
 }
