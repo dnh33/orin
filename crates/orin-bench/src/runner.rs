@@ -231,15 +231,13 @@ pub fn run(
         None
     };
 
-    // First 10 queries for a quick benchmark run (plain-name classes only;
-    // ext/type/size queries use orin syntax and are not portable to other tools).
-    let queries_to_run: Vec<String> = qmatrix
-        .exact
-        .iter()
-        .cloned()
-        .chain(qmatrix.prefix.iter().cloned())
-        .chain(qmatrix.substring.iter().cloned())
-        .collect();
+    // Class-driven matrix: shared plain-name classes run on every tool arm;
+    // orin-only classes (filter/glob/regex syntax) run on the orin arm alone
+    // (benchmark-harness rule: tool-specific syntax is a separate arm).
+    let mut classes: Vec<(&str, &[String])> = qmatrix.shared_classes();
+    if tool == "orin" {
+        classes.extend(qmatrix.orin_only_classes());
+    }
 
     let mut results = Vec::new();
     // Evidence of identity: the resolved binary (env from the workflow's
@@ -275,25 +273,28 @@ pub fn run(
     } else {
         (0.0, 0.0)
     };
-    for q in queries_to_run.iter().take(10) {
-        let (latencies, matches, nonzero) = run_tool(tool, corpus_dir, q, iterations)?;
-        let stat = crate::stats::from_durations(&latencies);
-        results.push(format!(
-            "{{\"query\":{},\"tool\":\"{}\",\"tool_path\":{},\"matches\":{},\
-             \"nonzero_exits\":{},\"spawn_us\":{:.0},\"status_us\":{:.0},\
+    for (class, needles) in &classes {
+        for q in needles.iter() {
+            let (latencies, matches, nonzero) = run_tool(tool, corpus_dir, q, iterations)?;
+            let stat = crate::stats::from_durations(&latencies);
+            results.push(format!(
+                "{{\"query_class\":{},\"query\":{},\"tool\":\"{}\",\"tool_path\":{},\
+             \"matches\":{},\"nonzero_exits\":{},\"spawn_us\":{:.0},\"status_us\":{:.0},\
              \"p50_us\":{},\"p95_us\":{},\"p99_us\":{},\"qps\":{:.2}}}",
-            serde_json::to_string(&q)?,
-            tool,
-            serde_json::to_string(&tool_path)?,
-            matches,
-            nonzero,
-            spawn_us,
-            status_us,
-            stat.latency_p50_us,
-            stat.latency_p95_us,
-            stat.latency_p99_us,
-            stat.qps
-        ));
+                serde_json::to_string(class)?,
+                serde_json::to_string(q)?,
+                tool,
+                serde_json::to_string(&tool_path)?,
+                matches,
+                nonzero,
+                spawn_us,
+                status_us,
+                stat.latency_p50_us,
+                stat.latency_p95_us,
+                stat.latency_p99_us,
+                stat.qps
+            ));
+        }
     }
 
     std::fs::write(out_path, format!("[{}]", results.join(",")))?;
