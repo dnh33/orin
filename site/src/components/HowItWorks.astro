@@ -1,0 +1,238 @@
+---
+const notes = [
+  {
+    label: 'auto-spawn',
+    body: 'The first query starts orind and waits until the index answers. Later queries reach the daemon that is already running.',
+  },
+  {
+    label: 'local pipe',
+    body: 'The CLI and the daemon talk over a local pipe with small framed messages, so there is no network service behind the query.',
+  },
+  {
+    label: 'hidden files',
+    body: 'Dotfiles, build directories, and other hidden entries are indexed like everything else.',
+  },
+];
+---
+
+<section class="section" id="how">
+  <div class="wrap">
+    <h2 class="h2" data-reveal>How it works.</h2>
+    <p class="lede" data-reveal>
+      Three pieces, one process boundary: the drives, the daemon that indexes them, and the
+      command that queries it.
+    </p>
+
+    <div class="diagram-scroll" data-reveal>
+      <svg
+        class="diagram"
+        viewBox="0 0 920 320"
+        role="img"
+        aria-label="Architecture: the disk is scanned into the orind index, which the orin and on commands query over a local pipe."
+      >
+        <title>orin architecture</title>
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+            orient="auto-start-reverse"
+          >
+            <path d="M0 0 10 5 0 10z" fill="currentColor"></path>
+          </marker>
+        </defs>
+
+        <!-- disk -->
+        <g>
+          <rect class="node" x="8" y="70" width="216" height="176" rx="8"></rect>
+          <text class="n-name" x="30" y="104">C:\</text>
+          <text class="n-role" x="30" y="126">every drive</text>
+          <g class="file-row">
+            <rect x="30" y="146" width="172" height="14" rx="3"></rect>
+            <rect x="30" y="168" width="140" height="14" rx="3"></rect>
+            <rect x="30" y="190" width="158" height="14" rx="3"></rect>
+            <rect x="30" y="212" width="120" height="14" rx="3"></rect>
+          </g>
+        </g>
+
+        <!-- scan arrow -->
+        <g class="flowline">
+          <path d="M232 158 H 306" marker-end="url(#ar)"></path>
+          <text class="f-label" x="269" y="146" text-anchor="middle">scan once</text>
+        </g>
+
+        <!-- daemon -->
+        <g>
+          <rect class="node node-live" x="316" y="52" width="280" height="212" rx="8"></rect>
+          <text class="n-name n-accent" x="340" y="88">orind</text>
+          <text class="n-role" x="340" y="110">resident daemon</text>
+          <rect class="inner" x="340" y="130" width="232" height="112" rx="6"></rect>
+          <text class="n-sub" x="358" y="158">whole-disk index</text>
+          <text class="n-dim" x="358" y="180">names, paths, sizes, depth,</text>
+          <text class="n-dim" x="358" y="198">type, hidden entries</text>
+          <text class="n-dim" x="358" y="224">kept in memory</text>
+        </g>
+
+        <!-- query arrows -->
+        <g class="flowline live">
+          <path d="M644 122 H 716" marker-end="url(#ar)"></path>
+          <text class="f-label" x="680" y="110" text-anchor="middle">query</text>
+          <path d="M716 178 H 644" marker-end="url(#ar)"></path>
+          <text class="f-label" x="680" y="200" text-anchor="middle">paths</text>
+        </g>
+
+        <!-- cli -->
+        <g>
+          <rect class="node" x="726" y="70" width="186" height="176" rx="8"></rect>
+          <text class="n-name" x="748" y="104">orin / on</text>
+          <text class="n-role" x="748" y="126">command line</text>
+          <text class="n-dim" x="748" y="156">query &lt;terms&gt;</text>
+          <text class="n-dim" x="748" y="178">status --json</text>
+          <text class="n-dim" x="748" y="200">exit 0 / 1 / 2</text>
+          <text class="n-accent" x="748" y="228">spawns orind</text>
+        </g>
+
+        <!-- spawn arc -->
+        <g class="flowline dashed">
+          <path d="M819 254 C 819 300, 456 306, 456 272" marker-end="url(#ar)"></path>
+        </g>
+      </svg>
+    </div>
+
+    <div class="notes" data-reveal>
+      {
+        notes.map((note) => (
+          <div class="note">
+            <p class="note-label">{note.label}</p>
+            <p class="note-body">{note.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .diagram-scroll {
+    margin-top: clamp(34px, 4.5vw, 48px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--bg-1);
+    overflow-x: auto;
+  }
+
+  .diagram {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+    color: var(--line-2);
+  }
+
+  .node {
+    fill: var(--bg-2);
+    stroke: var(--line-2);
+    stroke-width: 1;
+  }
+
+  .node-live {
+    stroke: var(--accent-line);
+  }
+
+  .inner {
+    fill: var(--bg);
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  .n-name {
+    font: 600 19px var(--mono);
+    letter-spacing: -0.02em;
+    fill: var(--text);
+  }
+
+  .n-role {
+    font: 500 10.5px var(--mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    fill: var(--faint);
+  }
+
+  .n-sub {
+    font: 500 13.5px var(--mono);
+    fill: var(--text);
+  }
+
+  .n-dim {
+    font: 400 13px var(--mono);
+    fill: var(--dim);
+  }
+
+  .n-accent {
+    fill: var(--accent);
+  }
+
+  .file-row rect {
+    fill: rgba(255, 255, 255, 0.06);
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  .flowline {
+    color: var(--line-2);
+  }
+
+  .flowline path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+
+  .flowline.live {
+    color: var(--accent-line);
+  }
+
+  .flowline.dashed {
+    color: var(--faint);
+  }
+
+  .flowline.dashed path {
+    stroke-dasharray: 5 5;
+  }
+
+  .f-label {
+    font: 400 11.5px var(--mono);
+    fill: var(--faint);
+    letter-spacing: 0.08em;
+  }
+
+  .flowline.live .f-label {
+    fill: var(--accent);
+  }
+
+  .notes {
+    margin-top: clamp(30px, 4vw, 44px);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 40px);
+    border-top: 1px solid var(--line);
+    padding-top: clamp(24px, 3vw, 32px);
+  }
+
+  .note-label {
+    font: 500 10.5px/1 var(--mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .note-body {
+    margin-top: 10px;
+    color: var(--dim);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 760px) {
+    .notes {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

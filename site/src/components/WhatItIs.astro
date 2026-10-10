@@ -1,0 +1,223 @@
+---
+const stagesRaw = [
+  {
+    name: 'orind',
+    role: 'resident daemon',
+    body: 'Scans every drive once, hidden files included, and holds the result in memory.',
+  },
+  {
+    name: 'index',
+    role: 'whole-disk index',
+    body: 'Structured entries the CLI filters by name, extension, size, depth, and type.',
+  },
+  {
+    name: 'orin / on',
+    role: 'command line',
+    body: 'Sends the query over a local pipe and prints matching paths. on is the short alias.',
+  },
+];
+
+const stages = stagesRaw;
+const flow = stages.flatMap((stage, index) =>
+  index === 0
+    ? [{ kind: 'stage', stage }]
+    : [
+        { kind: 'arrow' },
+        { kind: 'stage', stage },
+      ],
+);
+
+const facts = [
+  {
+    label: 'auto-spawn',
+    body: 'The first query starts orind when it is not running, so there is no service to install, start, or supervise.',
+  },
+  {
+    label: 'platforms',
+    body: 'Windows first. Linux and macOS are not supported yet.',
+  },
+  {
+    label: 'status',
+    body: 'orin status --json reports daemon version, indexed entries, memory use, and roots.',
+  },
+];
+
+const exits = [
+  { code: '0', label: 'results printed' },
+  { code: '1', label: 'no match' },
+  { code: '2', label: 'error' },
+];
+---
+
+<section class="section" id="what">
+  <div class="wrap">
+    <h2 class="h2" data-reveal>The whole disk, held in memory.</h2>
+    <p class="lede" data-reveal>
+      orind scans the drives once and keeps the index resident, so a query reads structured entries
+      instead of walking the tree on every call.
+    </p>
+
+    <div class="flow" data-reveal>
+      {
+        flow.map((item) =>
+          item.kind === 'arrow' ? (
+            <div class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 48 16" width="48" height="16">
+                <path d="M0 8h38M32 2l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.4" />
+              </svg>
+            </div>
+          ) : (
+            <div class="stage panel">
+              <p class="stage-name">{item.stage.name}</p>
+              <p class="stage-role">{item.stage.role}</p>
+              <p class="stage-body">{item.stage.body}</p>
+            </div>
+          ),
+        )
+      }
+    </div>
+
+    <dl class="facts" data-reveal>
+      {
+        facts.map((fact) => (
+          <div class="fact">
+            <dt>{fact.label}</dt>
+            <dd>{fact.body}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <div class="exits" data-reveal>
+      <p class="exits-label">Exit codes follow the ripgrep convention</p>
+      <div class="chips">
+        {
+          exits.map((exit) => (
+            <span class="chip">
+              <b>{exit.code}</b> {exit.label}
+            </span>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .flow {
+    margin-top: clamp(36px, 5vw, 52px);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .stage {
+    padding: 20px;
+    min-width: 0;
+  }
+
+  .stage-name {
+    font: 600 17px/1.2 var(--mono);
+    letter-spacing: -0.02em;
+  }
+
+  .stage-role {
+    margin-top: 6px;
+    font: 500 11px/1.4 var(--mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .stage-body {
+    margin-top: 12px;
+    color: var(--dim);
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  .arrow {
+    display: flex;
+    align-items: center;
+    color: var(--line-2);
+  }
+
+  .facts {
+    margin: clamp(40px, 5vw, 56px) 0 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .fact {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .fact dt {
+    font: 500 13px/1.6 var(--mono);
+    color: var(--accent);
+  }
+
+  .fact dd {
+    margin: 0;
+    color: var(--dim);
+    font-size: 15.5px;
+    max-width: 70ch;
+  }
+
+  .exits {
+    margin-top: clamp(32px, 4vw, 44px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 20px;
+  }
+
+  .exits-label {
+    color: var(--faint);
+    font-size: 14px;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .chip {
+    font: 400 13px/1 var(--mono);
+    color: var(--dim);
+    border: 1px solid var(--line);
+    border-radius: var(--pill);
+    padding: 8px 14px;
+    background: var(--bg-1);
+  }
+
+  .chip b {
+    color: var(--accent);
+    font-weight: 600;
+    margin-right: 6px;
+  }
+
+  @media (max-width: 900px) {
+    .flow {
+      grid-template-columns: 1fr;
+    }
+
+    .arrow {
+      transform: rotate(90deg);
+      justify-content: center;
+      padding-block: 2px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .fact {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>

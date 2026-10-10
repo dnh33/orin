@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import WhatItIs from '../components/WhatItIs.astro';
+import Install from '../components/Install.astro';
+import Benchmarks from '../components/Benchmarks.astro';
+import QuerySyntax from '../components/QuerySyntax.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Footer from '../components/Footer.astro';
+
+const title = 'orin - whole-disk file search';
+const description =
+  'orin keeps a whole-disk index in a resident daemon. The orin and on commands query it and print matching paths. Windows first, MIT OR Apache-2.0.';
+---
+
+<Base title={title} description={description}>
+  <Nav />
+  <main id="main">
+    <Hero />
+    <WhatItIs />
+    <Install />
+    <Benchmarks />
+    <QuerySyntax />
+    <HowItWorks />
+  </main>
+  <Footer />
+</Base>

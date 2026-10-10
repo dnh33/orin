@@ -1,0 +1,198 @@
+---
+const command = 'irm https://github.com/dnh33/orin/raw/main/install.ps1 | iex';
+
+const steps = [
+  'Downloads orin.exe, orind.exe, and on.exe from the latest GitHub release.',
+  'Runs each binary to verify it, then adds the install folder to your user PATH.',
+  'Needs no admin rights; running it again replaces the files in place.',
+];
+---
+
+<section class="section" id="install">
+  <div class="wrap">
+    <h2 class="h2" data-reveal>One line to install.</h2>
+    <p class="lede" data-reveal>
+      PowerShell reads the installer straight from the repository and runs it in memory, so there
+      is nothing to download first.
+    </p>
+
+    <div class="cmd panel" data-reveal>
+      <div class="cmd-scroll">
+        <code class="cmd-text" data-cmd>{command}</code>
+      </div>
+      <button class="copy btn btn-ghost" type="button" data-copy aria-label="Copy install command">
+        Copy
+      </button>
+    </div>
+
+    <dl class="steps" data-reveal>
+      {
+        steps.map((step) => (
+          <div class="step">
+            <dt aria-hidden="true">&rsaquo;</dt>
+            <dd>{step}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <p class="note" data-reveal>
+      The installer lives at <code>install.ps1</code> in the repository root. It is idempotent:
+      re-running it updates an existing install without touching your PATH twice.
+    </p>
+  </div>
+</section>
+
+<style>
+  .cmd {
+    margin-top: clamp(32px, 4vw, 44px);
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+    background: var(--bg-2);
+  }
+
+  .cmd-scroll {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+  }
+
+  .cmd-text {
+    font: 400 14.5px/1.5 var(--mono);
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .cmd-text::selection {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .copy {
+    height: auto;
+    flex: none;
+    align-self: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    min-width: 86px;
+    justify-content: center;
+  }
+
+  .copy.copied {
+    border-color: var(--accent-line);
+    color: var(--accent);
+  }
+
+  .steps {
+    margin: clamp(28px, 4vw, 40px) 0 0;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--line);
+    max-width: 74ch;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 10px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .step dt {
+    color: var(--accent);
+    font: 500 15px/1.6 var(--mono);
+  }
+
+  .step dd {
+    margin: 0;
+    color: var(--dim);
+    font-size: 15.5px;
+  }
+
+  .note {
+    margin-top: 20px;
+    color: var(--faint);
+    font-size: 14px;
+    max-width: 74ch;
+  }
+
+  .note code {
+    color: var(--dim);
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 1px 6px;
+    font-size: 0.92em;
+  }
+
+  @media (max-width: 760px) {
+    .cmd-text {
+      white-space: normal;
+      overflow-wrap: break-word;
+      font-size: 13.5px;
+    }
+
+    .cmd-scroll {
+      overflow-x: visible;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cmd {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .copy {
+      align-self: stretch;
+      height: 40px;
+    }
+  }
+</style>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const source = document.querySelector<HTMLElement>('[data-cmd]');
+
+  if (button && source) {
+    const original = button.textContent ?? 'Copy';
+    let resetTimer: number | undefined;
+
+    const fallbackCopy = (text: string) => {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        document.execCommand('copy');
+      } finally {
+        area.remove();
+      }
+    };
+
+    button.addEventListener('click', async () => {
+      const text = source.textContent?.trim() ?? '';
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        fallbackCopy(text);
+      }
+      button.textContent = 'Copied';
+      button.classList.add('copied');
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        button.textContent = original;
+        button.classList.remove('copied');
+      }, 1600);
+    });
+  }
+</script>

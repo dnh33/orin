@@ -1,0 +1,102 @@
+---
+const base = import.meta.env.BASE_URL;
+const links = [
+  { href: '#install', label: 'Install' },
+  { href: '#benchmarks', label: 'Benchmarks' },
+  { href: '#syntax', label: 'Syntax' },
+];
+---
+
+<header class="nav">
+  <div class="wrap inner">
+    <a class="mark" href={base} aria-label="orin home">orin<span class="caret" aria-hidden="true"></span></a>
+    <nav class="links" aria-label="Sections">
+      {
+        links.map((link) => (
+          <a href={link.href}>{link.label}</a>
+        ))
+      }
+      <a class="src" href="https://github.com/dnh33/orin">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 62px;
+  }
+
+  .mark {
+    font: 600 17px/1 var(--mono);
+    letter-spacing: -0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .mark:hover {
+    color: var(--text);
+  }
+
+  .caret {
+    width: 8px;
+    height: 15px;
+    background: var(--accent);
+    animation: blink 1.15s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 3vw, 28px);
+    font: 500 14px/1 var(--sans);
+    color: var(--dim);
+  }
+
+  .links a:hover {
+    color: var(--text);
+  }
+
+  .links .src {
+    border: 1px solid var(--line-2);
+    border-radius: var(--r-sm);
+    padding: 7px 13px;
+    color: var(--text);
+  }
+
+  .links .src:hover {
+    border-color: var(--accent-line);
+  }
+
+  @media (max-width: 560px) {
+    .links a:not(.src) {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .caret {
+      animation: none;
+    }
+  }
+</style>

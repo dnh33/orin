@@ -1,0 +1,62 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="wrap inner">
+    <div class="left">
+      <span class="mark">orin</span>
+      <span class="tag">whole-disk file search</span>
+    </div>
+    <div class="right">
+      <a href="https://github.com/dnh33/orin">github.com/dnh33/orin</a>
+      <span class="lic">MIT OR Apache-2.0</span>
+      <span class="year">{year}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    border-top: 1px solid var(--line);
+    padding-block: 32px;
+    background: var(--bg-1);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 32px;
+  }
+
+  .left,
+  .right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 20px;
+  }
+
+  .mark {
+    font: 600 15px/1 var(--mono);
+    letter-spacing: -0.02em;
+  }
+
+  .tag,
+  .lic,
+  .year {
+    color: var(--faint);
+    font-size: 13.5px;
+  }
+
+  .right a {
+    color: var(--dim);
+    font: 400 13.5px/1 var(--mono);
+  }
+
+  .right a:hover {
+    color: var(--accent);
+  }
+</style>

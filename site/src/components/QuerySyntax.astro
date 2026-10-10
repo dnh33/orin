@@ -1,0 +1,154 @@
+---
+const groups = [
+  {
+    label: 'terms',
+    rows: [
+      { code: 'report', plain: 'name match' },
+      { code: 'Cargo.toml', plain: 'full file name' },
+    ],
+  },
+  {
+    label: 'extension',
+    rows: [
+      { code: 'ext:rs', plain: 'files with this extension' },
+      { code: 'ext:!lock', plain: 'leading ! excludes' },
+    ],
+  },
+  {
+    label: 'size',
+    rows: [
+      { code: 'size:>10M', plain: 'larger than' },
+      { code: 'size:100K..1M', plain: 'a range' },
+      { code: 'size:<10K', plain: 'smaller than' },
+    ],
+  },
+  {
+    label: 'depth and type',
+    rows: [
+      { code: 'depth:<3', plain: 'shallower than' },
+      { code: 'depth:==2', plain: 'exact depth' },
+      { code: 'type:f', plain: 'files only (type:d for directories)' },
+    ],
+  },
+  {
+    label: 'path, glob, regex',
+    rows: [
+      { code: 'path:src', plain: 'restricted to a path segment' },
+      { code: 'src/**/*.rs', plain: 'glob pattern' },
+      { code: 're:config.*\\.(toml|json)$', plain: 'regular expression' },
+    ],
+  },
+  {
+    label: 'combine',
+    rows: [
+      { code: 'ext:rs type:f report', plain: 'filters and terms run together' },
+      { code: '!ext:lock size:>0', plain: 'several filters in one query' },
+    ],
+  },
+];
+---
+
+<section class="section" id="syntax">
+  <div class="wrap">
+    <h2 class="h2" data-reveal>Query language.</h2>
+    <p class="lede" data-reveal>
+      One string, read the same way by <code>orin</code> and <code>on</code>. Filters narrow the
+      index first, then terms match what is left.
+    </p>
+
+    <div class="grid" data-reveal>
+      {
+        groups.map((group) => (
+          <div class="group">
+            <p class="group-label">{group.label}</p>
+            <ul>
+              {group.rows.map((row) => (
+                <li>
+                  <code class="code">{row.code}</code>
+                  <span class="plain">{row.plain}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="flags" data-reveal>
+      Output flags: <code class="code">--limit N</code> caps results at 10,000 by default,
+      <code class="code">--json</code> prints one object per line, and
+      <code class="code">orin status --json</code> dumps the daemon state. Quote a query that
+      contains <code class="code">|</code> so the shell does not read it as a pipe.
+    </p>
+  </div>
+</section>
+
+<style>
+  .grid {
+    margin-top: clamp(34px, 4.5vw, 48px);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 36px) clamp(32px, 5vw, 64px);
+  }
+
+  .group-label {
+    font: 500 10.5px/1 var(--mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .group li {
+    display: grid;
+    grid-template-columns: minmax(0, auto) 1fr;
+    align-items: baseline;
+    gap: 6px 16px;
+    padding-top: 14px;
+  }
+
+  .plain {
+    color: var(--dim);
+    font-size: 14.5px;
+  }
+
+  .flags {
+    margin-top: clamp(30px, 4vw, 44px);
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    color: var(--dim);
+    font-size: 15px;
+    max-width: 84ch;
+  }
+
+  .flags .code {
+    margin: 0 3px;
+  }
+
+  .lede code {
+    color: var(--text);
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 1px 6px;
+    font-size: 0.86em;
+  }
+
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .group li {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>

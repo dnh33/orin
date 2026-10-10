@@ -1,0 +1,859 @@
+---
+const base = import.meta.env.BASE_URL;
+
+const method: { label: string; value: string; key?: string }[] = [
+  { label: 'Timing', value: 'process-per-query' },
+  { label: 'Runner', value: 'GitHub windows-latest' },
+  { label: 'Compared against', value: 'GNU find, fd, ripgrep' },
+  { label: 'Corpus', value: 'published per run', key: 'corpus' },
+  { label: 'Iterations', value: 'published per run', key: 'iters' },
+];
+---
+
+<section class="section" id="benchmarks" data-bench data-base={base}>
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>Benchmarks</p>
+    <h2 class="h2" data-reveal>Measured against find, fd, and ripgrep.</h2>
+    <p class="lede" data-reveal>
+      Every run publishes its own method: how it was timed, on what corpus, and how many times each
+      query was repeated.
+    </p>
+
+    <dl class="method" data-reveal>
+      {
+        method.map((row) => (
+          <div class="mrow">
+            <dt>{row.label}</dt>
+            <dd data-m={row.key ?? ''}>{row.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <noscript>
+      <style>
+        [data-state='loading'] {
+          display: none !important;
+        }
+        [data-state='empty'] {
+          display: block !important;
+        }
+      </style>
+    </noscript>
+
+    <div class="state loading" data-state="loading" aria-hidden="true">
+      <div class="skel"></div>
+      <div class="skel"></div>
+      <div class="skel"></div>
+      <p class="skel-note">loading published results</p>
+    </div>
+
+    <div class="state empty" data-state="empty" hidden>
+      <p class="empty-title">Benchmark campaign running</p>
+      <p class="empty-body">
+        No results are published yet, so no numbers are shown. Charts appear here as soon as a run
+        writes its data; nothing on this page is estimated or filled in.
+      </p>
+      <p class="empty-method">
+        Method reported with every run: process-per-query timing on GitHub windows-latest runners,
+        against GNU find, fd, and ripgrep, with corpus size and iteration count recorded per run.
+      </p>
+    </div>
+
+    <div class="state data" data-state="data" hidden>
+      <div class="controls">
+        <div class="ctl">
+          <span class="ctl-label">corpus</span>
+          <div class="seg" role="group" aria-label="Corpus" data-seg="corpus"></div>
+        </div>
+        <div class="ctl">
+          <span class="ctl-label">query</span>
+          <div class="seg" role="group" aria-label="Query" data-seg="query"></div>
+        </div>
+      </div>
+
+      <div class="charts">
+        <figure class="chart panel">
+          <figcaption class="cap">
+            <h3>Latency per tool</h3>
+            <div class="legend">
+              <span class="lg"><i class="sw sw-solid"></i>p50</span>
+              <span class="lg"><i class="sw sw-open"></i>p95</span>
+            </div>
+          </figcaption>
+          <div class="plot" data-bars></div>
+        </figure>
+
+        <figure class="chart panel">
+          <figcaption class="cap">
+            <h3>Latency vs corpus size</h3>
+            <p class="scale-note" data-scale-note></p>
+          </figcaption>
+          <div class="plot" data-scale></div>
+          <div class="legend wide" data-scale-legend></div>
+        </figure>
+      </div>
+
+      <div class="badges" data-badges></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  [hidden] {
+    display: none !important;
+  }
+
+  .method {
+    margin: clamp(30px, 4vw, 44px) 0 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mrow {
+    padding: 14px 18px 14px 0;
+    min-width: 0;
+  }
+
+  .mrow + .mrow {
+    padding-left: 18px;
+    border-left: 1px solid var(--line);
+  }
+
+  .mrow dt {
+    font: 500 10.5px/1.4 var(--mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .mrow dd {
+    margin: 6px 0 0;
+    font: 400 13.5px/1.5 var(--mono);
+    color: var(--text);
+    overflow-wrap: anywhere;
+  }
+
+  .state {
+    margin-top: clamp(28px, 4vw, 40px);
+  }
+
+  /* loading */
+  .loading .skel {
+    height: 18px;
+    border-radius: var(--r-sm);
+    background: linear-gradient(90deg, var(--bg-1), var(--bg-2), var(--bg-1));
+    background-size: 200% 100%;
+    margin-bottom: 12px;
+    animation: sweep 1.4s ease-in-out infinite;
+  }
+
+  .loading .skel:nth-child(2) {
+    width: 82%;
+  }
+
+  .loading .skel:nth-child(3) {
+    width: 64%;
+  }
+
+  .skel-note {
+    margin-top: 14px;
+    font: 400 13px/1 var(--mono);
+    color: var(--faint);
+  }
+
+  @keyframes sweep {
+    0% {
+      background-position: 120% 0;
+    }
+    100% {
+      background-position: -20% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loading .skel {
+      animation: none;
+    }
+  }
+
+  /* empty */
+  .empty {
+    border: 1px dashed var(--line-2);
+    border-radius: var(--r);
+    padding: clamp(24px, 4vw, 36px);
+    background: var(--bg-1);
+  }
+
+  .empty-title {
+    font: 600 20px/1.3 var(--sans);
+    letter-spacing: -0.02em;
+  }
+
+  .empty-body {
+    margin-top: 12px;
+    color: var(--dim);
+    max-width: 68ch;
+    font-size: 15.5px;
+  }
+
+  .empty-method {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--faint);
+    font: 400 13.5px/1.65 var(--mono);
+    max-width: 88ch;
+  }
+
+  /* data */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 32px;
+    margin-bottom: 22px;
+  }
+
+  .ctl {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .ctl-label {
+    font: 500 10.5px/1 var(--mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .seg {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  :global(.seg button) {
+    font: 400 13px/1 var(--mono);
+    color: var(--dim);
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: border-color 0.14s ease, color 0.14s ease;
+  }
+
+  :global(.seg button:hover) {
+    color: var(--text);
+    border-color: var(--line-2);
+  }
+
+  :global(.seg button[aria-pressed='true']) {
+    color: var(--accent);
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+  }
+
+  .charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 2vw, 24px);
+  }
+
+  .chart {
+    margin: 0;
+    padding: 18px 18px 16px;
+    min-width: 0;
+  }
+
+  .cap {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .cap h3 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .scale-note {
+    font: 400 12px/1.4 var(--mono);
+    color: var(--faint);
+  }
+
+  .plot {
+    overflow-x: auto;
+  }
+
+  .plot :global(svg) {
+    display: block;
+    width: 100%;
+    min-width: 420px;
+    max-width: 560px;
+    height: auto;
+    margin-inline: auto;
+  }
+
+  .plot :global(.b-tool) {
+    font: 500 13px var(--mono);
+    letter-spacing: -0.01em;
+  }
+
+  .plot :global(.b-val) {
+    font: 400 12px var(--mono);
+    fill: var(--dim);
+  }
+
+  .plot :global(.s-tick) {
+    font: 400 11px var(--mono);
+    fill: var(--faint);
+  }
+
+  .plot :global(.s-grid) {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  .plot :global(.s-axis) {
+    stroke: var(--line-2);
+    stroke-width: 1;
+  }
+
+  .plot :global(.plot-note) {
+    margin: 0;
+    padding: 30px 4px;
+    color: var(--faint);
+    font: 400 13.5px/1.6 var(--mono);
+  }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+  }
+
+  .legend.wide {
+    margin-top: 12px;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+  }
+
+  :global(.lg) {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font: 400 12px/1 var(--mono);
+    color: var(--dim);
+  }
+
+  .sw {
+    width: 16px;
+    height: 9px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  .sw-solid {
+    background: var(--accent);
+  }
+
+  .sw-open {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+  }
+
+  :global(.line-swatch) {
+    width: 22px;
+    height: 0;
+    border-top-width: 2px;
+    border-top-style: solid;
+    display: inline-block;
+  }
+
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  :global(.badge) {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    border: 1px solid var(--line);
+    background: var(--bg-1);
+    border-radius: var(--pill);
+    padding: 9px 15px;
+    font: 400 13px/1 var(--mono);
+    color: var(--dim);
+  }
+
+  :global(.badge b) {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  :global(.badge > span) {
+    color: var(--dim);
+  }
+
+  @media (max-width: 900px) {
+    .charts {
+      grid-template-columns: 1fr;
+    }
+
+    .method {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .mrow:nth-child(odd) {
+      padding-left: 0;
+      border-left: none;
+    }
+
+    .mrow:nth-child(even) {
+      padding-left: 18px;
+      border-left: 1px solid var(--line);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .method {
+      grid-template-columns: 1fr;
+    }
+
+    .mrow,
+    .mrow + .mrow,
+    .mrow:nth-child(even) {
+      padding-left: 0;
+      border-left: none;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mrow:last-child {
+      border-bottom: none;
+    }
+  }
+</style>
+
+<script>
+  type Run = {
+    corpus: string;
+    corpus_files?: number;
+    iterations: number;
+    tool: string;
+    query: string;
+    p50_us: number;
+    p95_us: number;
+    qps: number;
+    matches: number;
+    nonzero_exits: number;
+    tool_path?: string;
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-bench]');
+
+  if (root) {
+    const base = (root.dataset.base ?? '').replace(/\/$/, '');
+    const states = Array.from(root.querySelectorAll<HTMLElement>('[data-state]'));
+    const segCorpus = root.querySelector<HTMLElement>('[data-seg="corpus"]');
+    const segQuery = root.querySelector<HTMLElement>('[data-seg="query"]');
+    const barsBox = root.querySelector<HTMLElement>('[data-bars]');
+    const scaleBox = root.querySelector<HTMLElement>('[data-scale]');
+    const scaleNote = root.querySelector<HTMLElement>('[data-scale-note]');
+    const scaleLegend = root.querySelector<HTMLElement>('[data-scale-legend]');
+    const badgeBox = root.querySelector<HTMLElement>('[data-badges]');
+    const mCorpus = root.querySelector<HTMLElement>('[data-m="corpus"]');
+    const mIters = root.querySelector<HTMLElement>('[data-m="iters"]');
+
+    const acc = '#ffb454';
+    const neutrals = ['#b9c0c6', '#8b9299', '#62686e', '#474d53'];
+
+    let runs: Run[] = [];
+    let corpora: string[] = [];
+    let queries: string[] = [];
+    let selCorpus = '';
+    let selQuery = '';
+
+    const esc = (value: unknown) =>
+      String(value).replace(
+        /[&<>"']/g,
+        (ch) =>
+          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] ?? ch,
+      );
+
+    const num = (value: unknown) => {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    const fmtUs = (us: number) => {
+      if (us >= 1_000_000) return `${(us / 1_000_000).toFixed(2)} s`;
+      if (us >= 1000) return `${(us / 1000).toFixed(2)} ms`;
+      if (us >= 10) return `${Math.round(us)} \u00b5s`;
+      return `${us.toFixed(1)} \u00b5s`;
+    };
+
+    const fmtInt = (n: number) => n.toLocaleString('en-US');
+
+    const setState = (name: string) => {
+      for (const state of states) state.hidden = state.dataset.state !== name;
+    };
+
+    const normalize = (raw: unknown): Run | null => {
+      if (typeof raw !== 'object' || raw === null) return null;
+      const r = raw as Record<string, unknown>;
+      const corpus = typeof r.corpus === 'string' && r.corpus ? r.corpus : null;
+      const tool = typeof r.tool === 'string' && r.tool ? r.tool : null;
+      const query = typeof r.query === 'string' && r.query ? r.query : null;
+      const p50 = num(r.p50_us);
+      const p95 = num(r.p95_us);
+      if (!corpus || !tool || !query || p50 === null || p95 === null) return null;
+      return {
+        corpus,
+        corpus_files: num(r.corpus_files ?? null) ?? undefined,
+        iterations: num(r.iterations) ?? 0,
+        tool,
+        query,
+        p50_us: p50,
+        p95_us: p95,
+        qps: num(r.qps) ?? 0,
+        matches: num(r.matches) ?? 0,
+        nonzero_exits: num(r.nonzero_exits) ?? 0,
+        tool_path: typeof r.tool_path === 'string' ? r.tool_path : undefined,
+      };
+    };
+
+    let toolOrder: string[] = [];
+
+    const toolColor = (tool: string) => {
+      if (tool === 'orin') return acc;
+      const position = Math.max(0, toolOrder.indexOf(tool) - 1);
+      return neutrals[position % neutrals.length];
+    };
+
+    const buildToolOrder = () => {
+      const seen = Array.from(new Set(runs.map((r) => r.tool)));
+      const others = seen.filter((t) => t !== 'orin').sort();
+      toolOrder = seen.includes('orin') ? ['orin', ...others] : others;
+    };
+
+    const buildSegments = (
+      host: HTMLElement,
+      values: string[],
+      selected: string,
+      onPick: (value: string) => void,
+    ) => {
+      host.innerHTML = values
+        .map(
+          (value) =>
+            `<button type="button" aria-pressed="${value === selected}">${esc(value)}</button>`,
+        )
+        .join('');
+      const buttons = Array.from(host.querySelectorAll('button'));
+      buttons.forEach((button, index) => {
+        button.addEventListener('click', () => onPick(values[index]));
+      });
+    };
+
+    const renderBars = (subset: Run[]) => {
+      const ordered = [...subset].sort((a, b) => {
+        if (a.tool === 'orin') return -1;
+        if (b.tool === 'orin') return 1;
+        return a.p50_us - b.p50_us;
+      });
+
+      const width = 500;
+      const x0 = 86;
+      const maxBar = 250;
+      const rowH = 40;
+      const top = 18;
+      const height = top + ordered.length * rowH + 8;
+      const scaleMax = Math.max(...ordered.map((r) => r.p95_us), 1);
+
+      const rows = ordered
+        .map((run, index) => {
+          const color = toolColor(run.tool);
+          const y = top + index * rowH;
+          const w50 = Math.max(2, (run.p50_us / scaleMax) * maxBar);
+          const w95 = Math.max(2, (run.p95_us / scaleMax) * maxBar);
+          const label50 = fmtUs(run.p50_us);
+          const label95 = fmtUs(run.p95_us);
+          return `
+            <g>
+              <text x="76" y="${y + 18}" text-anchor="end" class="b-tool"
+                fill="${run.tool === 'orin' ? acc : '#c9ced3'}">${esc(run.tool)}</text>
+              <rect x="${x0}" y="${y + 6}" width="${w50.toFixed(1)}" height="11" rx="2" fill="${color}">
+                <title>${esc(run.tool)} p50 ${esc(label50)}</title>
+              </rect>
+              <text x="${x0 + w50 + 8}" y="${y + 15}" class="b-val">${esc(label50)}</text>
+              <rect x="${x0}" y="${y + 23}" width="${w95.toFixed(1)}" height="11" rx="2"
+                fill="${color}" fill-opacity="0.18" stroke="${color}" stroke-opacity="0.75">
+                <title>${esc(run.tool)} p95 ${esc(label95)}</title>
+              </rect>
+              <text x="${x0 + w95 + 8}" y="${y + 32}" class="b-val">${esc(label95)}</text>
+            </g>`;
+        })
+        .join('');
+
+      barsBox!.innerHTML = `
+        <svg viewBox="0 0 ${width} ${height}" role="img"
+          aria-label="p50 and p95 latency per tool for the selected corpus and query">
+          <title>Latency per tool</title>
+          ${rows}
+        </svg>`;
+    };
+
+    const renderScale = (selectedQuery: string) => {
+      const subset = runs.filter((r) => r.query === selectedQuery);
+      const points = new Map<string, Run[]>();
+      for (const run of subset) {
+        const list = points.get(run.tool) ?? [];
+        list.push(run);
+        points.set(run.tool, list);
+      }
+
+      const order = [...corpora];
+      if (order.length < 2 || points.size === 0) {
+        scaleBox!.innerHTML =
+          '<p class="plot-note">Plotting scale needs results from more than one corpus size.</p>';
+        scaleLegend!.innerHTML = '';
+        if (scaleNote) scaleNote.textContent = '';
+        return;
+      }
+
+      const values = subset.map((r) => r.p50_us).filter((v) => v > 0);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const useLog = values.length > 0 && max / min >= 50;
+
+      const width = 500;
+      const height = 280;
+      const padL = 66;
+      const padR = 12;
+      const padT = 12;
+      const padB = 42;
+      const plotW = width - padL - padR;
+      const plotH = height - padT - padB;
+
+      const xPos = (corpus: string) => {
+        const index = order.indexOf(corpus);
+        return padL + (order.length === 1 ? plotW / 2 : (index / (order.length - 1)) * plotW);
+      };
+
+      const lo = useLog ? Math.log10(Math.max(min, 0.001)) : 0;
+      const hi = useLog ? Math.log10(max) : max * 1.08;
+      const yPos = (value: number) => {
+        const v = useLog ? Math.log10(Math.max(value, 0.001)) : value;
+        const t = hi === lo ? 1 : (v - lo) / (hi - lo);
+        return padT + plotH - t * plotH;
+      };
+
+      const ticks: number[] = [];
+      if (useLog) {
+        for (let e = Math.floor(lo); e <= Math.ceil(hi); e += 1) {
+          const v = 10 ** e;
+          if (v >= min / 10 && v <= max * 10) ticks.push(v);
+        }
+      } else {
+        for (let i = 0; i <= 4; i += 1) ticks.push((max * 1.08 * i) / 4);
+      }
+
+      const grid = ticks
+        .map(
+          (tick) => `
+            <g>
+              <line x1="${padL}" y1="${yPos(tick).toFixed(1)}" x2="${width - padR}"
+                y2="${yPos(tick).toFixed(1)}" class="s-grid" />
+              <text x="${padL - 10}" y="${(yPos(tick) + 4).toFixed(1)}" text-anchor="end"
+                class="s-tick">${esc(fmtUs(tick))}</text>
+            </g>`,
+        )
+        .join('');
+
+      const xLabels = order
+        .map(
+          (corpus) => `
+            <text x="${xPos(corpus).toFixed(1)}" y="${height - padB + 22}" text-anchor="middle"
+              class="s-tick">${esc(corpus)}</text>`,
+        )
+        .join('');
+
+      const series: string[] = [];
+      const legend: string[] = [];
+      const visibleTools = toolOrder.filter((tool) => points.has(tool));
+
+      for (const tool of visibleTools) {
+        const list = points.get(tool) ?? [];
+        const sorted = [...list].sort(
+          (a, b) => order.indexOf(a.corpus) - order.indexOf(b.corpus),
+        );
+        const color = toolColor(tool);
+        const neutralSlot = neutrals.indexOf(color);
+        const dash =
+          tool === 'orin' || neutralSlot === 0
+            ? ''
+            : neutralSlot === 1
+              ? ' stroke-dasharray="7 4"'
+              : ' stroke-dasharray="2 4"';
+        const path = sorted
+          .map(
+            (run, i) =>
+              `${i === 0 ? 'M' : 'L'}${xPos(run.corpus).toFixed(1)},${yPos(run.p50_us).toFixed(1)}`,
+          )
+          .join(' ');
+        const dots = sorted
+          .map(
+            (run) => `
+              <circle cx="${xPos(run.corpus).toFixed(1)}" cy="${yPos(run.p50_us).toFixed(1)}" r="3.6"
+                fill="${color}">
+                <title>${esc(tool)} at ${esc(run.corpus)}: p50 ${esc(fmtUs(run.p50_us))}</title>
+              </circle>`,
+          )
+          .join('');
+        series.push(
+          `<g><path d="${path}" fill="none" stroke="${color}" stroke-width="2"${dash} />${dots}</g>`,
+        );
+        legend.push(
+          `<span class="lg"><i class="line-swatch" style="border-top-color:${color};${
+            neutralSlot === 1 ? 'border-top-style:dashed;' : neutralSlot === 2 ? 'border-top-style:dotted;' : ''
+          }"></i>${esc(tool)}</span>`,
+        );
+      }
+
+      scaleBox!.innerHTML = `
+        <svg viewBox="0 0 ${width} ${height}" role="img"
+          aria-label="p50 latency against corpus size for each tool">
+          <title>Latency vs corpus size</title>
+          ${grid}
+          <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${height - padB}" class="s-axis" />
+          <line x1="${padL}" y1="${height - padB}" x2="${width - padR}" y2="${height - padB}"
+            class="s-axis" />
+          ${xLabels}
+          ${series.join('')}
+        </svg>`;
+      scaleLegend!.innerHTML = legend.join('');
+      if (scaleNote) {
+        scaleNote.textContent = useLog
+          ? 'log scale (wide spread across tools)'
+          : 'linear scale, p50 per query';
+      }
+    };
+
+    const renderBadges = (subset: Run[]) => {
+      const matches = subset.map((r) => r.matches);
+      const matchText =
+        matches.length === 0
+          ? '0'
+          : Math.min(...matches) === Math.max(...matches)
+            ? fmtInt(matches[0])
+            : `${fmtInt(Math.min(...matches))}-${fmtInt(Math.max(...matches))}`;
+      const iters = subset.map((r) => r.iterations).filter((v) => v > 0);
+      const exits = subset.reduce((sum, r) => sum + r.nonzero_exits, 0);
+      const tools = new Set(subset.map((r) => r.tool)).size;
+
+      badgeBox!.innerHTML = [
+        { value: matchText, label: 'matches per run' },
+        { value: fmtInt(exits), label: 'nonzero exits' },
+        {
+          value: iters.length ? fmtInt(Math.min(...iters)) : '0',
+          label: 'iterations per query',
+        },
+        { value: fmtInt(tools), label: 'tools compared' },
+      ]
+        .map(
+          (badge) =>
+            `<span class="badge"><b>${esc(badge.value)}</b><span>${esc(badge.label)}</span></span>`,
+        )
+        .join('');
+    };
+
+    const updateMethod = () => {
+      const subset = runs.filter((r) => r.corpus === selCorpus && r.query === selQuery);
+      const files = subset.find((r) => r.corpus_files)?.corpus_files;
+      if (mCorpus) mCorpus.textContent = files ? `${selCorpus} (${fmtInt(files)} files)` : selCorpus;
+      const iters = subset.map((r) => r.iterations).filter((v) => v > 0);
+      if (mIters) {
+        mIters.textContent = iters.length
+          ? iters.every((v) => v === iters[0])
+            ? fmtInt(iters[0])
+            : `${fmtInt(Math.min(...iters))}-${fmtInt(Math.max(...iters))}`
+          : 'published per run';
+      }
+    };
+
+    const render = () => {
+      const subset = runs.filter((r) => r.corpus === selCorpus && r.query === selQuery);
+      if (subset.length === 0) {
+        setState('empty');
+        return;
+      }
+      renderBars(subset);
+      renderScale(selQuery);
+      renderBadges(subset);
+      updateMethod();
+      setState('data');
+    };
+
+    const refreshSegments = () => {
+      queries = Array.from(new Set(runs.filter((r) => r.corpus === selCorpus).map((r) => r.query)));
+      if (!queries.includes(selQuery)) selQuery = queries[0] ?? '';
+      if (segCorpus) buildSegments(segCorpus, corpora, selCorpus, pickCorpus);
+      if (segQuery) buildSegments(segQuery, queries, selQuery, pickQuery);
+    };
+
+    const pickCorpus = (value: string) => {
+      selCorpus = value;
+      refreshSegments();
+      render();
+    };
+
+    const pickQuery = (value: string) => {
+      selQuery = value;
+      refreshSegments();
+      render();
+    };
+
+    const boot = async () => {
+      try {
+        const response = await fetch(`${base}/data/benchmarks.json`, { cache: 'no-cache' });
+        if (!response.ok) throw new Error(String(response.status));
+        const payload = await response.json();
+        const rawRuns = Array.isArray(payload?.runs) ? payload.runs : [];
+        runs = rawRuns.map(normalize).filter((run): run is Run => run !== null);
+      } catch {
+        runs = [];
+      }
+
+      if (runs.length === 0) {
+        setState('empty');
+        return;
+      }
+
+      corpora = Array.from(new Set(runs.map((r) => r.corpus)));
+      const filesAll = runs.every((r) => r.corpus_files);
+      if (filesAll) {
+        corpora.sort((a, b) => {
+          const fa = runs.find((r) => r.corpus === a)?.corpus_files ?? 0;
+          const fb = runs.find((r) => r.corpus === b)?.corpus_files ?? 0;
+          return fa - fb;
+        });
+      }
+      buildToolOrder();
+      selCorpus = corpora[0] ?? '';
+      refreshSegments();
+      render();
+    };
+
+    boot();
+  }
+</script>

@@ -1,0 +1,4 @@
+# Build output and dependencies are never committed.
+node_modules/
+dist/
+.astro/
