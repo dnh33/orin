@@ -14,3 +14,6 @@ ci_log*.txt
 check_pr*.txt
 pr_check*.txt
 latest_run.txt
+
+# orchestrator scratch (harvest downloads)
+harvest*/
