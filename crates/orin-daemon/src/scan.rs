@@ -159,6 +159,7 @@ mod tests {
 
         let mut idx = orin_core::index::Index::new();
         let count = scan_root(dir.path(), 0, &mut idx).unwrap();
-        assert_eq!(count, 2); // file.txt + subdir
+        // The walker yields the root dir itself plus file.txt and subdir.
+        assert_eq!(count, 3);
     }
 }

@@ -15,6 +15,7 @@ pub mod watch;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tempfile::tempdir;
 
     #[test]
     fn daemon_modules_compile() {
@@ -25,10 +26,10 @@ mod tests {
         };
         let _ = checkpoint::Checkpoint::new(std::path::PathBuf::new(), 60);
         let _ = revalidate::Revalidate::new(60);
-        let _ = scan::scan_root(
-            std::path::Path::new("."),
-            0,
-            &mut orin_core::index::Index::new(),
-        );
+        // Walk a small unique tempdir instead of the process cwd, which can
+        // be the whole workspace (including target/) or the system dir on CI.
+        let dir = tempdir().unwrap();
+        std::fs::write(dir.path().join("a.txt"), b"x").unwrap();
+        let _ = scan::scan_root(dir.path(), 0, &mut orin_core::index::Index::new());
     }
 }

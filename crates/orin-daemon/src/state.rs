@@ -123,9 +123,97 @@ mod tests {
     #[test]
     fn state_creation() {
         let dir = tempdir().unwrap();
-        let state = State::new(dir.path()).unwrap();
+        let shared = test_support::new_shared_hermetic(dir.path(), "state_creation").unwrap();
+        let state = shared.lock().unwrap();
         assert_eq!(state.index.len(), 0);
         assert!(!state.roots.is_empty());
         assert!(state.listener.is_some());
+    }
+}
+
+/// Test-only helpers for hermetic listener creation.
+///
+/// `State::new` binds an IPC listener whose name comes from `ORIN_SOCKET`
+/// (or a fixed per-user default). Unit tests run in parallel threads of one
+/// process, so every test must bind a unique name. The env var is
+/// process-global, so its mutation is serialized by `LISTENER_LOCK` and the
+/// live value is visible only for the duration of the bind.
+#[cfg(test)]
+pub(crate) mod test_support {
+    use super::{RootEntry, SharedState, State};
+    use anyhow::Result;
+    use std::path::Path;
+    use std::sync::Arc;
+    use std::sync::Mutex;
+    use std::sync::atomic::{AtomicU32, Ordering};
+    use sysinfo::System;
+
+    /// Serializes ORIN_SOCKET mutation + listener binding across all tests
+    /// that create a listener in this test binary.
+    static LISTENER_LOCK: Mutex<()> = Mutex::new(());
+    /// Distinguishes successive binds within the test process.
+    static NEXT_BIND_ID: AtomicU32 = AtomicU32::new(0);
+
+    /// Create shared state with a unique IPC socket/pipe name.
+    ///
+    /// Windows: a bare namespaced name — interprocess's `GenericNamespaced`
+    /// prepends `\\.\pipe\` itself, and a pre-prefixed value would be doubled
+    /// into an invalid pipe path (backslashes are rejected inside the pipe
+    /// name; that doubling is the historical source of "Access is denied").
+    /// Unix: a socket file inside the caller's own tempdir.
+    ///
+    /// The name is unique per call (pid + bind counter + test label), so
+    /// parallel tests never collide with "Address already in use" (os error
+    /// 98) or "Access is denied" (os error 5).
+    ///
+    /// The listener is bound directly (mirroring `State::create_listener`)
+    /// instead of going through `State::new`, so the env-var window contains
+    /// only the name lookup + bind — not the slow `System::new_all()` pass —
+    /// and parallel tests reading the ambient `ORIN_SOCKET` (e.g.
+    /// `server::tests`) essentially never observe a hermetic name.
+    pub(crate) fn new_shared_hermetic(data_dir: &Path, label: &str) -> Result<SharedState> {
+        let _lock = LISTENER_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        let prev = std::env::var("ORIN_SOCKET").ok();
+        let pid = std::process::id();
+        let id = NEXT_BIND_ID.fetch_add(1, Ordering::Relaxed);
+        let name = if cfg!(windows) {
+            format!("orin-test-{pid}-{id}-{label}")
+        } else {
+            data_dir.join(format!("orin-test-{pid}-{id}.sock")).display().to_string()
+        };
+        // SAFETY: env mutation is serialized across all listener-creating
+        // tests by LISTENER_LOCK, and the previous value is restored below
+        // before the lock is released.
+        unsafe { std::env::set_var("ORIN_SOCKET", &name) };
+        let listener = interprocess::local_socket::ListenerOptions::new()
+            .name(orin_core::paths::socket_name()?)
+            .create_sync()?;
+        if let Some(prev) = prev {
+            unsafe { std::env::set_var("ORIN_SOCKET", prev) };
+        } else {
+            unsafe { std::env::remove_var("ORIN_SOCKET") };
+        }
+
+        // Same shape as State::new minus the listener creation (done above)
+        // and with a cheaper System::new(); tests don't inspect sys.
+        let state = State {
+            index: orin_core::index::Index::new(),
+            roots: orin_core::config::default_roots()
+                .into_iter()
+                .map(|p| RootEntry {
+                    path: p.into(),
+                    first: u32::MAX,
+                    count: 0,
+                    watch: "auto".to_string(),
+                })
+                .collect(),
+            listener: Some(listener),
+            sys: System::new(),
+            total_entries: 0,
+            unreadable: 0,
+            last_checkpoint: 0,
+            scan_progress: None,
+        };
+        Ok(Arc::new(Mutex::new(state)))
     }
 }

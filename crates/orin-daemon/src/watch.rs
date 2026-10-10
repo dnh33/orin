@@ -152,13 +152,14 @@ fn poll_root(
 
 #[cfg(test)]
 mod tests {
+    use crate::state::test_support::new_shared_hermetic;
     use super::*;
     use tempfile::tempdir;
 
     #[test]
     fn watcher_handle_creation() {
         let dir = tempdir().unwrap();
-        let state = crate::state::new_shared(dir.path()).unwrap();
+        let state = new_shared_hermetic(dir.path(), "watcher_handle_creation").unwrap();
         let handle = WatcherHandle::start(vec![dir.path().to_path_buf()], state).unwrap();
         handle.stop();
     }

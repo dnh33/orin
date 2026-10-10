@@ -162,13 +162,33 @@ fn find_parent(state: &crate::state::State, path: &Path, root_idx: usize) -> Res
 
 #[cfg(test)]
 mod tests {
+    use crate::state::test_support::new_shared_hermetic;
     use super::*;
     use tempfile::tempdir;
 
     #[test]
     fn apply_create() {
         let dir = tempdir().unwrap();
-        let state = crate::state::new_shared(dir.path()).unwrap();
+        let state = new_shared_hermetic(dir.path(), "apply_create").unwrap();
+        // Point the state's roots at this test's own tempdir: the default
+        // roots (home dir on Unix, drive letters on Windows) don't contain
+        // the tempdir on CI, and lookup_path needs a registered Index root
+        // to reconstruct entry paths.
+        {
+            let mut s = state.lock().unwrap();
+            s.roots.clear();
+            s.roots.push(crate::state::RootEntry {
+                path: dir.path().to_path_buf(),
+                first: 0,
+                count: 0,
+                watch: "none".to_string(),
+            });
+            s.index.roots.push(orin_core::index::Root {
+                path: dir.path().to_path_buf(),
+                first: 0,
+                count: 1,
+            });
+        }
         let file = dir.path().join("test.txt");
         std::fs::write(&file, b"hello").unwrap();
 

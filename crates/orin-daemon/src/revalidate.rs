@@ -205,13 +205,14 @@ pub fn start_revalidate_task(
 
 #[cfg(test)]
 mod tests {
+    use crate::state::test_support::new_shared_hermetic;
     use super::*;
     use tempfile::tempdir;
 
     #[test]
     fn revalidate_basic() {
         let dir = tempdir().unwrap();
-        let state = crate::state::new_shared(dir.path()).unwrap();
+        let state = new_shared_hermetic(dir.path(), "revalidate_basic").unwrap();
         let _rv = Revalidate::new(60);
 
         std::fs::write(dir.path().join("newfile.txt"), b"test").unwrap();
