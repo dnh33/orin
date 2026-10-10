@@ -56,6 +56,17 @@ jobs:
             }
             & $tool.name --version
           }
+      - name: Verify tool identities (bash PATH = the PATH the bench runs under)
+        run: |
+          # System32 find.exe (a string filter) must never answer `find` - it errors
+          # instantly and the error exits get timed as if they were fast searches.
+          echo "find -> $(command -v find)"; find --version | head -1
+          case "$(command -v find)" in
+            /usr/bin/find|*/mingw*/find) echo "GNU find OK" ;;
+            *) echo "find is NOT GNU findutils - refusing to bench"; exit 1 ;;
+          esac
+          echo "fd -> $(command -v fd)"; fd --version
+          echo "rg -> $(command -v rg)"; rg --version
       - name: Generate corpus (deterministic, same seed = identical tree)
         run: |
           cargo run --release -p orin-bench gen \

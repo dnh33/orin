@@ -119,8 +119,10 @@ pub fn run_tool(
     corpus_dir: &Path,
     query: &str,
     iterations: usize,
-) -> anyhow::Result<Vec<Duration>> {
+) -> anyhow::Result<(Vec<Duration>, usize, usize)> {
     let mut latencies = Vec::with_capacity(iterations);
+    let mut matches = 0usize;
+    let mut nonzero = 0usize;
 
     // Warmup
     _ = run_single(tool, corpus_dir, query)?;
@@ -130,12 +132,14 @@ pub fn run_tool(
         let result = run_single(tool, corpus_dir, query)?;
         let dur = start.elapsed();
         latencies.push(dur);
+        matches = String::from_utf8_lossy(&result.stdout).lines().count();
         if result.status.code() != Some(0) {
+            nonzero += 1;
             eprintln!("Warning: {} exited non-zero for query '{}'", tool, query);
         }
     }
 
-    Ok(latencies)
+    Ok((latencies, matches, nonzero))
 }
 
 fn run_single(tool: &str, corpus_dir: &Path, query: &str) -> anyhow::Result<std::process::Output> {
@@ -205,14 +209,31 @@ pub fn run(
         .collect();
 
     let mut results = Vec::new();
+    // Record WHICH binary answers for `tool` (catches e.g. System32 find.exe
+    // shadowing GNU find: instant error exits would otherwise look like speed).
+    let tool_path = Command::new("where")
+        .arg(tool)
+        .output()
+        .ok()
+        .map(|o| {
+            String::from_utf8_lossy(&o.stdout)
+                .lines()
+                .next()
+                .unwrap_or("?")
+                .to_string()
+        })
+        .unwrap_or_else(|| "?".to_string());
     for q in queries_to_run.iter().take(10) {
-        let latencies = run_tool(tool, corpus_dir, q, iterations)?;
+        let (latencies, matches, nonzero) = run_tool(tool, corpus_dir, q, iterations)?;
         let stat = crate::stats::from_durations(&latencies);
         results.push(format!(
-            "{{\"query\":{},\"tool\":\"{}\",\"p50_us\":{},\"p95_us\":{},\"p99_us\":{},\
-             \"qps\":{:.2}}}",
+            "{{\"query\":{},\"tool\":\"{}\",\"tool_path\":{},\"matches\":{},\
+             \"nonzero_exits\":{},\"p50_us\":{},\"p95_us\":{},\"p99_us\":{},\"qps\":{:.2}}}",
             serde_json::to_string(&q)?,
             tool,
+            serde_json::to_string(&tool_path)?,
+            matches,
+            nonzero,
             stat.latency_p50_us,
             stat.latency_p95_us,
             stat.latency_p99_us,
