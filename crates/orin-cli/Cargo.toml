@@ -9,6 +9,10 @@ repository = { workspace = true }
 name = "orin"
 path = "src/main.rs"
 
+[[bin]]
+name = "on"
+path = "src/bin/on.rs"
+
 [dependencies]
 orin-core = { path = "../orin-core" }
 clap = { workspace = true, features = ["derive"] }

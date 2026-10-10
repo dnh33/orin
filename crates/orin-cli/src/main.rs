@@ -46,7 +46,7 @@ enum Commands {
     },
 }
 
-fn main() -> ExitCode {
+pub fn main() -> ExitCode {
     let cli = Cli::parse();
     match run(cli) {
         Ok(code) => code,
