@@ -43,6 +43,7 @@ impl QueryMatrix {
             .with_context(|| format!("write {}", path.display()))
     }
 
+    #[allow(dead_code)]
     pub fn len(&self) -> usize {
         self.exact.len()
             + self.prefix.len()

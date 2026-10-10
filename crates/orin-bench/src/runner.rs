@@ -39,6 +39,23 @@ fn bench_socket() -> String {
     format!("orin-bench-{}", std::process::id())
 }
 
+/// Resolved binary for a comparison tool. The workflow exports BENCH_TOOL_* with
+/// the Windows path verified in the SAME shell context the bench runs under -
+/// a bare name lets CreateProcess resolve `find` to System32 find.exe (a string
+/// filter whose instant error exits get timed as if they were fast searches).
+fn tool_bin(tool: &str) -> String {
+    let key = match tool {
+        "fd" => "BENCH_TOOL_FD",
+        "find" => "BENCH_TOOL_FIND",
+        "rg" | "ripgrep" => "BENCH_TOOL_RG",
+        _ => "",
+    };
+    if key.is_empty() {
+        return tool.to_string();
+    }
+    std::env::var(key).unwrap_or_else(|_| tool.to_string())
+}
+
 /// Spawn `orind` indexing the corpus and wait until it serves results.
 /// Returns the daemon child handle (kept alive for the whole run).
 fn ensure_daemon(corpus_dir: &Path) -> anyhow::Result<std::process::Child> {
@@ -124,8 +141,18 @@ pub fn run_tool(
     let mut matches = 0usize;
     let mut nonzero = 0usize;
 
-    // Warmup
-    _ = run_single(tool, corpus_dir, query)?;
+    // Preflight (also warmup): refuse to time an empty search - a query that
+    // matches nothing is not a measurement ("a tool can win by returning nothing").
+    let warm = run_single(tool, corpus_dir, query)?;
+    if String::from_utf8_lossy(&warm.stdout).lines().count() == 0 {
+        anyhow::bail!(
+            "query '{}' matched nothing for {} (exit={:?}) - corpus/query \
+             misalignment, refusing to time empty searches",
+            query,
+            tool,
+            warm.status.code()
+        );
+    }
 
     for _ in 0..iterations {
         let start = Instant::now();
@@ -155,19 +182,25 @@ fn run_single(tool: &str, corpus_dir: &Path, query: &str) -> anyhow::Result<std:
             cmd
         }
         "fd" => {
-            let mut cmd = Command::new("fd");
-            cmd.arg(query);
+            // Whole-tree scope parity: hidden + .gitignore'd files are in scope
+            // for find/orin, so fd must not silently skip them.
+            let mut cmd = Command::new(tool_bin(tool));
+            cmd.arg("--hidden").arg("--no-ignore").arg(query);
             cmd
         }
         "find" => {
-            let mut cmd = Command::new("find");
+            let mut cmd = Command::new(tool_bin(tool));
             cmd.arg(".").arg("-iname").arg(format!("*{query}*"));
             cmd
         }
         "rg" | "ripgrep" => {
             // Filename-mode ripgrep: glob filter over --files.
-            let mut cmd = Command::new("rg");
-            cmd.arg("--files").arg("-g").arg(format!("*{query}*"));
+            let mut cmd = Command::new(tool_bin(tool));
+            cmd.arg("--files")
+                .arg("--hidden")
+                .arg("--no-ignore")
+                .arg("-g")
+                .arg(format!("*{query}*"));
             cmd
         }
         _ => anyhow::bail!("unknown tool: {tool}"),
@@ -209,20 +242,13 @@ pub fn run(
         .collect();
 
     let mut results = Vec::new();
-    // Record WHICH binary answers for `tool` (catches e.g. System32 find.exe
-    // shadowing GNU find: instant error exits would otherwise look like speed).
-    let tool_path = Command::new("where")
-        .arg(tool)
-        .output()
-        .ok()
-        .map(|o| {
-            String::from_utf8_lossy(&o.stdout)
-                .lines()
-                .next()
-                .unwrap_or("?")
-                .to_string()
-        })
-        .unwrap_or_else(|| "?".to_string());
+    // Evidence of identity: the resolved binary (env from the workflow's
+    // identity gate), not just the command name.
+    let tool_path = if tool == "orin" {
+        bin_dir().join(exe_name("orin")).display().to_string()
+    } else {
+        tool_bin(tool)
+    };
     for q in queries_to_run.iter().take(10) {
         let (latencies, matches, nonzero) = run_tool(tool, corpus_dir, q, iterations)?;
         let stat = crate::stats::from_durations(&latencies);

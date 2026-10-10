@@ -60,6 +60,9 @@ jobs:
         run: |
           # System32 find.exe (a string filter) must never answer `find` - it errors
           # instantly and the error exits get timed as if they were fast searches.
+          # CreateProcess resolves names via the WINDOWS PATH order, which differs
+          # from bash's - so export the verified binaries as Windows paths and make
+          # the runner consume them (BENCH_TOOL_*), never a bare name.
           echo "find -> $(command -v find)"; find --version | head -1
           case "$(command -v find)" in
             /usr/bin/find|*/mingw*/find) echo "GNU find OK" ;;
@@ -67,6 +70,11 @@ jobs:
           esac
           echo "fd -> $(command -v fd)"; fd --version
           echo "rg -> $(command -v rg)"; rg --version
+          {
+            echo "BENCH_TOOL_FIND=$(cygpath -w "$(command -v find)")"
+            echo "BENCH_TOOL_FD=$(cygpath -w "$(command -v fd)")"
+            echo "BENCH_TOOL_RG=$(cygpath -w "$(command -v rg)")"
+          } >> "$GITHUB_ENV"
       - name: Generate corpus (deterministic, same seed = identical tree)
         run: |
           cargo run --release -p orin-bench gen \

@@ -119,5 +119,28 @@ pub fn generate(name: &str, out: &Path, seed: u64) -> anyhow::Result<()> {
         fs::write(git.join("config"), b"[core]\nrepositoryformatversion = 0\n")?;
     }
 
+    // Plant names for EVERY shared-table query class (exact / prefix / substring),
+    // deterministically. The harness refuses to time queries that match nothing,
+    // so the corpus must cover all of them. (pkg_ is covered by node_modules above.)
+    for name in ["Cargo.toml", "README.md", "main.rs", "LICENSE", ".gitignore"] {
+        fs::write(out.join(name), b"planted\n")?;
+        for d in dirs.iter().take(2) {
+            fs::write(d.join(name), b"planted\n")?;
+        }
+    }
+    for (pi, prefix) in ["test_", "app_", "config_", "src_"].iter().enumerate() {
+        for j in 0..50 {
+            let d = &dirs[(pi * 7 + j) % dirs.len()];
+            let ext = cfg.extensions[j % cfg.extensions.len()];
+            fs::write(d.join(format!("{prefix}{j}.{ext}")), b"planted\n")?;
+        }
+    }
+    for (si, s) in ["test", "util", "mod", "fn", "struct"].iter().enumerate() {
+        for j in 0..20 {
+            let d = &dirs[(si * 11 + j) % dirs.len()];
+            fs::write(d.join(format!("{s}_hit_{j}.txt")), b"planted\n")?;
+        }
+    }
+
     Ok(())
 }
