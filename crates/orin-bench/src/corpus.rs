@@ -2,6 +2,7 @@
 
 use anyhow::Context;
 use rand::Rng;
+use rand::RngCore;
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 use std::fs;
@@ -93,22 +94,25 @@ pub fn generate(name: &str, out: &Path, seed: u64) -> anyhow::Result<()> {
         let fname = format!("{}_{}.{}", cfg.prefix, i, ext);
         let path = dir.join(&fname);
 
-        let size = match rng.random_range(0..10) {
-            0 => rng.random_range(1..100),                // tiny
-            1 => rng.random_range(100..10_000),           // small
-            2 => rng.random_range(10_000..1_000_000),     // medium
-            3 => rng.random_range(1_000_000..50_000_000), // large
-            _ => rng.random_range(1..1_000),              // default
+        // Realistic small-file-dominant distribution (bounded totals so the
+        // medium/large corpora fit on a runner disk): ~5.4KB average.
+        let size = match rng.random_range(0..1000) {
+            0..=699 => rng.random_range(1..500),               // tiny (70%)
+            700..=949 => rng.random_range(500..10_000),        // small (25%)
+            950..=994 => rng.random_range(10_000..100_000),    // medium (4.5%)
+            _ => rng.random_range(100_000..500_000),           // large (0.5%)
         };
 
-        let content: Vec<u8> = (0..size).map(|_| rng.random_range(0..=255u8)).collect();
+        let mut content = vec![0u8; size];
+        rng.fill_bytes(&mut content);
         fs::write(&path, &content)?;
         written += 1;
         i += 1;
     }
 
-    // Create some node_modules-like dirs and .git-like dirs
-    for d in &dirs {
+    // Create some node_modules-like dirs and .git-like dirs (bounded: at scale
+    // the full per-dir loop would add millions of phantom files)
+    for d in dirs.iter().take(100) {
         let nm = d.join("node_modules");
         fs::create_dir_all(&nm)?;
         for j in 0..50 {

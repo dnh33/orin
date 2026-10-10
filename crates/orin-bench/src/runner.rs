@@ -249,17 +249,46 @@ pub fn run(
     } else {
         tool_bin(tool)
     };
+    // Decomposition probes for the orin arm: spawn_us = pure process cost
+    // (--version), status_us = spawn + connect + IPC floor (status round trip).
+    // p50 - status_us is query + output cost.
+    let (spawn_us, status_us) = if tool == "orin" {
+        let orin = bin_dir().join(exe_name("orin"));
+        let mut spawn_lat = Vec::new();
+        let mut status_lat = Vec::new();
+        for _ in 0..20 {
+            let t = Instant::now();
+            _ = Command::new(&orin).arg("--version").output();
+            spawn_lat.push(t.elapsed());
+            let t = Instant::now();
+            _ = Command::new(&orin)
+                .arg("status")
+                .arg("--json")
+                .env("ORIN_SOCKET", bench_socket())
+                .env("ORIN_NO_SPAWN", "1")
+                .output();
+            status_lat.push(t.elapsed());
+        }
+        let s = crate::stats::from_durations(&spawn_lat);
+        let st = crate::stats::from_durations(&status_lat);
+        (s.latency_p50_us, st.latency_p50_us)
+    } else {
+        (0.0, 0.0)
+    };
     for q in queries_to_run.iter().take(10) {
         let (latencies, matches, nonzero) = run_tool(tool, corpus_dir, q, iterations)?;
         let stat = crate::stats::from_durations(&latencies);
         results.push(format!(
             "{{\"query\":{},\"tool\":\"{}\",\"tool_path\":{},\"matches\":{},\
-             \"nonzero_exits\":{},\"p50_us\":{},\"p95_us\":{},\"p99_us\":{},\"qps\":{:.2}}}",
+             \"nonzero_exits\":{},\"spawn_us\":{:.0},\"status_us\":{:.0},\
+             \"p50_us\":{},\"p95_us\":{},\"p99_us\":{},\"qps\":{:.2}}}",
             serde_json::to_string(&q)?,
             tool,
             serde_json::to_string(&tool_path)?,
             matches,
             nonzero,
+            spawn_us,
+            status_us,
             stat.latency_p50_us,
             stat.latency_p95_us,
             stat.latency_p99_us,
