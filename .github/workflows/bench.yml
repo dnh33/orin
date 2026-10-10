@@ -12,26 +12,29 @@ on:
         options: [orin, fd, find, rg]
         default: orin
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   gen:
     runs-on: ubuntu-latest
-    outputs:
-      corpus_path: ${{ steps.setpath.outputs.corpus }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
       - name: Generate corpus
         run: |
-          mkdir -p /tmp/orin-bench
+          mkdir -p "$RUNNER_TEMP/orin-bench/corpus"
           cargo run --release -p orin-bench gen \
             --corpus ${{ inputs.corpus }} \
-            --out /tmp/orin-bench/corpus \
+            --out "$RUNNER_TEMP/orin-bench/corpus" \
             --seed 0xC0FFEE
-      - name: Set path output
-        id: setpath
-        run: echo "corpus=/tmp/orin-bench/corpus" >> "$GITHUB_OUTPUT"
+      - name: Upload corpus
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-corpus
+          path: ${{ runner.temp }}/orin-bench/corpus
+          retention-days: 1
 
   bench:
     needs: gen
@@ -44,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Install fd (ubuntu)
+      - name: Install fd/rg (ubuntu)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y fd-find ripgrep
       - name: Install fd/rg (macos)
@@ -52,20 +55,27 @@ jobs:
         run: brew install fd ripgrep
       - name: Install fd/rg (windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
           choco install fd ripgrep -y
           refreshenv
-      - run: cargo build --release -p orin-bench
+      - name: Download corpus
+        uses: actions/download-artifact@v4
+        with:
+          name: bench-corpus
+          path: ${{ runner.temp }}/orin-bench/corpus
+      - name: Build bench + orin binaries
+        run: cargo build --release -p orin-bench -p orin-cli -p orin-daemon
       - name: Run benchmark
         run: |
           cargo run --release -p orin-bench run \
             --tool ${{ matrix.tool }} \
-            --corpus /tmp/orin-bench/corpus \
+            --corpus "$RUNNER_TEMP/orin-bench/corpus" \
             --queries crates/orin-bench/queries.json \
             --iterations 1000 \
-            --out /tmp/orin-bench/results_${{ matrix.tool }}_${{ matrix.os }}.json
+            --out "$RUNNER_TEMP/orin-bench/results_${{ matrix.tool }}_${{ matrix.os }}.json"
       - name: Upload results
         uses: actions/upload-artifact@v4
         with:
           name: bench-results
-          path: /tmp/orin-bench/results_*.json
+          path: ${{ runner.temp }}/orin-bench/results_*.json

@@ -88,6 +88,18 @@ pub struct Config {
 
 /// Get default roots for the current platform.
 pub fn default_roots() -> Vec<String> {
+    // Env override: ORIN_ROOTS (`;`-separated on Windows, `:`-separated on Unix).
+    if let Ok(env_roots) = std::env::var("ORIN_ROOTS") {
+        let sep = if cfg!(windows) { ';' } else { ':' };
+        let roots: Vec<String> = env_roots
+            .split(sep)
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect();
+        if !roots.is_empty() {
+            return roots;
+        }
+    }
     if cfg!(windows) {
         let mut roots = Vec::new();
         for c in b'C'..=b'Z' {
