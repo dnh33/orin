@@ -274,18 +274,18 @@ impl Index {
             let Ok(rest) = abs.strip_prefix(&r.path) else {
                 continue;
             };
-            // Seed at the root directory entry (first in its range when the
-            // scan placed it there), falling back to the map for hand-built
-            // indexes. An empty index resolves nothing: callers add entries.
+            // Seed at the root directory entry when the scan placed one at
+            // the head of the range (children key under it). Indexes without
+            // a root entry (incremental/test indexes) key root-level children
+            // under u32::MAX instead: seed virtually and walk from there.
             let mut cur = match self.entries.get(r.first as usize) {
                 Some(e) if e.parent == u32::MAX => r.first,
-                _ => {
-                    let root_name = r.path.file_name().and_then(|n| n.to_str())?;
-                    *map.get(&(u32::MAX, root_name.to_string()))?
-                }
+                _ => u32::MAX,
             };
             if rest.as_os_str().is_empty() {
-                return Some(cur);
+                // The root path itself: a real entry when the scan created
+                // one, `None` under a virtual seed (no root entry exists).
+                return (cur != u32::MAX).then_some(cur);
             }
             for comp in rest.components() {
                 let name = comp.as_os_str().to_str()?;

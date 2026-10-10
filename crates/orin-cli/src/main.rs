@@ -124,7 +124,10 @@ fn on_alias(argv: &[OsString]) -> bool {
         return false;
     };
     let stem = std::path::Path::new(argv0).file_stem().unwrap_or(argv0);
-    if !stem.to_str().is_some_and(|name| name.eq_ignore_ascii_case("on")) {
+    if !stem
+        .to_str()
+        .is_some_and(|name| name.eq_ignore_ascii_case("on"))
+    {
         return false;
     }
     let Some(first) = argv.get(1) else {
@@ -134,7 +137,9 @@ fn on_alias(argv: &[OsString]) -> bool {
     let first = first.to_string_lossy().into_owned();
     let mut command = Cli::command();
     command.build();
-    let explicit = command.get_subcommands().any(|sub| sub.get_name() == first.as_str());
+    let explicit = command
+        .get_subcommands()
+        .any(|sub| sub.get_name() == first.as_str());
     !explicit && !ROOT_FLAGS.contains(&first.as_str())
 }
 
