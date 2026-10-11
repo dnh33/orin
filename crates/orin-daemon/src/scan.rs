@@ -115,7 +115,12 @@ pub fn initial_scan(state: &SharedState) -> Result<u64> {
 
     for (root_path, root_idx) in roots {
         let count = scan_root(&root_path, root_idx, &mut idx)?;
-        total_entries.fetch_add(count as u64, Ordering::Relaxed);
+        let seen = total_entries.fetch_add(count as u64, Ordering::Relaxed) + count as u64;
+        // Keep the building-state progress roughly current so status can
+        // report movement during a multi-minute whole-disk scan.
+        if let Some(p) = state.lock().unwrap().scan_progress.as_mut() {
+            p.entries = seen;
+        }
     }
 
     {

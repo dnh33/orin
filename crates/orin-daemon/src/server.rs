@@ -176,7 +176,11 @@ impl Server {
                 let data = StatusData {
                     version: env!("CARGO_PKG_VERSION").to_string(),
                     protocol: PROTOCOL_VERSION,
-                    state: "ready".to_string(),
+                    state: if state.scan_progress.is_some() {
+                        "building".to_string()
+                    } else {
+                        "ready".to_string()
+                    },
                     entries: state.index.len() as u64,
                     mem_bytes: state.index_memory_bytes(),
                     roots: state

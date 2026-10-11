@@ -94,21 +94,31 @@ pub fn run_daemon(args: DaemonArgs) -> Result<()> {
         tracing::warn!("snapshot load failed: {}", e);
     }
 
-    // Initial scan of all roots before serving, then the one startup
-    // revalidation pass. Both are on-demand work (never periodic) and run on
-    // a below-normal priority worker so background indexing cannot compete
-    // with interactive query latency.
-    std::thread::scope(|scope| {
-        let _scan = scope.spawn(|| {
+    // Initial scan and the one startup revalidation run in the background
+    // while the server answers: real disks take minutes, and status must
+    // report "building" with progress instead of going silent. (A joining
+    // scope here made the daemon unanswerable at whole-disk scale.) Queries
+    // during the build see an empty-or-growing index and MCP's partial flag
+    // tells callers to retry. The offline-build-then-swap inside
+    // initial_scan can clobber watcher-applied entries; the startup
+    // revalidation pass runs after the swap and heals exactly that drift.
+    {
+        let state = state.clone();
+        std::thread::spawn(move || {
             priority::set_below_normal();
+            state.lock().unwrap().scan_progress = Some(state::ScanProgress {
+                entries: 0,
+                since_ms: 0,
+            });
             if let Err(e) = scan::initial_scan(&state) {
                 tracing::warn!("initial scan failed: {}", e);
             }
             if let Err(e) = revalidate::Revalidate::run(&state) {
                 tracing::warn!("startup revalidation failed: {}", e);
             }
+            state.lock().unwrap().scan_progress = None;
         });
-    });
+    }
 
     // Watch roots for changes -> apply
     let roots: Vec<PathBuf> = {
