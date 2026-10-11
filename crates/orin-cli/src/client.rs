@@ -155,7 +155,11 @@ fn spawn_without_inherit(
         }
         let result = command.spawn();
         for (i, n) in GETS.iter().enumerate() {
-            SetHandleInformation(GetStdHandle(*n), HANDLE_FLAG_INHERIT, saved[i] & HANDLE_FLAG_INHERIT);
+            SetHandleInformation(
+                GetStdHandle(*n),
+                HANDLE_FLAG_INHERIT,
+                saved[i] & HANDLE_FLAG_INHERIT,
+            );
         }
         result
     }

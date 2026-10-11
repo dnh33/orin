@@ -144,8 +144,7 @@ pub fn run_daemon(args: DaemonArgs) -> Result<()> {
             // Background checkpoint loop: the only periodic work left, kept
             // for snapshot durability (one save per interval, plus one on
             // shutdown). Revalidation is deliberately not periodic.
-            let _cp_task =
-                checkpoint::start_checkpoint_task(checkpoint, state.clone(), shutdown);
+            let _cp_task = checkpoint::start_checkpoint_task(checkpoint, state.clone(), shutdown);
         });
     }
 
