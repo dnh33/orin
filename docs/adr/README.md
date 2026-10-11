@@ -11,3 +11,4 @@ Decisions that are hard to reverse. Newest number last.
 | [0005](0005-benchmark-integrity.md) | Benchmark integrity rules | accepted |
 | [0006](0006-path-resolution-map.md) | Transient lookup map, not linear scans | accepted |
 | [0007](0007-mcp-surface.md) | Official SDK, paginated tools, honest partial flag | accepted |
+| [0008](0008-license-mit-apache.md) | License: MIT OR Apache-2.0 | accepted |
