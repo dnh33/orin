@@ -35,7 +35,7 @@ open = "5"
 tempfile = "3"
 globset = "0.4"
 ctrlc = "3"
-sysinfo = { version = "0.31", default-features = false, features = ["system"] }
+sysinfo = { version = "0.39", default-features = false, features = ["system"] }
 regex = "1"
 whoami = "1.4"
 
