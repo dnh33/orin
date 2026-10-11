@@ -617,8 +617,33 @@ const method: { label: string; value: string; key?: string }[] = [
       });
     };
 
+    const median = (xs: number[]) => {
+      const s = [...xs].sort((a, b) => a - b);
+      const m = s.length >> 1;
+      return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+    };
+
     const renderBars = (subset: Run[]) => {
-      const ordered = [...subset].sort((a, b) => {
+      // Replicates aggregate to one row per tool (median across runs),
+      // so the chart never shows the same tool twice.
+      const byTool = new Map<string, Run[]>();
+      for (const r of subset) {
+        const arr = byTool.get(r.tool) ?? [];
+        arr.push(r);
+        byTool.set(r.tool, arr);
+      }
+      const runCounts = new Map<string, number>();
+      const aggregated: Run[] = [];
+      for (const [tool, rs] of byTool) {
+        runCounts.set(tool, rs.length);
+        aggregated.push({
+          ...rs[0],
+          tool,
+          p50_us: median(rs.map((r) => r.p50_us)),
+          p95_us: median(rs.map((r) => r.p95_us)),
+        });
+      }
+      const ordered = [...aggregated].sort((a, b) => {
         if (a.tool === 'orin') return -1;
         if (b.tool === 'orin') return 1;
         return a.p50_us - b.p50_us;
@@ -645,7 +670,7 @@ const method: { label: string; value: string; key?: string }[] = [
               <text x="76" y="${y + 18}" text-anchor="end" class="b-tool"
                 fill="${run.tool === 'orin' ? acc : '#c9ced3'}">${esc(run.tool)}</text>
               <rect class="b-bar" x="${x0}" y="${y + 6}" width="${w50.toFixed(1)}" height="11" rx="2" fill="${color}">
-                <title>${esc(run.tool)} p50 ${esc(label50)}</title>
+                <title>${esc(run.tool)} p50 ${esc(label50)}${(runCounts.get(run.tool) ?? 1) > 1 ? ` (median of ${runCounts.get(run.tool)} runs)` : ''}</title>
               </rect>
               <text x="${x0 + w50 + 8}" y="${y + 15}" class="b-val">${esc(label50)}</text>
               <rect class="b-bar" x="${x0}" y="${y + 23}" width="${w95.toFixed(1)}" height="11" rx="2"
