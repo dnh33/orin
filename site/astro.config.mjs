@@ -1,12 +1,10 @@
 import { defineConfig } from 'astro/config';
 
-// Static site. Served two ways:
-//   - GitHub Pages as a project site (base '/orin', the default).
-//   - orin.hjermitslev.dev from Cloudflare Pages at the root. Cloudflare sets
-//     CF_PAGES during its builds, so root serving detects itself; ORIN_BASE
-//     overrides either case by hand.
-// If the GitHub Pages deployment is ever retired, drop `base` entirely.
+// Static site, served at the root of its own custom domain:
+//   - orin.hjermitslev.dev (GitHub Pages, Cloudflare DNS).
+// GitHub Pages serves custom-domain sites at the root, so base is '/'.
+// ORIN_BASE overrides for any other mount point.
 export default defineConfig({
-  base: process.env.CF_PAGES ? '/' : process.env.ORIN_BASE || '/orin',
+  base: process.env.ORIN_BASE || '/',
   trailingSlash: 'ignore',
 });
