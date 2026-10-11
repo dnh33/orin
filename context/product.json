@@ -3,7 +3,7 @@
     "name": "orin",
     "wordmark_case": "lowercase",
     "what_it_is": "whole-disk instant file search for Windows",
-    "license": ["MIT", "Apache-2.0"],
+    "license": ["MIT"],
     "platforms": ["windows"],
     "site": "https://orin.hjermitslev.dev",
     "repository": "https://github.com/dnh33/orin",

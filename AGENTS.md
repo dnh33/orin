@@ -45,7 +45,7 @@ Read in this order: this file, `docs/OVERVIEW.md`, `CONTEXT.md`.
 7. **Measured numbers only in public copy.** README and site state results as
    measured on named GitHub runners. No fake precision, no development-state
    hedging, no em dashes. Outcomes, not process.
-8. **License policy.** Dual MIT/Apache-2.0. Dependencies must pass
+8. **License policy.** MIT (owner ruling, 2026-11). Dependencies must pass
    `cargo deny` (`deny.toml` allowlist: 0BSD, CC0-1.0, MIT, Apache-2.0, ISC,
    BSD-3-Clause, Unicode-*); RustSec `cargo audit` runs on every CI pass.
 9. **Release = tag `v*`.** `release.yml` builds the single binary, stages

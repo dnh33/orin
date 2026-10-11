@@ -100,4 +100,4 @@ orin is Windows only, by design. Cross-platform support is not planned.
 
 ## License
 
-Licensed under either the [MIT license](LICENSE-MIT) or the [Apache License 2.0](LICENSE-APACHE), at your option.
+Licensed under the [MIT license](LICENSE-MIT).
