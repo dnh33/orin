@@ -40,9 +40,10 @@ pub fn socket_name() -> std::io::Result<Name<'static>> {
             .to_ns_name::<GenericNamespaced>()
             .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e));
     }
-    let user = whoami::username();
-    let hash = std::process::id() % 10000;
-    let pipe_name = format!(r"\\.\pipe\orin-{}-{:04}", user, hash);
+    // Stable per-user name: one daemon serves one user. A per-process suffix
+    // (the old PID hash) made every client compute a different pipe name than
+    // the daemon it spawned, so no client could ever find its daemon.
+    let pipe_name = format!(r"\\.\pipe\orin-{}", whoami::username());
     pipe_name
         .to_ns_name::<GenericNamespaced>()
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))

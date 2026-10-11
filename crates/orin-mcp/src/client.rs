@@ -210,12 +210,15 @@ fn scan_named_pipes() -> Option<Stream> {
     use interprocess::local_socket::GenericNamespaced;
     use interprocess::local_socket::ToNsName;
 
+    // Stable name is exactly `orin-<user>`; names with a trailing segment are
+    // legacy per-process pipes from older daemons.
+    let exact = format!("orin-{}", whoami::username());
     let prefix = format!("orin-{}-", whoami::username());
     let mut candidates: Vec<String> = std::fs::read_dir(r"\\.\pipe\")
         .ok()?
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.file_name().to_string_lossy().into_owned())
-        .filter(|name| name.starts_with(&prefix))
+        .filter(|name| name.starts_with(&prefix) || name == &exact)
         .collect();
     candidates.sort();
     for pipe in candidates {
