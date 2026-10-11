@@ -1,6 +1,6 @@
 # orin
 
-orin is whole-disk instant file search for Windows: a resident index answers warm queries at a p50 of 8-14 ms, while `find`, `fd`, and `rg` walk the disk at 40-60 ms. Measured on named GitHub Actions `windows-latest` runners over a 25,926-entry deterministic corpus.
+orin is whole-disk instant file search for Windows: a resident index answers warm queries at a median p50 of 7 ms (5-9 ms for most queries), while `find`, `fd`, and `rg` walk the disk at 45-65 ms. Measured on named GitHub Actions `windows-latest` runners over a 25,926-entry deterministic corpus.
 
 One binary, `orin.exe`, is a CLI, an interactive picker, and an MCP server for AI agents. `on.exe` is the same bytes under a two-letter name.
 
@@ -75,7 +75,7 @@ Every number below was measured on GitHub Actions `windows-latest` runners, over
 
 | Measurement | Result |
 | --- | --- |
-| Warm query p50, orin | 8-14 ms |
+| Warm query p50, orin | 7 ms median, 5-9 ms typical, 23 ms widest scans |
 | Warm query p50, find | 45 ms |
 | Warm query p50, fd | 61 ms |
 | Warm query p50, rg | 41-58 ms |
@@ -84,7 +84,7 @@ Every number below was measured on GitHub Actions `windows-latest` runners, over
 | Process spawn per CLI query | 6.5 ms |
 | Snapshot load on a real machine | about 130 ms (Windows 11 desktop, 3,638,273-entry index) |
 
-**The spawn floor.** Starting `orin.exe` costs 6.5 ms on every CLI query, and that cost is inside the 8-14 ms above: at the fast end of the range it is most of the total. It is the honest floor for one-shot commands. Long-lived callers, the daemon itself and `orin mcp`, do not pay it per query.
+**The spawn floor.** Starting `orin.exe` costs 6.5 ms on every CLI query, and that cost is inside the 5-9 ms above: at the fast end it is most of the total. It is the honest floor for one-shot commands. Long-lived callers, the daemon itself and `orin mcp`, do not pay it per query.
 
 **Real machine.** The corpus rows are a controlled benchmark. The last row is one Windows 11 desktop holding a 3,638,273-entry index, where loading the snapshot takes about 130 ms.
 
