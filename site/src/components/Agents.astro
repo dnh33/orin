@@ -12,7 +12,7 @@ const facts: { label: string; body: string; cmd: string }[] = [
   },
   {
     label: 'latency',
-    body: 'Warm queries measure a p50 of 8-14 ms, against 45 ms for find, 61 ms for fd, and 41-58 ms for ripgrep. Measured on GitHub windows-latest runners over a 25,926-entry corpus, with a 6.5 ms process spawn floor on every query.',
+    body: 'Most warm queries measure a p50 of 5-9 ms (median 7 ms); the widest prefix scans reach 23 ms. Against 45 ms for find, 62 ms for fd, and 45-66 ms for ripgrep. Measured on GitHub windows-latest runners over a 25,926-entry corpus, with a 6.5 ms process spawn floor on every query.',
     cmd: 'orin query main.rs',
   },
   {
