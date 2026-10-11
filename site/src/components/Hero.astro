@@ -9,7 +9,7 @@ const base = import.meta.env.BASE_URL;
       <h1 data-reveal aria-label="orin"><span class="word" aria-hidden="true"><span class="ch">o</span><span class="ch">r</span><span class="ch">i</span><span class="ch">n</span></span><span class="caret" aria-hidden="true"></span></h1>
       <p class="truth" data-reveal>
         <code>orin daemon</code> keeps the index in memory, so <code>orin</code> answers with JSON
-        Lines output, exit codes 0 / 1 / 2, and a warm-query p50 of 8-14 ms: GitHub windows-latest
+        Lines output, exit codes 0 / 1 / 2, and a warm-query p50 of 5-9 ms for most queries (median 7 ms): GitHub windows-latest
         runners, 25,926-entry corpus, and a 6.5 ms process spawn floor on every query.
       </p>
       <div class="cta" data-reveal>
