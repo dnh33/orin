@@ -1,0 +1,31 @@
+{
+  "product": {
+    "name": "orin",
+    "wordmark_case": "lowercase",
+    "what_it_is": "whole-disk instant file search for Windows",
+    "license": ["MIT", "Apache-2.0"],
+    "platforms": ["windows"],
+    "site": "https://orin.hjermitslev.dev",
+    "repository": "https://github.com/dnh33/orin",
+    "installer": {
+      "command": "irm https://github.com/dnh33/orin/raw/main/install.ps1 | iex",
+      "installs": ["orin.exe", "on.exe (copy of orin.exe)"],
+      "admin_required": false
+    }
+  },
+  "surfaces": {
+    "orin query": "one-shot search; JSON Lines with --json; exit codes 0 results, 1 no match, 2 error",
+    "orin status": "daemon health: entries, roots, memory, progress",
+    "orin tui": "interactive picker; prints the selected path to stdout on Enter",
+    "orin mcp": "MCP server on stdio: tools find, stat, status",
+    "orin daemon": "runs the resident indexer; auto-spawned on first use",
+    "on": "argv[0] alias: on foo == orin query foo"
+  },
+  "measured": {
+    "basis": "GitHub Actions windows-latest runners, 25,926-entry deterministic corpus",
+    "warm_query_p50_ms": {"orin": "8-14", "find": "45", "fd": "61", "rg": "41-58"},
+    "cold_scan_ms": 850,
+    "warm_start_snapshot_ms": 850,
+    "cli_spawn_floor_ms": 6.5
+  }
+}

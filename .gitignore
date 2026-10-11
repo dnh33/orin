@@ -17,3 +17,4 @@ latest_run.txt
 
 # orchestrator scratch (harvest downloads)
 harvest*/
+regress*/

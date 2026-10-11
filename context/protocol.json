@@ -1,0 +1,63 @@
+{
+  "protocol": {
+    "transport": "Windows named pipe, user-scoped (\\\\.\\pipe\\orin-<user>-<hash>)",
+    "frame": "u32 LE length + one UTF-8 JSON object",
+    "source": "crates/orin-core/src/protocol.rs",
+    "requests": {
+      "ping": {},
+      "status": {},
+      "query": {"q": "string", "limit": "u32"},
+      "stat": {"path": "string"},
+      "roots.list": {},
+      "roots.add": {"path": "string"},
+      "roots.remove": {"path": "string"},
+      "rescan": {},
+      "stop": {}
+    },
+    "responses": {
+      "pong": {},
+      "StatusData": {
+        "version": "string",
+        "protocol": "u32",
+        "state": "building|ready|revalidating",
+        "entries": "u64",
+        "mem_bytes": "u64",
+        "unreadable": "u64",
+        "roots": "[RootWire]",
+        "progress": "Progress|null"
+      },
+      "Hits": "[HitWire]",
+      "StatData": "StatInfo",
+      "Ok": {},
+      "Err": {"message": "string"}
+    },
+    "HitWire": {
+      "p": "path",
+      "n": "name",
+      "t": "kind 0 file 1 dir 2 link 3 other",
+      "s": "size",
+      "m": "mtime",
+      "score": "f32"
+    },
+    "client_behavior": {
+      "auto_spawn": "spawns `orin daemon` detached on first contact",
+      "opt_out": "ORIN_NO_SPAWN=1 forbids spawn",
+      "retry": "backoff 50ms to 400ms cap, 3s deadline"
+    }
+  },
+  "mcp": {
+    "server": "orin mcp (stdio), rmcp SDK, spec 2026-07-28",
+    "tools": {
+      "find": {"query": "string", "limit": "int default 20 clamp 500", "cursor": "opaque from next_cursor"},
+      "stat": {"path": "string"},
+      "status": {}
+    },
+    "find_result": {
+      "query": "string",
+      "hits": "[HitResult]",
+      "partial": "bool; index converging, retry later",
+      "next_cursor": "string|null; absent on last page"
+    },
+    "contents_policy": "paths and metadata only, never file contents"
+  }
+}

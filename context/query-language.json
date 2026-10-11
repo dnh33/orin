@@ -1,0 +1,16 @@
+{
+  "query_language": {
+    "literals": {"syntax": "bare words", "example": "Cargo.toml", "note": "multiple words form a phrase"},
+    "phrase": {"syntax": "quoted string", "example": "\"budget 2026\""},
+    "negation": {"syntax": "!term", "example": "!test_"},
+    "ext": {"syntax": "ext:a or ext:!a or ext:a,b", "example": "ext:rs", "note": "negation and comma lists supported"},
+    "size": {"syntax": "size:>N size:<N size:A..B", "example": "size:>1M", "units": ["K", "M", "G", "none=bytes"]},
+    "type": {"syntax": "type:k", "example": "type:f", "values": {"f": "file", "d": "dir", "l": "symlink"}},
+    "depth": {"syntax": "depth:<N or depth:>N", "example": "depth:<3", "note": "prefix forms only; no exact-depth syntax exists"},
+    "path": {"syntax": "path:segment", "example": "path:src", "note": "matches a path segment"},
+    "regex": {"syntax": "re:pattern", "example": "re:^app_.*"},
+    "glob": {"syntax": "shell glob", "example": "*.test.rs", "note": "triggered by * or ? in a bare term"}
+  },
+  "defaults": {"match": "case-insensitive literal", "sort": "score", "limit": 1000},
+  "exit_codes": {"0": "results", "1": "no match", "2": "error"}
+}
