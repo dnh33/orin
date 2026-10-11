@@ -1,8 +1,9 @@
 name: release
 
 # Builds the single-binary Windows release and publishes it on a version tag.
-# Asset contract (install.ps1 consumes it): a BARE `orin.exe` asset named
-# exactly `orin.exe`, fetched from /releases/latest via the GitHub API.
+# Asset contract (install.ps1 consumes it): the zip `orin-<version>-windows-
+# x86_64.zip` carrying the single product binary, plus a bare `orin.exe`
+# convenience copy. Both are published; the installer selects the zip.
 
 on:
   push:

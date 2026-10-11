@@ -49,9 +49,9 @@ Read in this order: this file, `docs/OVERVIEW.md`, `CONTEXT.md`.
    `cargo deny` (`deny.toml` allowlist: 0BSD, CC0-1.0, MIT, Apache-2.0, ISC,
    BSD-3-Clause, Unicode-*); RustSec `cargo audit` runs on every CI pass.
 9. **Release = tag `v*`.** `release.yml` builds the single binary, stages
-   `on.exe` as a copy, and publishes bare `orin.exe` (+ zip + SHA256SUMS) that
-   `install.ps1` fetches from `/releases/latest` via the GitHub API. The
-   installer contract: asset name is exactly `orin.exe`.
+   `on.exe` as a copy, and publishes `orin-<version>-windows-x86_64.zip` plus
+   a bare `orin.exe` and `SHA256SUMS.txt`. `install.ps1` fetches the zip from
+   `/releases/latest` via the GitHub API (asset pattern `*-windows-x86_64.zip`).
 10. **Protocol is length-prefixed JSON over a named pipe**, user-scoped. Query
     wire shape lives in `crates/orin-core/src/protocol.rs`; changing it is an
     ADR, not a refactor.

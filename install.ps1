@@ -2,8 +2,8 @@
 #
 #   irm https://github.com/dnh33/orin/raw/main/install.ps1 | iex
 #
-# Downloads orin.exe from the newest GitHub release, drops the byte-identical
-# `on.exe` copy beside it, verifies the binary starts, and puts the install
+# Downloads the Windows archive from the newest GitHub release (it carries
+# the one product binary, orin.exe), drops the byte-identical `on.exe` copy, verifies the binary starts, and puts the install
 # folder on the user PATH. Running it again replaces the files in place.
 # Administrator rights are never required: everything lands under
 # %LOCALAPPDATA%\orin.
@@ -16,7 +16,7 @@ $ownerRepo = ($homeUrl -replace '^https://github\.com/', '')
 $binaries = @('orin.exe')
 $aliases = @('on.exe')
 $installDir = Join-Path $env:LOCALAPPDATA 'orin'
-$assetPattern = '*x86_64-pc-windows-msvc.zip'
+$assetPattern = '*-windows-x86_64.zip'
 
 function Write-Step([string]$text) {
     Write-Host "orin  $text"

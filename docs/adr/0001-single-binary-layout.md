@@ -22,8 +22,10 @@ library the CLI calls.
 ## Consequences
 
 - Every additional executable must answer "why is this not a subcommand?".
-- `install.ps1` downloads exactly one asset (`orin.exe`) and creates `on.exe`
-  as a `Copy-Item`. The release workflow publishes bare `orin.exe` to match.
+- `install.ps1` downloads the Windows archive asset (`orin-*-windows-x86_64.zip`,
+  whose only product binary is `orin.exe`) and creates `on.exe` as a
+  `Copy-Item`. The release workflow publishes that zip plus a bare `orin.exe`
+  and `SHA256SUMS.txt`.
 - `orin mcp` auto-spawns `orin daemon` from its own executable path.
 - Historical name `orind` survives only in on-disk filenames
   (`orind.log`/`orind.lock`) to avoid orphaning existing installs.
