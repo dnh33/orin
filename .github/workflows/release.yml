@@ -56,6 +56,9 @@ jobs:
         run: |
           mkdir -p dist
           cp target/release/orin.exe dist/orin.exe
+          # on.exe rides in the zip for manual installs; it is NOT published
+          # as a separate asset (one exe on the release page). The installer
+          # derives it locally via Copy-Item.
           cp target/release/orin.exe dist/on.exe
           cp install.ps1 dist/install.ps1
           cp README.md dist/README.md
@@ -71,7 +74,6 @@ jobs:
         run: |
           gh release create "$TAG" \
             dist/orin.exe \
-            dist/on.exe \
             "orin-${VERSION}-windows-x86_64.zip" \
             SHA256SUMS.txt \
             --repo "$GITHUB_REPOSITORY" \
