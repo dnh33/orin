@@ -281,9 +281,7 @@ impl Index {
             // seed virtually and walk from there.
             let root_name = r.path.file_name().and_then(|n| n.to_str());
             let mut cur = match (self.entries.get(r.first as usize), root_name) {
-                (Some(e), Some(name))
-                    if e.parent == u32::MAX && self.name_of(r.first) == name =>
-                {
+                (Some(e), Some(name)) if e.parent == u32::MAX && self.name_of(r.first) == name => {
                     r.first
                 }
                 (Some(e), None) if e.parent == u32::MAX => r.first,
