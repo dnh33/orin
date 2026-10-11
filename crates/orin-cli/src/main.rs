@@ -9,6 +9,7 @@
 
 mod client;
 mod tui;
+mod update;
 
 use clap::CommandFactory;
 use clap::Parser;
@@ -73,6 +74,12 @@ enum Commands {
         #[command(flatten)]
         args: DaemonArgs,
     },
+    /// Update orin in place to the latest release
+    Update {
+        /// Check for a newer release without installing
+        #[arg(long)]
+        check: bool,
+    },
 }
 
 fn main() -> ExitCode {
@@ -96,6 +103,7 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
             run_daemon(args)?;
             Ok(ExitCode::SUCCESS)
         }
+        Commands::Update { check } => update::run(check),
     }
 }
 
@@ -163,13 +171,32 @@ fn query_cmd(terms: &[String], limit: u32, json: bool) -> anyhow::Result<ExitCod
 
 fn status_cmd(json: bool) -> anyhow::Result<ExitCode> {
     let data = client::status()?;
+    // Cached, six-hourly, and silent on failure: `status` must stay useful
+    // with the network down. Nothing here ever runs on the query path.
+    let update = update::status_check();
     if json {
-        let text = serde_json::to_string_pretty(&data)?;
+        let mut value = serde_json::to_value(&data)?;
+        if let Some(fields) = value.as_object_mut() {
+            fields.insert("update".to_string(), update_json(update.as_ref()));
+        }
+        let text = serde_json::to_string_pretty(&value)?;
         println!("{text}");
     } else {
-        print_status(&data);
+        let line = update.as_ref().map(update::report_line);
+        print_status(&data, line.as_deref());
     }
     Ok(ExitCode::SUCCESS)
+}
+
+/// The `update` member of `orin status --json`: null when the check failed.
+fn update_json(update: Option<&update::Check>) -> serde_json::Value {
+    let Some(check) = update else {
+        return serde_json::Value::Null;
+    };
+    if !check.available {
+        return serde_json::json!({ "available": false });
+    }
+    serde_json::json!({ "latest": check.latest.as_str(), "available": true })
 }
 
 fn mcp_cmd() -> anyhow::Result<ExitCode> {
@@ -177,8 +204,11 @@ fn mcp_cmd() -> anyhow::Result<ExitCode> {
     Ok(ExitCode::SUCCESS)
 }
 
-fn print_status(data: &StatusData) {
+fn print_status(data: &StatusData, update: Option<&str>) {
     println!("orin daemon {} (protocol {})", data.version, data.protocol);
+    if let Some(line) = update {
+        println!("{line}");
+    }
     println!("state: {}", data.state);
     println!("entries: {}", data.entries);
     println!("memory: {}", human_size(data.mem_bytes));
