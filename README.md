@@ -77,8 +77,8 @@ Every number below was measured on GitHub Actions `windows-latest` runners, over
 | --- | --- |
 | Warm query p50, orin | 7 ms median, 5-9 ms typical, 23 ms widest scans |
 | Warm query p50, find | 45 ms |
-| Warm query p50, fd | 61 ms |
-| Warm query p50, rg | 41-58 ms |
+| Warm query p50, fd | 62 ms median (60-69) |
+| Warm query p50, rg | 52 ms median (45-66) |
 | Cold scan to ready | 0.85 s (30k entries/s on this corpus) |
 | Warm start from snapshot | 0.85 s |
 | Process spawn per CLI query | 6.5 ms |
