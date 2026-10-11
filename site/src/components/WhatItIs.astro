@@ -1,7 +1,7 @@
 ---
 const stagesRaw = [
   {
-    name: 'orind',
+    name: 'orin daemon',
     role: 'resident daemon',
     body: 'Scans every drive once, hidden files included, and holds the result in memory.',
   },
@@ -13,7 +13,7 @@ const stagesRaw = [
   {
     name: 'orin / on',
     role: 'command line',
-    body: 'Sends the query over a local pipe and prints matching paths. on is the short alias.',
+    body: 'Sends the query over a local pipe and prints matching paths. on is a byte-identical copy of orin.exe.',
   },
 ];
 
@@ -36,11 +36,11 @@ type Fact = {
 const facts: Fact[] = [
   {
     label: 'auto-spawn',
-    body: 'The first query starts <code>orind</code> when it is not running, so there is no service to install, start, or supervise.',
+    body: 'The first query starts <code>orin daemon</code> when it is not running, so there is no service to install, start, or supervise.',
   },
   {
     label: 'platforms',
-    body: 'Windows only. The daemon, CLI, TUI and MCP server all target it.',
+    body: 'Windows only. The daemon, CLI, TUI, and MCP server all ship in the one orin.exe binary.',
     mark: true,
   },
   {
@@ -55,7 +55,7 @@ const facts: Fact[] = [
   <div class="wrap">
     <h2 class="h2" data-reveal>The whole disk, held in memory.</h2>
     <p class="lede" data-reveal>
-      <code>orind</code> scans the drives once and keeps the index resident, so a query reads
+      <code>orin daemon</code> scans the drives once and keeps the index resident, so a query reads
       structured entries instead of walking the tree on every call.
     </p>
 

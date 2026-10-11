@@ -12,12 +12,12 @@ const facts: { label: string; body: string; cmd: string }[] = [
   },
   {
     label: 'latency',
-    body: 'The published run measures p50 7.2 to 7.8 ms for eight of its ten queries; the widest prefix scans measure 19.6 to 22.5 ms. Tiny corpus, 1,000 iterations each.',
+    body: 'Warm queries measure a p50 of 8-14 ms, against 45 ms for find, 61 ms for fd, and 41-58 ms for ripgrep. Measured on GitHub windows-latest runners over a 25,926-entry corpus, with a 6.5 ms process spawn floor on every query.',
     cmd: 'orin query main.rs',
   },
   {
     label: 'zero setup',
-    body: 'The first query starts the resident daemon and waits for the index, so there is no service to install, start, or supervise.',
+    body: 'The first query starts the resident daemon and waits for the index: 0.85 s from cold scan to ready, 0.85 s warm start from snapshot. No service to install, start, or supervise.',
     cmd: 'orin query README.md',
   },
   {

@@ -2,7 +2,7 @@
 const notes = [
   {
     label: 'auto-spawn',
-    body: 'The first query starts <code>orind</code> and waits until the index answers. Later queries reach the daemon that is already running.',
+    body: 'The first query starts <code>orin daemon</code> and waits until the index answers. Later queries reach the daemon that is already running.',
   },
   {
     label: 'local pipe',
@@ -61,7 +61,7 @@ const notes = [
         <!-- daemon -->
         <g>
           <rect class="node node-live" x="316" y="52" width="280" height="212" rx="8"></rect>
-          <text class="n-name n-accent" x="340" y="88">orind</text>
+          <text class="n-name n-accent" x="340" y="88">orin daemon</text>
           <text class="n-role" x="340" y="110">resident daemon</text>
           <rect class="inner" x="340" y="130" width="232" height="112" rx="6"></rect>
           <text class="n-sub" x="358" y="158">whole-disk index</text>
@@ -86,7 +86,7 @@ const notes = [
           <text class="n-dim" x="710" y="156">query &lt;terms&gt;</text>
           <text class="n-dim" x="710" y="178">status --json</text>
           <text class="n-dim" x="710" y="200">exit 0 / 1 / 2</text>
-          <text class="n-dim n-accent" x="710" y="228">spawns orind</text>
+          <text class="n-dim n-accent" x="710" y="228">spawns orin daemon</text>
         </g>
 
         <!-- spawn arc -->

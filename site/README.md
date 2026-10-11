@@ -97,7 +97,7 @@ than displayed, so a partial export degrades instead of lying.
 ### Empty state
 
 If the file is missing, unreadable, or `runs` is empty, the section shows
-"Benchmark campaign running" plus the method, and draws no charts. Never commit
+"No benchmark data loaded" plus the method, and draws no charts. Never commit
 estimated or placeholder numbers: an empty `runs` array is the correct payload
 until a benchmark run publishes real data.
 

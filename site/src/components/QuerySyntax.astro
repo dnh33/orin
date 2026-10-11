@@ -18,7 +18,6 @@ const groups = [
     label: 'size',
     rows: [
       { code: 'size:>10M', plain: 'larger than' },
-      { code: 'size:100K..1M', plain: 'a range' },
       { code: 'size:<10K', plain: 'smaller than' },
     ],
   },
@@ -26,7 +25,7 @@ const groups = [
     label: 'depth and type',
     rows: [
       { code: 'depth:<3', plain: 'shallower than' },
-      { code: 'depth:==2', plain: 'exact depth' },
+      { code: 'depth:>2', plain: 'deeper than' },
       { code: 'type:f', plain: 'files only (type:d for directories)' },
     ],
   },

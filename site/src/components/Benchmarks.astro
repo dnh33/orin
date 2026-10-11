@@ -49,10 +49,10 @@ const method: { label: string; value: string; key?: string }[] = [
     </div>
 
     <div class="state empty" data-state="empty" hidden>
-      <p class="empty-title">Benchmark campaign running</p>
+      <p class="empty-title">No benchmark data loaded</p>
       <p class="empty-body">
-        No results are published yet, so no numbers are shown. Charts appear here as soon as a run
-        writes its data; nothing on this page is estimated or filled in.
+        Charts and numbers render only from published run data, so this section stays empty when
+        that data cannot be read. Nothing on this page is estimated or filled in.
       </p>
       <p class="empty-method">
         Method reported with every run: process-per-query timing on GitHub windows-latest runners,

@@ -8,8 +8,9 @@ const base = import.meta.env.BASE_URL;
       <p class="eyebrow" data-reveal>Agent-first whole-disk file search</p>
       <h1 data-reveal aria-label="orin"><span class="word" aria-hidden="true"><span class="ch">o</span><span class="ch">r</span><span class="ch">i</span><span class="ch">n</span></span><span class="caret" aria-hidden="true"></span></h1>
       <p class="truth" data-reveal>
-        <code>orind</code> keeps the index in memory, so <code>orin</code> answers with JSON Lines
-        output, exit codes 0 / 1 / 2, and a p50 of 7.2 ms in the published run.
+        <code>orin daemon</code> keeps the index in memory, so <code>orin</code> answers with JSON
+        Lines output, exit codes 0 / 1 / 2, and a warm-query p50 of 8-14 ms: GitHub windows-latest
+        runners, 25,926-entry corpus, and a 6.5 ms process spawn floor on every query.
       </p>
       <div class="cta" data-reveal>
         <a class="btn btn-primary" href="#install">Install</a>
@@ -22,7 +23,7 @@ const base = import.meta.env.BASE_URL;
         <span>powershell</span>
         <span class="term-tag">orin</span>
       </div>
-      <pre class="term-body"><span class="line" style="--i: 0"><span class="p">PS&gt;</span> orin query ext:rs type:f --limit 50 --json</span><span class="line note" style="--i: 1"># one JSON object per hit: path, name, type, size, mtime, score</span><span class="line" style="--i: 2"><span class="p">PS&gt;</span> orin status --json</span><span class="line note" style="--i: 3"># version, entries, memory, roots: a health check</span><span class="line" style="--i: 4"><span class="p">PS&gt;</span> on query size:&gt;10M</span><span class="line note" style="--i: 5"># on is the short alias of orin</span><span class="line" style="--i: 6"><span class="p">PS&gt;</span> echo $LASTEXITCODE</span><span class="line note" style="--i: 7"># 0 results, 1 no match, 2 error</span></pre>
+      <pre class="term-body"><span class="line" style="--i: 0"><span class="p">PS&gt;</span> orin query ext:rs type:f --limit 50 --json</span><span class="line note" style="--i: 1"># one JSON object per hit: path, name, type, size, mtime, score</span><span class="line" style="--i: 2"><span class="p">PS&gt;</span> orin status --json</span><span class="line note" style="--i: 3"># version, entries, memory, roots: a health check</span><span class="line" style="--i: 4"><span class="p">PS&gt;</span> on query size:&gt;10M</span><span class="line note" style="--i: 5"># on is the byte-identical copy of orin.exe</span><span class="line" style="--i: 6"><span class="p">PS&gt;</span> echo $LASTEXITCODE</span><span class="line note" style="--i: 7"># 0 results, 1 no match, 2 error</span></pre>
     </div>
   </div>
 </section>
