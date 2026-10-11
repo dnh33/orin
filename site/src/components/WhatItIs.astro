@@ -27,7 +27,13 @@ const flow = stages.flatMap((stage, index) =>
       ],
 );
 
-const facts = [
+type Fact = {
+  label: string;
+  body: string;
+  mark?: boolean;
+};
+
+const facts: Fact[] = [
   {
     label: 'auto-spawn',
     body: 'The first query starts <code>orind</code> when it is not running, so there is no service to install, start, or supervise.',
@@ -35,6 +41,7 @@ const facts = [
   {
     label: 'platforms',
     body: 'Windows first. Linux and macOS are not supported yet.',
+    mark: true,
   },
   {
     label: 'status',
@@ -77,7 +84,17 @@ const facts = [
         facts.map((fact) => (
           <div class="fact">
             <dt>{fact.label}</dt>
-            <dd set:html={fact.body}></dd>
+            <dd>
+              {fact.mark && (
+                <svg class="win-mini" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" focusable="false">
+                  <rect x="0" y="0" width="7" height="7" rx="1.5"></rect>
+                  <rect x="9" y="0" width="7" height="7" rx="1.5"></rect>
+                  <rect x="0" y="9" width="7" height="7" rx="1.5"></rect>
+                  <rect x="9" y="9" width="7" height="7" rx="1.5"></rect>
+                </svg>
+              )}
+              <span set:html={fact.body}></span>
+            </dd>
           </div>
         ))
       }
@@ -161,6 +178,13 @@ const facts = [
     color: var(--dim);
     font-size: 15.5px;
     max-width: 70ch;
+  }
+
+  /* platform mark: same four-pane geometry as the Install header, smaller */
+  .win-mini {
+    fill: var(--accent);
+    vertical-align: -2px;
+    margin-right: 7px;
   }
 
   @media (hover: hover) and (pointer: fine) {

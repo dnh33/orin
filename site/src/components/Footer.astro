@@ -10,7 +10,7 @@ const year = new Date().getFullYear();
     </div>
     <div class="right">
       <a href="https://github.com/dnh33/orin">github.com/dnh33/orin</a>
-      <span class="lic">MIT OR Apache-2.0</span>
+      <span class="lic"><a href="https://github.com/dnh33/orin/blob/main/LICENSE-MIT">MIT</a> OR <a href="https://github.com/dnh33/orin/blob/main/LICENSE-APACHE">Apache-2.0</a></span>
       <span class="year">{year}</span>
     </div>
   </div>
@@ -58,5 +58,16 @@ const year = new Date().getFullYear();
 
   .right a:hover {
     color: var(--accent);
+  }
+
+  .lic a {
+    font: inherit;
+    color: var(--dim);
+    border-bottom: 1px solid var(--line-2);
+  }
+
+  .lic a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent-line);
   }
 </style>

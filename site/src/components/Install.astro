@@ -10,7 +10,18 @@ const steps = [
 
 <section class="section" id="install">
   <div class="wrap">
-    <h2 class="h2" data-reveal>One line to install.</h2>
+    <div class="head" data-reveal>
+      <h2 class="h2">One line to install.</h2>
+      <p class="win">
+        <svg class="win-mark" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+          <rect x="0" y="0" width="7" height="7" rx="1.5"></rect>
+          <rect x="9" y="0" width="7" height="7" rx="1.5"></rect>
+          <rect x="0" y="9" width="7" height="7" rx="1.5"></rect>
+          <rect x="9" y="9" width="7" height="7" rx="1.5"></rect>
+        </svg>
+        for Windows
+      </p>
+    </div>
     <p class="lede" data-reveal>
       PowerShell reads the installer straight from the repository and runs it in memory, so there
       is nothing to download first.
@@ -40,10 +51,53 @@ const steps = [
       The installer lives at <code>install.ps1</code> in the repository root. It is idempotent:
       re-running it updates an existing install without touching your PATH twice.
     </p>
+
+    <p class="lic-line" data-reveal>License: <a href="https://github.com/dnh33/orin/blob/main/LICENSE-MIT">MIT</a> OR <a href="https://github.com/dnh33/orin/blob/main/LICENSE-APACHE">Apache-2.0</a></p>
   </div>
 </section>
 
 <style>
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 14px 20px;
+  }
+
+  .win {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    font: 500 14px/1 var(--mono);
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .win-mark {
+    fill: var(--accent);
+    flex: none;
+  }
+
+  .lic-line {
+    margin-top: 14px;
+    color: var(--faint);
+    font-size: 14px;
+  }
+
+  .lic-line a {
+    color: var(--dim);
+    border-bottom: 1px solid var(--line-2);
+  }
+
+  .lic-line a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent-line);
+  }
+
   .cmd {
     margin-top: clamp(32px, 4vw, 44px);
     display: flex;
