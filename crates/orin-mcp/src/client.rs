@@ -25,7 +25,7 @@ const REQ_ID: u64 = 1;
 /// Recv timeout for real responses (long searches on big indexes).
 const RESPONSE_TIMEOUT: Duration = Duration::from_secs(30);
 /// Total retry budget while waiting for a freshly spawned daemon.
-const SPAWN_WAIT: Duration = Duration::from_secs(3);
+const SPAWN_WAIT: Duration = Duration::from_secs(30);
 /// `DETACHED_PROCESS`: spawn the daemon without a console window.
 const DETACHED_PROCESS: u32 = 0x0000_0008;
 
@@ -149,6 +149,39 @@ fn orin_program() -> std::path::PathBuf {
     std::path::PathBuf::from("orin")
 }
 
+/// Spawn without handle inheritance.
+///
+/// A daemon spawned from a shell pipeline can inherit the shell's pipe
+/// handles and hold them open forever (that is how a background daemon kept
+/// `orin status --json | head` from ever seeing EOF). Clear the inherit flag
+/// on this process's standard handles around the spawn: the daemon receives
+/// its own null handles and nothing else. Previous flags are restored.
+fn spawn_without_inherit(
+    command: &mut std::process::Command,
+) -> std::io::Result<std::process::Child> {
+    const HANDLE_FLAG_INHERIT: u32 = 0x0000_0001;
+    const GETS: [u32; 3] = [((-10i32) as u32), ((-11i32) as u32), ((-12i32) as u32)];
+    #[link(name = "kernel32")]
+    unsafe extern "system" {
+        fn GetStdHandle(n: u32) -> *mut core::ffi::c_void;
+        fn GetHandleInformation(h: *mut core::ffi::c_void, flags: *mut u32) -> i32;
+        fn SetHandleInformation(h: *mut core::ffi::c_void, mask: u32, flags: u32) -> i32;
+    }
+    unsafe {
+        let mut saved = [0u32; 3];
+        for (i, n) in GETS.iter().enumerate() {
+            let h = GetStdHandle(*n);
+            GetHandleInformation(h, &mut saved[i]);
+            SetHandleInformation(h, HANDLE_FLAG_INHERIT, 0);
+        }
+        let result = command.spawn();
+        for (i, n) in GETS.iter().enumerate() {
+            SetHandleInformation(GetStdHandle(*n), HANDLE_FLAG_INHERIT, saved[i] & HANDLE_FLAG_INHERIT);
+        }
+        result
+    }
+}
+
 /// Start `orin daemon` in the background, detached from this console.
 fn spawn_daemon() -> anyhow::Result<std::process::Child> {
     let program = orin_program();
@@ -159,7 +192,7 @@ fn spawn_daemon() -> anyhow::Result<std::process::Child> {
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null());
     command.creation_flags(DETACHED_PROCESS);
-    match command.spawn() {
+    match spawn_without_inherit(&mut command) {
         Ok(child) => Ok(child),
         Err(err) => Err(anyhow::anyhow!(
             "failed to start `{} daemon`: {err}",

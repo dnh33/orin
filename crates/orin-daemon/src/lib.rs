@@ -120,31 +120,40 @@ pub fn run_daemon(args: DaemonArgs) -> Result<()> {
         });
     }
 
-    // Watch roots for changes -> apply
-    let roots: Vec<PathBuf> = {
-        let st = state.lock().unwrap();
-        st.roots.iter().map(|r| r.path.clone()).collect()
-    };
-    let watcher = match watch::WatcherHandle::start(roots, state.clone()) {
-        Ok(w) => Some(w),
-        Err(e) => {
-            tracing::warn!("watcher start failed: {}", e);
-            None
-        }
-    };
-
-    // Background checkpoint loop: the only periodic work left, kept for
-    // snapshot durability (one save per interval, plus one on shutdown).
-    // Revalidation is deliberately not periodic: it ran once at startup
-    // above and runs again only when a client sends a Rescan request.
-    let _cp_task =
-        checkpoint::start_checkpoint_task(checkpoint.clone(), state.clone(), shutdown.clone());
+    // Watch roots for changes -> apply. Deferred to its own thread: on
+    // whole-disk roots the watcher setup can take seconds, and nothing may
+    // delay the accept loop (first-contact latency is a product metric).
+    let watcher_slot: std::sync::Arc<std::sync::Mutex<Option<watch::WatcherHandle>>> =
+        std::sync::Arc::new(std::sync::Mutex::new(None));
+    {
+        let state = state.clone();
+        let slot = watcher_slot.clone();
+        let checkpoint = checkpoint.clone();
+        let shutdown = shutdown.clone();
+        std::thread::spawn(move || {
+            let roots: Vec<PathBuf> = {
+                let st = state.lock().unwrap();
+                st.roots.iter().map(|r| r.path.clone()).collect()
+            };
+            match watch::WatcherHandle::start(roots, state.clone()) {
+                Ok(w) => *slot.lock().unwrap() = Some(w),
+                Err(e) => {
+                    tracing::warn!("watcher start failed: {}", e);
+                }
+            }
+            // Background checkpoint loop: the only periodic work left, kept
+            // for snapshot durability (one save per interval, plus one on
+            // shutdown). Revalidation is deliberately not periodic.
+            let _cp_task =
+                checkpoint::start_checkpoint_task(checkpoint, state.clone(), shutdown);
+        });
+    }
 
     let mut server = server::Server::new(state.clone(), args.idle_exit)?;
     server.run(shutdown.clone(), waker)?;
 
     // Shut down cleanly: stop watcher, final checkpoint
-    if let Some(w) = watcher {
+    if let Some(w) = watcher_slot.lock().unwrap().take() {
         w.stop();
     }
     if let Err(e) = checkpoint.save(&state) {
